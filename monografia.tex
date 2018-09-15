@@ -1,0 +1,143 @@
+\documentclass[12pt,
+openright, 
+oneside,
+%twoside, %TCC: Se seu texto tem mais de 100 páginas, descomente esta linha e comente a anterior
+a4paper,
+brazil]{facom-ufu-abntex2}
+
+%\usepackage[disable]{todonotes}
+\usepackage[colorinlistoftodos]{todonotes}	%use a linha anterior para esconder os todos.
+\usepackage{listings}
+\usepackage{forest}
+\usepackage{listings}
+
+\newcommand{\codigo}{
+\lstset{
+	language=C++,
+    basicstyle=\ttfamily\tiny,
+    stringstyle=\color{red},
+    commentstyle=\color{green},
+    morecomment=[s][\color{blue}]{/**}{*/},
+    extendedchars=true,
+    showspaces=false,
+    showstringspaces=false,
+    numbers=left,
+    numberstyle=\tiny,
+    breaklines=true,
+    breakautoindent=true,
+    breakatwhitespace=true,
+}}
+
+\renewcommand{\lstlistingname}{Listagem}
+
+\autor{José Augusto Bolina Lucas} %TCC
+\data{2018}
+\orientador{Lásaro Jonas Camargos} %TCC
+
+\titulo{Projeto de Graduação} %TCC
+
+\renewcommand{\thesection}{\arabic{chapter}.\arabic{section}}
+
+\begin{document}
+
+
+
+% ----------------------------------------------------------
+% ELEMENTOS PRÉ-TEXTUAIS
+% ----------------------------------------------------------
+%\pretextual
+\imprimircapa
+\imprimirfolhaderosto
+
+%\begin{resumo} %TCC:
+
+ %\vspace{\onelineskip}
+
+ %\noindent
+ %\textbf{Palavras-chave}: Acordo de Nível de Serviço (SLA), Monitoramento, Multicaminhos,
+ %OpenFlow, Qualidade de Serviço (QoS), Redes Definidas por Software. %TCC:
+%\end{resumo}
+
+%% ---
+%% inserir lista de símbolos, se for adequado ao trabalho. %TCC:
+%% ---
+
+
+\begin{siglas}
+\end{siglas}
+
+%\begin{simbolos}
+%  \item[$ \Gamma $] Letra grega Gama
+%  \item[$ \Lambda $] Lambda
+%  \item[$ \zeta $] Letra grega minúscula zeta
+%  \item[$ \in $] Pertence
+%\end{simbolos}
+%% ---
+
+% ---
+% inserir o sumario
+% ---
+\pdfbookmark[0]{\contentsname}{toc}
+\tableofcontents*
+\cleardoublepage
+% ---
+
+
+% ----------------------------------------------------------
+% ELEMENTOS TEXTUAIS
+% ----------------------------------------------------------
+\textual
+
+% ----------------------------------------------------------
+% Introdução
+% ----------------------------------------------------------
+\chapter{Introdução}
+Com o avanço da tecnologia a nossa interação com a computação se tornou diária, mesmo
+nos mínimos detalhes sempre acabamos interagindo com algum softwares no dia a dia. Do
+grande aumento na utilização de softwares e do aprimoramento de novas tecnologias, surge
+a necessidade de aplicações tolerantes a falhas. \\
+
+Uma aplicação tolerante a falhas consegue manter o funcionamento mesmo com a eventual 
+falha de um de seus componente, e assim, esperar que esse componente retorne para 
+funcionamento em algum momento. Como é possível existirem eventos inesperados que podem
+causar a eventual falha, ou \textit{crash}, de um servidor, com o seu retorno para 
+funcionamento é necessária uma intensa comunicação para que a aplicação continue
+consistente com os eventos que ocorrem durante o período de falha.\\
+
+Uma maneira de possuir uma aplicação tolerante a falhas é a replicação de máquinas
+de estado, 
+
+\section{Objetivos}
+\subsection{Objetivos Gerais}
+\subsection{Objetivos Específicos}
+
+\section{Justificativas}
+\section{Método}
+
+%######################### FUNDAMENTACAO ##################################
+\chapter{Fundamentação Teórica}
+\section{Referencial Teórico}
+Aqui veremos sobre as teorias e tecnologias utilizadas no trabalho.
+\subsection{Paxos}
+\subsection{P4}
+\subsection{Mininet}
+
+
+\section{Trabalhos Correlatos}
+
+
+%######################### DESENVOLVIMENTO ##################################
+\chapter{Desenvolvimento}
+Nesse capítulo veremos o programa desenvolvido utilizando p4, entre outras tecnologias, e explicaremos sobre o ambiente de simulação, topologia entre outros assuntos.
+ 
+\subsection{Arquitetura do projeto}
+\subsection{Arquitetura da rede}
+\subsubsection{Cabeçalhos}
+\subsubsection{Experimento}
+\subsubsection{Código}
+\subsubsection{Testes}
+
+%######################### CONCLUSAO ##################################
+\section{Conclusão}
+\end{document}
+
