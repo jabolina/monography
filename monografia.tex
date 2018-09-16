@@ -92,77 +92,72 @@ brazil]{facom-ufu-abntex2}
 \chapter{Introdução}
 
 Com o avanço da tecnologia a nossa interação com a computação se tornou diária, mesmo
-nos mínimos detalhes sempre acabamos interagindo com algum softwares no dia a dia. Do
-grande aumento na utilização de softwares e do aprimoramento de novas tecnologias, surge
-a necessidade de aplicações tolerantes a falhas. 
+nos mínimos detalhes sempre acabamos interagindo com algum software no dia a dia. Com
+esse grande aumento na utilização de softwares e do aprimoramento de novas tecnologias, 
+surge a necessidade de aplicações resilientes e tolerantes a falhas. 
 
 Uma aplicação tolerante a falhas consegue manter o funcionamento mesmo com a eventual 
-falha de um de seus componente, e assim, esperar que esse componente retorne para 
-funcionamento em algum momento. Como é possível existirem eventos inesperados que podem
-causar a eventual falha, ou \textit{crash}, de um servidor, com o seu retorno para 
-funcionamento é necessária uma intensa comunicação para que a aplicação continue
-consistente com os eventos que ocorrem durante o período de falha.
+falha de um de seus componentes. Como é possível existirem eventos inesperados que podem
+causar a eventual falha, - ou \textit{crash} - de um servidor, são necessários métodos
+para garantir a consistência quando a aplicação retornar com seu funcionamento
+normal. 
 
 Uma maneira de possuir uma aplicação tolerante a falhas é a replicação de máquinas
-de estado, onde o serviço é modelo como uma máquina de estados determinística, e o
+de estado, onde o serviço é modelado como uma máquina de estados determinísticos, e o
 serviço é executado em cada réplica \citep{santos2012state}, dessa maneira é mantida
-a consistência da aplicação. No centro da replicação de máquina de estados existe o 
-consenso, onde o conjunto de réplicas deve chegar em um consenso sobre qual o estado 
-válido, qual transição será realizada. 
+a consistência da aplicação. No centro da replicação de máquina de estados, existe o 
+consenso, onde o conjunto de réplicas deve chegar em um consenso e decidir sobre 
+qual o estado válido, decidir sobre qual transição será realizada. 
 
 Para obtenção do consenso e da criação de uma aplicação tolerante a falhas, o algoritmo
-Paxos é extensivamente com esse intuito. O algoritmo realiza uma extensa e custosa 
-trocas de mensagens entre seus agentes, com as mensagens podendo demorar um tempo 
-arbitrário para chegar ao destinatário ou se perder. Para se conseguir uma melhora na
-performance pode-se realizar a implementação do Paxos no dispositivos fisícos da rede
+Paxos é extensivamente utilizado com esse intuito. O algoritmo realiza uma custosa 
+trocas de mensagens entre seus agentes. Por se tratar de um ambiente distribuído 
+as mensagens podem demorar um tempo arbitrário para chegar ao destinatário ou se 
+perder durante a transmissão. Para se conseguir uma melhora na performance pode-se 
+realizar a implementação do Paxos no dispositivos físicos da rede
 \citep{dang2016paxos}.
 
-Com a utilização da linguagem P4 é possível programar o plano de dados nos 
-\textit{switches} da rede, onde é possível customizar o processamentos do pacotes
-nos dispositivos. 
-
+Com a utilização da linguagem P4, é aberta a possibilidade de se programar dispositivos
+de rede. Com a utilização de uma tabela \textit{match+action} é possível 
+realizar um processamento customizado dos pacotes sendo transportados.
 
 \section{Objetivos}
 O presente trabalho visa realizar a implementação do algoritmo Paxos nos dispositivos
-de rede, especificamente \textit{switches} utilizando a linguagem $P4_{16}$. 
-Deste maneira, conseguindo uma melhora na performance do algoritmo, pois uma parte 
-do algoritmo se moveria de um servidor para ser executado nesses dispositivos.
-
-Dispositivos como o \textit{switch} não possuem a capacidade de criar novas mensagens,
-somente encaminhar, assim, as mensagens que seriam trocadas entre os agentes e precisariam
-de uma lógica para processamento nos servidores passariam as ser processadas pelo 
-\textit{switch}, "no fio" \citep{dang2016paxos}.
+de rede, especificamente \textit{switches}, utilizando a linguagem $P4_{16}$. 
+Desta maneira, conseguindo uma melhora na performance do algoritmo, pois uma parte 
+que seria executado em um servidor se moveria para ser executado nesses dispositivos.
 
 Existe um trabalho na área, publicado em 2016 \citep{dang2016paxos}. Neste trabalho,
 os pesquisadores utilizaram $P4_{14}$ na versão 1.0.2, e deixaram pontos que podem ser
 melhorados no trabalho com a evolução da linguagem, que atualmente se encontra na versão
-$P4_{16}$ 1.0.0 que é uma revisão da P4 de 2016 \citep{paxos16spec}.
+$P4_{16}$ 1.0.0, que é uma revisão da P4 de 2016 \citep{paxos16spec}.
 
 \subsection{Objetivos Gerais}
-Os objetivos iniciais do projeto, seriam, de modo geral, replicar o trabalho 
-desenvolvido anteriormente e implementar os pontos passíveis de melhora citados
-pelos autores.
+Os objetivos iniciais do projeto, seriam, de modo claro, replicar o trabalho 
+desenvolvido anteriormente e implementar os pontos de melhora citados pelos autores.
 
-Com uma gama maior de opções com a linguagem $P4_{16}$ analisar pontos passíveis
-de melhora no presente projeto e realizar a implementação de tais.
+Com uma gama maior de opções com a evolução linguagem $P4_{16}$, 
+analisar pontos passíveis de melhora no presente projeto e realizar uma 
+análise e implementação de tais.
 
 \section{Justificativas}
 \section{Método}
 
 %######################### FUNDAMENTACAO ##################################
 \chapter{Fundamentação Teórica}
-Esse capítulo manterá um foco em detalhar e explicar as técnicas utilizadas
+Esse capítulo manterá o foco em detalhar e explicar as técnicas utilizadas
 para realização do projeto. Não serão abordadas questões de implementação,
-serão explicadas somente de modo teórico para entendimento do leitor.
+serão explicadas somente de modo teórico, afim de auxiliar o entendimento do leitor.
 
 \section{Referencial Teórico}
-Para seguirmos uma linha de raciocínio linear e melhor entendimento da teoria
+Para seguirmos uma linha de raciocínio linear, e melhorar entendimento da teoria
 para compreender o projeto, será abordado inicialmente informações sobre o 
 algoritmo Paxos, seu modo de operar e flexibilidade para resolução de problemas.
 
-Em seguida será abordado como funcionam linguagem de programação para o plano de
+Em seguida será abordado como funcionam linguagens de programação para o plano de
 dados em dispositivos de redes sendo realizado um paralelo com a linguagem P4, 
-especificamente a versão utilizada para o desenvolvimento deste projeto.
+especificamente a versão utilizada para o desenvolvimento deste projeto e algumas
+outras opções disponíveis.
 
 E para finalizar o referencial teórico, será explicado sobre o Mininet, de que
 maneira funciona e qual o intuito na sua utilização no projeto.
@@ -177,7 +172,6 @@ maneira funciona e qual o intuito na sua utilização no projeto.
 
 %######################### DESENVOLVIMENTO ##################################
 \chapter{Desenvolvimento}
-Nesse capítulo veremos o programa desenvolvido utilizando p4, entre outras tecnologias, e explicaremos sobre o ambiente de simulação, topologia entre outros assuntos.
  
 \subsection{Arquitetura do projeto}
 \subsection{Arquitetura da rede}
