@@ -51,11 +51,12 @@ brazil]{facom-ufu-abntex2}
 
 %\begin{resumo} %TCC:
 
- %\vspace{\onelineskip}
+% \vspace{\onelineskip}
 
- %\noindent
- %\textbf{Palavras-chave}: Acordo de Nível de Serviço (SLA), Monitoramento, Multicaminhos,
- %OpenFlow, Qualidade de Serviço (QoS), Redes Definidas por Software. %TCC:
+% \noindent
+% \textbf{Palavras-chave}: Acordo de Nível de Serviço (SLA), Monitoramento, Multicaminhos,
+% OpenFlow, Qualidade de Serviço (QoS), Redes Definidas por Software. %TCC:
+
 %\end{resumo}
 
 %% ---
@@ -91,8 +92,8 @@ brazil]{facom-ufu-abntex2}
 % ######################### INICIO ###########################################
 \chapter{Introdução}
 
-Com o avanço da tecnologia a nossa interação com a computação se tornou diária, mesmo
-nos mínimos detalhes sempre acabamos interagindo com algum software no dia a dia. Com
+Com o avanço da tecnologia a interação com a computação se tornou diária, mesmo
+nos mínimos detalhes sempre se interage com algum software no dia a dia. Com
 esse grande aumento na utilização de softwares e do aprimoramento de novas tecnologias, 
 surge a necessidade de aplicações resilientes e tolerantes a falhas. 
 
@@ -105,49 +106,75 @@ normal.
 Uma maneira de possuir uma aplicação tolerante a falhas é a replicação de máquinas
 de estado, onde o serviço é modelado como uma máquina de estados determinísticos, e o
 serviço é executado em cada réplica \citep{santos2012state}, dessa maneira é mantida
-a consistência da aplicação. No centro da replicação de máquina de estados, existe o 
-consenso, onde o conjunto de réplicas deve chegar em um consenso e decidir sobre 
-qual o estado válido, decidir sobre qual transição será realizada. 
+a consistência da aplicação, mas com isso é adicionado um \textit{overhead} na execução
+de comandos, pois as réplicas precisam ser consistentes entre si. No centro da replicação
+de máquina de estados, existe o consenso, onde o conjunto de réplicas deve chegar 
+em um consenso e decidir sobre qual é o estado válido e decidir sobre qual 
+transição será realizada. 
 
 Para obtenção do consenso e da criação de uma aplicação tolerante a falhas, o algoritmo
-Paxos é extensivamente utilizado com esse intuito. O algoritmo realiza uma custosa 
-trocas de mensagens entre seus agentes. Por se tratar de um ambiente distribuído 
-as mensagens podem demorar um tempo arbitrário para chegar ao destinatário ou se 
-perder durante a transmissão. Para se conseguir uma melhora na performance pode-se 
-realizar a implementação do Paxos no dispositivos físicos da rede
-\citep{dang2016paxos}.
+Paxos é extensivamente utilizado com esse intuito \citep{dang2016paxos}. 
+O algoritmo realiza uma custosa trocas de mensagens entre seus agentes. Por se 
+tratar de um ambiente distribuído as mensagens podem demorar um tempo arbitrário 
+para chegar ao destinatário ou se perder durante a transmissão. Para se 
+conseguir uma melhora na performance na execução do algoritmo, pode-se realizar a 
+implementação do Paxos no dispositivos físicos da rede \citep{dang2016paxos}.
 
 Com a utilização da linguagem P4, é aberta a possibilidade de se programar dispositivos
 de rede. Com a utilização de uma tabela \textit{match+action} é possível 
-realizar um processamento customizado dos pacotes sendo transportados.
+realizar um processamento customizado dos pacotes sendo transportados, de forma a
+se diminuir a latência do algoritmo e os pacotes atravessariam menos \textit{hops}.
+
+Alguns exemplos de aplicações que realizam replicação de máquinas de estados, são,
+por exemplo OpenReplica \citep{openreplica} e Google Chubby \citep{27897}. Aplicações
+de replicação são críticas em data centers, que precisam sempre manter o serviço 
+disponível, com informações consistentes, logo, a maneira como um algoritmo de consenso
+para realizar a replicação de máquina de estados influencia na performance de um data center.
+
+\section{Justificativas}
+Para a construção de uma aplicação tolerante a falhas, é possível encontrar no centro um
+problema de consenso a ser resolvido. Com a utilização do algoritmo de consenso Paxos,
+para  que se consiga que os agentes cheguem a um consenso e tomem uma decisão, 
+existe uma intensa troca de mensagens.
+
+Sistemas que precisam ser tolerantes a falha e além disso ter alta disponibilidade, 
+poderiam ser afetados por essa sequência de trocas de mensagens entre réplicas de uma aplicação.
+Pois, essas trocas de mensagens podem se tornar algo custoso na rede e no processamento,
+visto que ficariam para os servidores o processamento das mensagens, assim afetando a 
+disponibilidade da aplicação. 
+
+Com esse problema em mente, este projeto busca obter uma melhora na performance de execução
+do Paxos, com a implementação do algoritmo nos dispositivos de rede.
+
 
 \section{Objetivos}
-O presente trabalho visa realizar a implementação do algoritmo Paxos nos dispositivos
+Com a possibilidade de programação em dispositivos de redes, o presente trabalho 
+visa realizar a implementação do algoritmo Paxos nos dispositivos
 de rede, especificamente \textit{switches}, utilizando a linguagem $P4_{16}$. 
 Desta maneira, conseguindo uma melhora na performance do algoritmo, pois uma parte 
-que seria executado em um servidor se moveria para ser executado nesses dispositivos.
+que seria executado em um servidor se moveria para ser executado nesses dispositivos, desta
+forma as mensagens seriam processadas enquanto estão sendo roteadas e atravessando menos
+\textit{hops}, resultando na redução da latência.
 
-Existe um trabalho na área, publicado em 2016 \citep{dang2016paxos}. Neste trabalho,
-os pesquisadores utilizaram $P4_{14}$ na versão 1.0.2, e deixaram pontos que podem ser
-melhorados no trabalho com a evolução da linguagem, que atualmente se encontra na versão
-$P4_{16}$ 1.0.0, que é uma revisão da P4 de 2016 \citep{paxos16spec}.
+Inicialmente, alcançando os resultados obtidos em um projeto passado \citep{dang2016paxos},
+como citado pelos pesquisadores do projeto passado, o algoritmo Paxos é uma implementação
+não trivial para linguagem P4, e, como um dos principais pontos deixado pelos pesquisadores
+seria em relação ao desenvolvimento e evolução das linguagens de programação de plano de dados,
+um dos objetivos seria também uma nova perspectiva acerca das linguagens de programação de 
+planos de dados, especificamente a linguagem P4, que sofreu um amadurecimento com o tempo 
+percorrido desde o projeto passado.
 
-\subsection{Objetivos Gerais}
-Os objetivos iniciais do projeto, seriam, de modo claro, replicar o trabalho 
-desenvolvido anteriormente e implementar os pontos de melhora citados pelos autores.
-
+\section{Método}
 Com uma gama maior de opções com a evolução linguagem $P4_{16}$, 
 analisar pontos passíveis de melhora no presente projeto e realizar uma 
 análise e implementação de tais.
 
-\section{Justificativas}
-\section{Método}
 
 %######################### FUNDAMENTACAO ##################################
 \chapter{Fundamentação Teórica}
 Esse capítulo manterá o foco em detalhar e explicar as técnicas utilizadas
 para realização do projeto. Não serão abordadas questões de implementação,
-serão explicadas somente de modo teórico, afim de auxiliar o entendimento do leitor.
+serão explicadas somente de modo teórico, a fim de auxiliar o entendimento do leitor.
 
 \section{Referencial Teórico}
 Para seguirmos uma linha de raciocínio linear, e melhorar entendimento da teoria
@@ -163,11 +190,38 @@ E para finalizar o referencial teórico, será explicado sobre o Mininet, de que
 maneira funciona e qual o intuito na sua utilização no projeto.
 
 \subsection{Paxos}
+Para iniciar a explicação sobre Paxos, será explicado de onde surgiu o algoritmo e qual
+problema ele busca resolver para uma melhor contextualização. Paxos foi criado por 
+Leslie Lamport e foi publicado inicialmente em 1989, e consiste em uma família de algoritmos
+voltada para resolução de problemas de consenso. 
+
+A ideia de consenso é a de compartilhar informações entre um grupo de elementos
+processadores, de preferência com uma maneira tolerante a falhas \citep{barborak1993consensus}.
+Normalmente esse compartilhamento de informações é realizado com o intuito de tomar
+uma decisão, por exemplo, os elementos devem decidir se \textit{commitam} ou não
+uma transação realizada no banco de dados. 
+
+De maneira básica, os elementos devem propor valores para serem escolhidos, comunicar entre
+si para tomar uma decisão e o valor final é escolhido pela maioria de elementos do conjunto.
+Essa escolha de maioria não precisa necessariamente ser $\frac{n}{2}+1$, sendo $n$ o número
+total de elementos processadores, a decisão do que seria maioria para tomada de decisão
+pode ser criada pelo projetista, mas sempre criando de forma a atender o projeto, levando
+em consideração que dentre esses $n$ elementos existirão alguns que falharão.
+
+
+
 \subsection{P4}
 \subsection{Mininet}
 
 
 \section{Trabalhos Correlatos}
+Essa seção visa listar trabalhos relacionados com o presente projeto, alguns destes usados
+como material de referência para o desenvolvimento.
+
+Existe um trabalho na área, publicado em 2016 \citep{dang2016paxos}. Neste trabalho,
+os pesquisadores utilizaram $P4_{14}$ na versão 1.0.2, e deixaram pontos que podem ser
+melhorados no trabalho com a evolução da linguagem, que atualmente se encontra na versão
+$P4_{16}$ 1.0.0, que é uma revisão da P4 de 2016 \citep{paxos16spec}.
 
 
 %######################### DESENVOLVIMENTO ##################################
