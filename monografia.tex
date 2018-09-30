@@ -7,9 +7,13 @@ brazil]{facom-ufu-abntex2}
 
 %\usepackage[disable]{todonotes}
 \usepackage[colorinlistoftodos]{todonotes}	%use a linha anterior para esconder os todos.
+\usepackage{amsthm}
 \usepackage{listings}
 \usepackage{forest}
 \usepackage{listings}
+\usepackage{xcolor}
+\usepackage[portuguese, ruled, linesnumbered]{algorithm2e}
+
 
 \newcommand{\codigo}{
 \lstset{
@@ -29,6 +33,9 @@ brazil]{facom-ufu-abntex2}
 }}
 
 \renewcommand{\lstlistingname}{Listagem}
+
+\theoremstyle{definition}
+\newtheorem*{definition}{Definição}
 
 \autor{José Augusto Bolina Lucas} %TCC
 \data{2018}
@@ -201,12 +208,155 @@ Normalmente esse compartilhamento de informações é realizado com o intuito de
 uma decisão, por exemplo, os elementos devem decidir se \textit{commitam} ou não
 uma transação realizada no banco de dados. 
 
-De maneira básica, os elementos devem propor valores para serem escolhidos, comunicar entre
-si para tomar uma decisão e o valor final é escolhido pela maioria de elementos do conjunto.
-Essa escolha de maioria não precisa necessariamente ser $\frac{n}{2}+1$, sendo $n$ o número
-total de elementos processadores, a decisão do que seria maioria para tomada de decisão
-pode ser criada pelo projetista, mas sempre criando de forma a atender o projeto, levando
-em consideração que dentre esses $n$ elementos existirão alguns que falharão.
+De maneira básica, os elementos devem propor valores para serem escolhidos, 
+comunicar entre si para tomar uma decisão e o valor final é escolhido pela maioria de 
+elementos do conjunto.
+A escolha da maioria não é necessariamente $\frac{n}{2}+1$, --- sendo $n$ o número
+total de elementos processadores --- a decisão do que será maioria para tomada de decisão
+pode ser criada pelo projetista, mas sempre visando atender o projeto, levando
+em consideração que dentre esses $n$ elementos existirão alguns que falharão, essa maioria
+é o quorum.
+
+Para garantir a escolha de um valor e a propagação do valor decidido, o problema
+possui alguns requisitos que devem ser atendidos pelos algoritmos. Os requisitos de
+segurança são:
+
+\begin{itemize}
+    \item Um valor proposto talvez seja aceito
+    \item Os elementos não aprendem qual o valor decidido até que um valor 
+    tenha sido realmente decidido
+    \item Um único valor é decidido
+\end{itemize}
+
+Algoritmos para consenso funcionam em estágios que refletem o próprio problema, e para
+serem algoritmos tolerante a falhas, devem estar preparados para repetir esses ciclos,
+considerando os valores escolhidos no ciclo passado, cada um desses ciclos é conhecido como
+\textit{round} \citep{camargos2008multicoordinated}.
+
+Os elementos participantes do Paxos, chamados de agentes, comunicam entre si, e assumem 
+um ou mais papéis para a evolução do algoritmo. Os papéis a serem desempenhados são, 
+utilizando a nomenclatura fornecida por Lamport \citep{lamport2001paxos}, 
+\textit{proposers}, são agentes que propõem algum valor, \textit{acceptors} 
+agentes que escolhem um único valor e \textit{learners} que são os agentes que aprendem
+qual foi o valor escolhido pelo algoritmo.
+Existem alguns papéis de coordenadores, que podem ou não ser utilizados no algoritmo, 
+sendo, por exemplo \textit{distinguished proposer}, que iremos explicar ao fim.
+
+A comunicação dos agentes se dá por troca de mensagens, utilizando um modelo assíncrono e
+não-bizantino, onde os agentes operam em diferentes velocidades, podem falhar e podem ser
+resetados, os agentes possuem um espaço de memória não volátil para armazenar informações.
+As mensagens podem levar um tempo arbitrário para serem entregues, podem ser perdidas, podem
+ser duplicadas, mas nunca são corrompidas \citep{lamport2001paxos}.
+
+\subsubsection{Escolha do valor}
+A explicação para o entendimento do Paxos será iniciada pela escolha de um valor. 
+Quando uma mensagem, com algum
+valor proposto chega para o \textit{acceptor}, esse valor pode ou não ser aceito, logo,
+um \textit{acceptor} deve ser capaz de aceitar um valor proposto, desta maneira temos a seguinte 
+definição:
+
+\begin{definition}
+$P_1$: um \textit{acceptor} deve aceitar o primeiro valor que receber.
+\end{definition}
+
+Mas para se chegar a um consenso e um único valor ser decidido pelos agentes, cada um
+dos agentes deve ter escolhido o mesmo valor. Desta forma, os \textit{acceptors} devem
+ser capazes de aceitar mais de uma proposta e também devem conseguir identificar qual
+a proposta aceita, onde cada \textit{acceptor} possui um histórico de quais foram as
+propostas aceitas.
+
+As propostas enviadas devem possuir um identificador, possível de ser ordenado e que não 
+possa ser repetido por outra proposta, para não existir diferentes propostas com o mesmo
+identificador no algoritmo, adiante as propostas serão simbolizadas por 
+\textit{(n, v)}, sendo a proposta com identificador $n$ e valor $v$.
+
+Mas para os \textit{acceptors} escolherem mais de uma proposta, deve-se existir a garantia de
+que todas as propostas enviadas possuam o mesmo valor, disso, surge a seguinte definição:
+
+\begin{definition}
+$P_2$: se uma proposta $(n, v)$ foi decidida, então todas propostas escolhidas com 
+identificador $>n$ devem possuir valor $v$.
+\end{definition}
+
+Como os identificadores podem ser ordenados, a propriedade de que somente um valor é escolhido
+é mantida pelo algoritmo. Como, para ser decidida, uma proposta tem que ter sido escolhida
+por pelo menos um \textit{acceptor}, para fortalecer $P_2$, surge a seguinte definição:
+
+\begin{definition}
+$P_2^a$: se uma proposta $(n, v)$ foi decidida, então todas propostas com identificador
+$>n$ escolhidas por um \textit{acceptor}, possui valor $v$.
+\end{definition}
+
+Mas a definição $P_2$ ainda precisa ser reforçada, pois ainda existem cenários onde a 
+definição pode ser violada, um desses cenários exemplificado por Lamport, é o seguinte. 
+Sempre se mantem $P_1$ para uma proposta ser escolhida, mas como
+a comunicação é assíncrona, uma proposta pode ser escolhida por um \textit{acceptor c} 
+que nunca tenha escolhido nenhuma proposta antes, e como os agentes podem falhar, suponha
+que um \textit{proposer} envie uma proposta com identificador maior e com um valor qualquer.
+O \textit{acceptor c} escolheria essa proposta, isso violaria a definição $P_2^a$. Para
+fortalecer a definição, se tem o seguinte:
+
+\begin{definition}
+$P_2^b$: se uma proposta $(n, v)$ foi decidida, então todas propostas com identificador
+$>n$ enviadas por um \textit{proposer}, possui valor $v$.
+\end{definition}
+
+Finalmente, para assegurar $P_2$, se tem a seguinte definição:
+
+\begin{definition}
+$P_2^c$: Para qualquer proposta $(n, v)$ enviada, existe um conjunto $S$ de
+\textit{acceptors}, que cairá em um dos casos:
+
+\begin{enumerate}
+    \item $S$ não possui nenhum \textit{acceptor} que tenha escolhido uma proposta com 
+identificador $<n$.
+
+    \item $v$ é o valor da proposta com o maior identificador dentre as propostas com o 
+menor identificador $<n$ escolhidas pelo conjunto $S$.
+\end{enumerate}
+\end{definition}
+
+Com essas definições, o algoritmo para envio de propostas funcionará da seguinte maneira,
+um \textit{proposer} envia proposta com identificador $n$ para conjunto de 
+\textit{acceptors}, esperando uma das seguintes respostas:
+
+\begin{itemize}
+    \item Promessa de não aceitar valor $<n$
+    \item Se existir, proposta com maior identificador $<n$
+\end{itemize}
+
+Se receber uma resposta da maioria dos \textit{acceptors}, enviar a proposta
+$(n, v)$, sendo $v$ o valor da proposta de maior identificador recebido nas respostas,
+senão, um valor escolhido pelo próprio \textit{proposer}.
+
+Esses passos do algoritmo receberam um nomenclatura, que são \textit{prepare} e
+\textit{accept}, respectivamente. O algoritmo em pseudo-código fica de seguinte maneira:
+
+\begin{algorithm}[H]
+\caption{Envio de propostas}
+\SetAlgoLined
+\Inicio{
+$A$ = conjunto de \textit{acceptors}
+
+$n$ = identificador
+
+$respostas$ = []
+
+\Para{cada $a \in A$}{
+    $resposta$ = prepare($n$)
+    
+    adicione $resposta$ em $respostas$
+}
+
+\Se {aceito pela maioria}{
+        $v$ = $v$ da proposta com maior indentificador $\in respostas$ ou algum valor proposto
+        
+        \Para{cada $a \in A$}{
+            accept($(n, v)$)
+        }
+    }
+}
+\end{algorithm}
 
 
 
