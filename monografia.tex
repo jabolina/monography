@@ -41,13 +41,11 @@ brazil]{facom-ufu-abntex2}
 \data{2018}
 \orientador{Lásaro Jonas Camargos} %TCC
 
-\titulo{Projeto de Graduação} %TCC
+\titulo{[TCC - José Augusto] P4 Paxos} %TCC
 
 \renewcommand{\thesection}{\arabic{chapter}.\arabic{section}}
 
 \begin{document}
-
-
 
 % ----------------------------------------------------------
 % ELEMENTOS PRÉ-TEXTUAIS
@@ -96,6 +94,8 @@ brazil]{facom-ufu-abntex2}
 % ----------------------------------------------------------
 \textual
 
+\todo{A estrutura do texto está excelente. A explicação do paxos está bem legal, mais detalhada do que esperava. É preciso falar mais na intro sobre o trabalho que estamos replicando (duas ou três linhas). Depois de terminar de preencher, precisaremos dar uma revisada no texto pois tem muitas redundâncias. Depois que tiver ficado um tempo sem ler, você mesmo as perceberá.}
+
 % ######################### INICIO ###########################################
 \chapter{Introdução}
 
@@ -138,6 +138,11 @@ de replicação são críticas em data centers, que precisam sempre manter o ser
 disponível, com informações consistentes, logo, a maneira como um algoritmo de consenso
 para realizar a replicação de máquina de estados influencia na performance de um data center.
 
+Existe um trabalho posterior, publicado em 2016 em que o atual projeto se norteia para
+execução \citep{dang2016paxos}. O trabalho possui pontos positivos em relação aos 
+resultados alcançados, previsões de aplicações da pesquisa no futuro das aplicações e 
+no desenvolvimento das linguagens de programação de plano de dados.
+
 \section{Justificativas}
 Para a construção de uma aplicação tolerante a falhas, é possível encontrar no centro um
 problema de consenso a ser resolvido. Com a utilização do algoritmo de consenso Paxos,
@@ -172,10 +177,67 @@ planos de dados, especificamente a linguagem P4, que sofreu um amadurecimento co
 percorrido desde o projeto passado.
 
 \section{Método}
-Com uma gama maior de opções com a evolução linguagem $P4_{16}$, 
-analisar pontos passíveis de melhora no presente projeto e realizar uma 
-análise e implementação de tais.
+O método utilizado para o desenvolvimento do presente projeto foi divido em três partes, para
+ser realizado uma análise em cada uma das partes do projeto separadamente, assim deixando uma
+visão mais clara acerca do decorrer do projeto.
 
+\subsection{Fase 1}
+Replicação do antigo projeto feito utilizando a linguagem $P4_{14}$, realização de simulações
+para verificar o funcionamento do projeto. As simulações serão realizadas utilizando o
+Mininet para construir a rede e comunicação.
+
+\subsection{Fase 2}
+Transposição do projeto da linguagem $P4_{14}$ para a linguagem $P4_{16}$, onde serão relatadas
+o que foi possível ou não de ser realizado com as funcionalidades ofertadas pela linguagem na
+sua versão mais atual e um comparativo entre as duas linguagens.
+
+\subsection{Fase 3}
+A terceira e última fase será composta pela análise e implementação de melhorias na versão
+utilizando a linguagem $P4_{16}$, serão realizadas simulações também utilizando o Mininet
+para verificação do comportamento na rede e uma comparação entre a nova e atual versão do
+projeto e possíveis pontos para futuras aplicações e pesquisas.
+
+\section{Cronograma}
+O projeto será realizado em dois semestres, cada semestre compreende 18 semanas, sendo assim,
+um tempo total de desenvolvimento de 36 semanas ou aproximadamente 8 meses. A tabela 
+\ref{tab:atividades} demonstra como serão realizadas as atividades no decorrer dos meses.
+
+\begin{table}[h!]
+    \begin{tabular}{p{8cm}|c|c|c|c|c|c|c|c|}
+    \hline
+    Atividades & 1 & 2 & 3 & 4 & 5 & 6 & 7 & 8 \\
+    \hline
+     
+    Revisão trabalhos correlatos & X & X & & & & & &  \\
+    \hline 
+    
+    Revisão Paxos & & X & X & & & & & \\
+    \hline
+    
+    Revisão P4 & & & X & X & & & & \\
+    \hline
+    
+    Primeira fase do método & & & & X & & & & \\
+    \hline
+    
+    Segunda fase do método & & & & & X & & & \\
+    \hline
+    
+    Terceira fase do método & & & & & & X & & \\
+    \hline
+    
+    Correção da monografia & & & & & & & X & \\
+    \hline
+    
+    Monografia & & X & X & X & X & X & & \\
+    \hline
+    
+    Defesa do trabalho de conclusão de curso & & & & & & & & X \\
+    \hline
+\end{tabular}
+    \caption{Tabela de atividades}
+    \label{tab:atividades}
+\end{table}
 
 %######################### FUNDAMENTACAO ##################################
 \chapter{Fundamentação Teórica}
@@ -349,7 +411,7 @@ $respostas$ = []
 }
 
 \Se {aceito pela maioria}{
-        $v$ = $v$ da proposta com maior indentificador $\in respostas$ ou algum valor proposto
+        $v$ = $v$ da proposta com maior identificador $\in respostas$ ou algum valor proposto
         
         \Para{cada $a \in A$}{
             accept($(n, v)$)
@@ -358,7 +420,69 @@ $respostas$ = []
 }
 \end{algorithm}
 
+Com esse algoritmo para envio de propostas, tem-se que um \textit{acceptor} irá
+receber requisições do tipo \textit{prepare} e \textit{accept}, para evitar um \textit{overhead}
+de requisições e mensagens, o \textit{acceptor} pode ignorar requisições de qualquer tipo,
+mas pode responder requisições do tipo \textit{prepare}, se, e somente se, não estiver
+prometido a outra proposta. Assim, para finalizar, tem-se:
 
+\begin{definition}
+$P_1^a$: um \textit{acceptor} pode aceitar qualquer proposta $(n, v)$, sse não tiver
+respondido um requisição \textit{prepare} com identificador $>n$.
+\end{definition}
+
+Desta forma, o algoritmo para envio de proposta está totalmente definido. Para se definir
+o algoritmo para escolha de valores, deve-se assegurar que um \textit{acceptor} se
+lembre da proposta com maior identificador que já escolheu e lembrar o maior identificador
+que da requisição de \textit{prepare} que respondeu, essas informações devem ser mantidas
+em uma memória não volátil, para que não sejam perdidas em eventuais falhas.
+
+O algoritmo final para escolha é definido a seguir, separado em duas fases:
+
+\begin{itemize}
+    \item [Fase 1]
+    \begin{itemize}
+        \item [a] Um \textit{proposer} envia um requisição de \textit{prepare} com
+        identificador $n$.
+        
+        \item [b] Se um \textit{acceptor} recebe um \textit{prepare} com identificador
+        $n$ sendo o maior identificador que já recebeu, responde com a promessa de não
+        aceitar nenhuma proposta com identificador $<n$, juntamente com a proposta com
+        maior identificador $<n$, se existir.
+    \end{itemize}
+    
+    \item [Fase 2]
+    \begin{itemize}
+        \item [a] Se o \textit{proposer} recebe resposta de uma maioria de \textit{acceptors}
+        para seu \textit{prepare} de identificador $n$, então, envia um \textit{accept} 
+        com identificador $n$ e valor $v$, sendo $v$ o valor da resposta de \textit{prepare}
+        com maior identificador, senão, $v$ é um valor escolhido pelo \textit{proposer}.
+        
+        \item [b] Se um \textit{acceptor} recebe um \textit{accept} com identificador $n$
+        ele o aceita, caso no tempo transcorrido tenha respondido um \textit{prepare}
+        com identificador $>n$ poderá negar o \textit{accept} recebido.
+    \end{itemize}
+\end{itemize}
+
+Após o valor ser decidido pelo algoritmo, o valor deve ser propagado para os \textit{learners},
+que só conhecem o valor após ser definitivamente decidido.
+
+\subsubsection{Propagação do valor decidido}
+Após um valor ser decidido, os \textit{learners} devem conhecer o valor, isso pode ser realizado
+de diferentes maneiras, e fica a critério do arquiteto para escolher qual atende melhor o
+problema a ser resolvido.
+
+Uma das maneiras de se realizar, seria que cada um dos \textit{acceptors} respondessem para
+todos os \textit{learners} qual o valor decidido, assim, resultaria em uma troca de mensagens
+$n \cdot m$, o produto entre o número de \textit{acceptors} e o número de \textit{learners}.
+
+Outra maneira de ser realizada essa propagação, aqui entra também o papel de coordenador
+citado anteriormente. Os \textit{acceptors} enviam o valor decidido para um
+\textit{distinguished learner}, que após conhecer o valor decidido, envia para os
+\textit{learners} o valor decidido, esse método teria $n + m$ troca de mensagens,
+a soma entre o número de \textit{acceptors} e o número de \textit{learners}. Mas, como os
+agentes são suscetíveis a falhas, o \textit{distinguished learner} também pode falhar,
+assim impossibilitando a transmissão do valor decidido para os \textit{learners}.
 
 \subsection{P4}
 \subsection{Mininet}
