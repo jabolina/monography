@@ -41,7 +41,7 @@ brazil]{facom-ufu-abntex2}
 \data{2018}
 \orientador{Lásaro Jonas Camargos} %TCC
 
-\titulo{[TCC - José Augusto] P4 Paxos} %TCC
+\titulo{Revisitando o P4 Paxos} %TCC
 
 \renewcommand{\thesection}{\arabic{chapter}.\arabic{section}}
 
@@ -94,7 +94,7 @@ brazil]{facom-ufu-abntex2}
 % ----------------------------------------------------------
 \textual
 
-\todo{A estrutura do texto está excelente. A explicação do paxos está bem legal, mais detalhada do que esperava. É preciso falar mais na intro sobre o trabalho que estamos replicando (duas ou três linhas). Depois de terminar de preencher, precisaremos dar uma revisada no texto pois tem muitas redundâncias. Depois que tiver ficado um tempo sem ler, você mesmo as perceberá.}
+% \todo{A estrutura do texto está excelente. A explicação do paxos está bem legal, mais detalhada do que esperava. É preciso falar mais na intro sobre o trabalho que estamos replicando (duas ou três linhas). Depois de terminar de preencher, precisaremos dar uma revisada no texto pois tem muitas redundâncias. Depois que tiver ficado um tempo sem ler, você mesmo as perceberá.}
 
 % ######################### INICIO ###########################################
 \chapter{Introdução}
@@ -105,26 +105,26 @@ esse grande aumento na utilização de softwares e do aprimoramento de novas tec
 surge a necessidade de aplicações resilientes e tolerantes a falhas. 
 
 Uma aplicação tolerante a falhas consegue manter o funcionamento mesmo com a eventual 
-falha de um de seus componentes. Como é possível existirem eventos inesperados que podem
-causar a eventual falha, - ou \textit{crash} - de um servidor, são necessários métodos
+falha de um de seus componentes. Como é possível existir eventos inesperados que podem
+causar a eventual falha - ou \textit{crash} - de um servidor, são necessários métodos
 para garantir a consistência quando a aplicação retornar com seu funcionamento
 normal. 
 
 Uma maneira de possuir uma aplicação tolerante a falhas é a replicação de máquinas
 de estado, onde o serviço é modelado como uma máquina de estados determinísticos, e o
 serviço é executado em cada réplica \citep{santos2012state}, dessa maneira é mantida
-a consistência da aplicação, mas com isso é adicionado um \textit{overhead} na execução
+a consistência da aplicação, mas um \textit{overhead} é adicionado na execução
 de comandos, pois as réplicas precisam ser consistentes entre si. No centro da replicação
-de máquina de estados, existe o consenso, onde o conjunto de réplicas deve chegar 
-em um consenso e decidir sobre qual é o estado válido e decidir sobre qual 
+de máquina de estados, existe um problema de consenso, onde o conjunto de réplicas deve 
+chegar a um consenso e decidir sobre qual é o estado válido e decidir sobre qual 
 transição será realizada. 
 
-Para obtenção do consenso e da criação de uma aplicação tolerante a falhas, o algoritmo
+Para alcançar o consenso e obter uma aplicação tolerante a falhas, o algoritmo
 Paxos é extensivamente utilizado com esse intuito \citep{dang2016paxos}. 
 O algoritmo realiza uma custosa trocas de mensagens entre seus agentes. Por se 
 tratar de um ambiente distribuído as mensagens podem demorar um tempo arbitrário 
-para chegar ao destinatário ou se perder durante a transmissão. Para se 
-conseguir uma melhora na performance na execução do algoritmo, pode-se realizar a 
+para chegar ao destinatário ou se perder durante a transmissão. Para conseguir 
+uma melhora na performance na execução do algoritmo, pode-se realizar a 
 implementação do Paxos no dispositivos físicos da rede \citep{dang2016paxos}.
 
 Com a utilização da linguagem P4, é aberta a possibilidade de se programar dispositivos
@@ -136,36 +136,38 @@ Alguns exemplos de aplicações que realizam replicação de máquinas de estado
 por exemplo OpenReplica \citep{openreplica} e Google Chubby \citep{27897}. Aplicações
 de replicação são críticas em data centers, que precisam sempre manter o serviço 
 disponível, com informações consistentes, logo, a maneira como um algoritmo de consenso
-para realizar a replicação de máquina de estados influencia na performance de um data center.
+funciona para realizar a replicação de máquina de estados influencia na performance 
+de um data center.
 
 Existe um trabalho posterior, publicado em 2016 em que o atual projeto se norteia para
-execução \citep{dang2016paxos}. O trabalho possui pontos positivos em relação aos 
-resultados alcançados, previsões de aplicações da pesquisa no futuro das aplicações e 
-no desenvolvimento das linguagens de programação de plano de dados.
+execução \citep{dang2016paxos}. O trabalho possui visões promissoras para o desenvolvimento
+e pesquisa nas linguagens de programação de planos de dados e vislumbra o que pode ser
+novos desafios nas pesquisas de protocolos de consenso. O presente projeto dá atenção maior
+ao primeiro fator citado, realizando a implementação do algoritmo de consenso Paxos utilizando
+a linguagem de programação de planos de dados P4.
 
 \section{Justificativas}
-Para a construção de uma aplicação tolerante a falhas, é possível encontrar no centro um
-problema de consenso a ser resolvido. Com a utilização do algoritmo de consenso Paxos,
-para  que se consiga que os agentes cheguem a um consenso e tomem uma decisão, 
-existe uma intensa troca de mensagens.
+Com a utilização do algoritmo Paxos para resolução do problema de consenso e para a 
+construção de uma aplicação tolerante a falhas, é necessário uma comunicação entre os 
+agentes pertencentes a aplicação. Essa comunicação, pode se tornar dispendiosa, pois 
+a troca de mensagens entre as partes podem ter falhas e ser prolongada até que o 
+algoritmo alcance seu objetivo que é o consenso.
 
-Sistemas que precisam ser tolerantes a falha e além disso ter alta disponibilidade, 
-poderiam ser afetados por essa sequência de trocas de mensagens entre réplicas de uma aplicação.
-Pois, essas trocas de mensagens podem se tornar algo custoso na rede e no processamento,
-visto que ficariam para os servidores o processamento das mensagens, assim afetando a 
-disponibilidade da aplicação. 
+Desta forma, essa comunicação poderiam influenciar na performance da aplicação e em 
+sua disponibilidade, visto que esse processamento é realizado pela própria aplicação ou 
+em servidores que tem essa função delegada.
 
-Com esse problema em mente, este projeto busca obter uma melhora na performance de execução
-do Paxos, com a implementação do algoritmo nos dispositivos de rede.
-
+Visando esse problema, o presente projeto busca obter uma melhora na performance de 
+execução do Paxos e obter uma resposta do algoritmo de forma mais rápida e menos 
+custosa, realizando a implementação do algoritmo em dispositivos de rede.
 
 \section{Objetivos}
 Com a possibilidade de programação em dispositivos de redes, o presente trabalho 
 visa realizar a implementação do algoritmo Paxos nos dispositivos
 de rede, especificamente \textit{switches}, utilizando a linguagem $P4_{16}$. 
 Desta maneira, conseguindo uma melhora na performance do algoritmo, pois uma parte 
-que seria executado em um servidor se moveria para ser executado nesses dispositivos, desta
-forma as mensagens seriam processadas enquanto estão sendo roteadas e atravessando menos
+que seria executado em um servidor se moveria para ser executado nesses dispositivos, assim
+as mensagens seriam processadas enquanto estão sendo roteadas e atravessando menos
 \textit{hops}, resultando na redução da latência.
 
 Inicialmente, alcançando os resultados obtidos em um projeto passado \citep{dang2016paxos},
@@ -177,7 +179,7 @@ planos de dados, especificamente a linguagem P4, que sofreu um amadurecimento co
 percorrido desde o projeto passado.
 
 \section{Método}
-O método utilizado para o desenvolvimento do presente projeto foi divido em três partes, para
+O método utilizado para o desenvolvimento do projeto foi divido em três partes, para
 ser realizado uma análise em cada uma das partes do projeto separadamente, assim deixando uma
 visão mais clara acerca do decorrer do projeto.
 
@@ -200,12 +202,13 @@ projeto e possíveis pontos para futuras aplicações e pesquisas.
 \section{Cronograma}
 O projeto será realizado em dois semestres, cada semestre compreende 18 semanas, sendo assim,
 um tempo total de desenvolvimento de 36 semanas ou aproximadamente 8 meses. A tabela 
-\ref{tab:atividades} demonstra como serão realizadas as atividades no decorrer dos meses.
+\ref{tab:atividades} demonstra como serão realizadas as atividades no decorrer dos meses. \todo{preferiria um cronograma semana a semana, dado que o prazo de execução é tão curto}
 
 \begin{table}[h!]
-    \begin{tabular}{p{8cm}|c|c|c|c|c|c|c|c|}
+    \begin{tabular}{|p{8cm}|c|c|c|c|c|c|c|c|}
     \hline
     Atividades & 1 & 2 & 3 & 4 & 5 & 6 & 7 & 8 \\
+    \hline
     \hline
      
     Revisão trabalhos correlatos & X & X & & & & & &  \\
@@ -250,10 +253,9 @@ Para seguirmos uma linha de raciocínio linear, e melhorar entendimento da teori
 para compreender o projeto, será abordado inicialmente informações sobre o 
 algoritmo Paxos, seu modo de operar e flexibilidade para resolução de problemas.
 
-Em seguida será abordado como funcionam linguagens de programação para o plano de
-dados em dispositivos de redes sendo realizado um paralelo com a linguagem P4, 
-especificamente a versão utilizada para o desenvolvimento deste projeto e algumas
-outras opções disponíveis.
+Em seguida será abordado como se dá o funcionamento de linguagens de programação 
+para o plano de dados e será explicado como é o funcionamento da linguagem P4, 
+especificamente a versão utilizada para o desenvolvimento deste projeto.
 
 E para finalizar o referencial teórico, será explicado sobre o Mininet, de que
 maneira funciona e qual o intuito na sua utilização no projeto.
@@ -485,6 +487,29 @@ agentes são suscetíveis a falhas, o \textit{distinguished learner} também pod
 assim impossibilitando a transmissão do valor decidido para os \textit{learners}.
 
 \subsection{P4}
+P4 é uma linguagem utilizada para programação do plano de dados em  dispositivos de 
+rede \citep{paxos16spec}. Dispositivos de rede possuem dois planos, sendo eles o 
+plano de controle e o plano de encaminhamento, também chamado de plano de dados ou 
+plano do usuário. 
+
+Pode ser feita uma analogia para se entender a diferença entre o 
+plano de controle e o plano de dados, foi eleito de forma honesta, um novo 
+funcionário para cuidar do transporte público 
+da cidade Zanzizânia. Antes de se enviar os veículos é necessário realizar o 
+planejamento de quais o caminhos serão utilizados, as pessoas ainda não foram 
+movidas pelos veículos, mas os caminhos e as paradas são conhecidos, essa parte é 
+semelhante ao plano de controle, onde são encontradas as rotas.\citep{dataVsControl}.
+
+Numa rede de roteadores, esse planejamento, que é descobrir e aprender novas rotas 
+pode ser realizado por rotas estáticas, onde o roteador é ensinado sobre redes remotas
+e como acessar essas redes. Pode também ser utilizado protocolos de roteamento dinâmicos,
+onde os roteadores aprendem entre si sobre a existência de redes remotas.\citep{dataVsControl}.
+
+Com o plano de rotas definidos para a cidade, agora é possível transportar os cidadãos
+para os locais desejados através das ruas. Isso se trata do plano de dados, onde 
+um pacote chega e é transportado para outro local, ou interface, através das rotas 
+conhecidas \citep{dataVsControl}.
+
 \subsection{Mininet}
 
 
