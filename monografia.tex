@@ -14,13 +14,13 @@ brazil]{facom-ufu-abntex2}
 \usepackage{xcolor}
 \usepackage[portuguese, ruled, linesnumbered]{algorithm2e}
 
+\definecolor{comment_green}{RGB}{0,128,0}
 
-\newcommand{\codigo}{
 \lstset{
 	language=C++,
     basicstyle=\ttfamily\tiny,
     stringstyle=\color{red},
-    commentstyle=\color{green},
+    commentstyle=\color{comment_green},
     morecomment=[s][\color{blue}]{/**}{*/},
     extendedchars=true,
     showspaces=false,
@@ -30,14 +30,16 @@ brazil]{facom-ufu-abntex2}
     breaklines=true,
     breakautoindent=true,
     breakatwhitespace=true,
-}}
+}
+\newcommand{\codigo}{
+}
 
 \renewcommand{\lstlistingname}{Listagem}
 
 \theoremstyle{definition}
 \newtheorem*{definition}{Definição}
 
-\autor{José Augusto Bolina Lucas} %TCC
+\autor{José Augusto Bolina} %TCC
 \data{2018}
 \orientador{Lásaro Jonas Camargos} %TCC
 
@@ -253,9 +255,9 @@ Para seguirmos uma linha de raciocínio linear, e melhorar entendimento da teori
 para compreender o projeto, será abordado inicialmente informações sobre o 
 algoritmo Paxos, seu modo de operar e flexibilidade para resolução de problemas.
 
-Em seguida será abordado como se dá o funcionamento de linguagens de programação 
-para o plano de dados e será explicado como é o funcionamento da linguagem P4, 
-especificamente a versão utilizada para o desenvolvimento deste projeto.
+Em seguida será explicado como é o funcionamento da linguagem P4, alguns exemplos
+da sintaxe e como suas definições e um comparativo entre a versão utilizada neste 
+projeto e a versão passada, $P4_{16}$ e $P4_{14}$, respectivamente.
 
 E para finalizar o referencial teórico, será explicado sobre o Mininet, de que
 maneira funciona e qual o intuito na sua utilização no projeto.
@@ -510,7 +512,137 @@ para os locais desejados através das ruas. Isso se trata do plano de dados, ond
 um pacote chega e é transportado para outro local, ou interface, através das rotas 
 conhecidas \citep{dataVsControl}.
 
+A linguagem P4 trabalha exatamente com o objetivo de expressar como os pacotes serão 
+processados pelo plano de dados em um dispositivo de redirecionamento programável, 
+como placas de redes, FPGA, switch em software, e ASICs \citep{paxos16spec}. Existe 
+protocolo de comunicação como o OpenFlow, em que é possível controlar o fluxo dos 
+pacotes de um roteador ou switch, mas para isso, é necessário explicitar os 
+cabeçalhos em que se está trabalhando, tal método causou um aumento na complexidade 
+especificação da linguagem enquanto não a tornou flexível para se adicionar campos 
+nos cabeçalhos \citep{bosshart2014p4}.
+
+Com isso, a P4 veio para ser independente do protocolo com que se está trabalhando,
+vide seu nome no artigo em que foi publicado, 
+\textit{Programming protocol-independent packet processor}. A linguagem foi 
+construída visando a reconfigurabilidade e ser independente do dispositivo em que se 
+deseja trabalhar, ou seja, é possível processar e analisar os pacotes enquanto o programador
+não precisa se preocupar com detalhes do switch, onde esse trabalho fica para o compilador 
+em transformar um código independente em um código para o dispositivo em que se vai 
+trabalhar \citep{bosshart2014p4}.
+
+\subsubsection{Funcionamento da linguagem}
+
+A linguagem utiliza um modelo abstrato para redirecionamento de pacotes, que possui
+dois tipos de operações, \textit{configure} e \textit{populate}. Durante a operação
+de \textit{configure}, o parser é criado, é definida a ordem de estágios nas tabelas
+\textit{match+action} e quais os campos do cabeçalhos são processados em cada estágio,
+durante a operação de \textit{populate} adicionam e removem entradas nas tabelas
+\textit{match+action} construídas durante operação de \textit{configure}. Assim,
+durante \textit{configure}, é definido qual protocolo será utilizado e como será
+o processamento dos pacotes, e durante \textit{populate} é determinada qual a 
+política utilizada nos pacotes \citep{bosshart2014p4}.
+
+A linguagem possui alguns componentes centrais,
+o primeiro desses componentes é o cabeçalho, cada cabeçalho é definido seguindo 
+o nome do campo em conjunto com seu tamanho, campos que possui tamanho variável,
+devem ser definidos com o tamanho máximo que esse campo pode possuir, um exemplo
+da definição de cabeçalho seria:
+
+\lstinputlisting[language=c++, caption={header.p4}]{code/p4-example/header.p4}
+
+Outro componente é o parser, o parser especifica quais campos do cabeçalhos estão
+bem definidos e como encontrar esses campos. Os campos extraídos dos cabeçalhos e 
+são enviados para tabela de \textit{match+action}, onde será processado e seguirá
+para o próximo passo, agindo de maneira semelhante a uma máquina de estados, em 
+que as transições são realizadas por valores nos campos do cabeçalho. Um parser
+segue a seguinte definição:
+
+\lstinputlisting[language=c++, caption={header.p4}]{code/p4-example/parser.p4}
+
+O parser é iniciado em \texttt{start}, é segue até encontrar um \texttt{stop} ou não
+encontrar nenhum match, o que seria um erro \citep{bosshart2014p4}. O parser cria um 
+\textit{parsed packet} em que a tabela de \textit{match+action} irá utilizar,
+assim, valores que serão utilizados no processamento devem estar contidos nesse
+\textit{parsed packet} \citep{p4USITutorial}.
+
+O componente fornecido pela linguagem para o processamento dos pacotes são as tabelas,
+de acordo com matches em campos do cabeçalho, esse match  pode ser exato, parcial 
+ou ser algum "coringa", são especificados quais as ações serão executadas no
+pacote. Utilizando a definição da tabela, o compilador pode decidir quanta memória 
+é necessária e qual o tipo de memória necessária \citep{bosshart2014p4}. A
+tabela é um componente que aponta qual ação deve ser realizada, assim, não é a 
+tabela que executa a ação em si. A definição da tabela segue a seguinte forma:
+
+\lstinputlisting[language=c++, caption={header.p4}]{code/p4-example/table.p4}
+
+Pela definição da tabela pode se notar assim, que a ação é outro componente presente
+na linguagem. Com a ação, é possível criar comandos mais complexos para primitivas
+presentes no cabeçalho dos pacotes \citep{bosshart2014p4}. Ações funcionam de
+maneira imperativa através de suas primitivas, podendo modificar, adicionar ou 
+remover campos do cabeçalho, alterar campos dos metadados, realizar operações
+que mantém um estado \citep{p4USITutorial}. O exemplo da estrutura de uma ação
+é a seguinte:
+
+\lstinputlisting[language=c++, caption={header.p4}]{code/p4-example/action.p4}
+
+Caso uma ação necessite de parâmetros para ser executada, como no exemplo com
+\texttt{value} e \texttt{egr\_spec}, esses parâmetros são fornecidos pela tabela em tempo 
+de execução \citep{bosshart2014p4}.
+
+O último componente é o controle de programa, utilizando funções, condições e referências
+a tabelas, é definido o fluxo de uma tabela para a próxima, assim, o controle de programa
+consiste em um programa imperativo que descreve o fluxo entre tabelas \textit{match+action} 
+\citep{bosshart2014p4}. Um exemplo de como é o controle do programa: 
+
+\lstinputlisting[language=c++, caption={header.p4}]{code/p4-example/program.p4}
+
+Para a implantação do programa definido em dispositivos de rede, é necessário realizar
+a compilação para mapear a descrição que está independente para o alvo em que se deseja
+trabalhar. A compilação do controle de programa é realizada em duas etapas, inicialmente
+é gerada uma representação intermediaria, onde o programa é representado como grafo de
+dependências entre tabelas, que é analisado para verificar dependências entre as tabelas
+e verificar quais campos de cabeçalho podem ser processados em paralelo. A segunda etapa
+utiliza o grafo resultante da primeira etapa, que é mapeado para utilizar os recursos
+específicos do dispositivo alvo em que se vai trabalhar \citep{bosshart2014p4}.
+
+Esse foi o funcionamento proposto para linguagem em seu artigo de 2014 \citep{bosshart2014p4}.
+Após seu lançamento, a linguagem passou por mudanças e diferentes versões já foram 
+distribuídas. Para finalizar sobre a P4, será realizado um breve explicação sobre as
+alterações que aconteceram da versão $P4_{14}$ para a versão $P4_{16}$.
+
+\subsubsection{Comparação com a versão anterior}
+Com a versão $P4_{16}$, foi realizado um trabalho, em que deixou uma lacuna de
+incompatibilidade na semântica e sintaxe, quando comparada com a versão
+$P4_{14}$, devido ao fato que diversos elementos da linguagem foram movidos
+para arquivos externos, funcionando como bibliotecas, assim sendo necessário
+importa os arquivos necessários para se utilizar dessas funcionalidades.
+
+\begin{figure}[h]
+    \caption{Mudança entre $P4_{14}$ para $P4_{16}$}
+    \centering
+    \includegraphics[width=\textwidth]{images/p414To16.png}
+    \label{fig:language-comparison}
+\end{figure}
+
+Esse processo foi realizado para criar uma linguagem mais consistente, onde o núcleo da 
+linguagem não sofrerá muitas alterações e se manterá compatível com futuras versões 
+distribuídas, e caso não for possível manter a compatibilidade, viabilizar uma maneira 
+fácil de realizar a migração entre versões da linguagem \citep{paxos16spec}.
+
+Um exemplo fornecido pelo documento de especificação da linguagem, demonstra a implementação
+da arquitetura de um switch simples, de forma a demonstrar um exemplo  da linguagem,
+utilizando a versão $P4_{16}$\citep{paxos16spec}. O exemplo a seguir define a arquitetura,
+assim, o exemplo pode ser importado em outro projeto, que se utiliza da arquitetura para
+seu funcionamento, o código é o seguinte:
+
+\lstinputlisting[language=c++, caption={simple-switch-model.p4}]{code/p4-example/simple-switch.p4}
+
+Com a arquitetura definida, é possível, por exemplo, implementar o roteamento de pacotes
+IPv4.
+
 \subsection{Mininet}
+
+\subsection{Docker}
 
 
 \section{Trabalhos Correlatos}
