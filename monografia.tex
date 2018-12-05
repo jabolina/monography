@@ -37,7 +37,7 @@ brazil]{facom-ufu-abntex2}
 \renewcommand{\lstlistingname}{Listagem}
 
 \theoremstyle{definition}
-\newtheorem*{definition}{Definição}
+\newtheorem{definition}{Definição}
 
 \autor{José Augusto Bolina} %TCC
 \data{2018}
@@ -141,8 +141,8 @@ disponível, com informações consistentes, logo, a maneira como um algoritmo d
 funciona para realizar a replicação de máquina de estados influencia na performance 
 de um data center.
 
-Existe um trabalho posterior, publicado em 2016 em que o atual projeto se norteia para
-execução \citep{dang2016paxos}. O trabalho possui visões promissoras para o desenvolvimento
+O presente trabalho se baseia no trabalho de Tu Dang et. al. \citep{dang2016paxos}, publicado
+em 2016. Tal trabalho possui visões promissoras para o desenvolvimento
 e pesquisa nas linguagens de programação de planos de dados e vislumbra o que pode ser
 novos desafios nas pesquisas de protocolos de consenso. O presente projeto dá atenção maior
 ao primeiro fator citado, realizando a implementação do algoritmo de consenso Paxos utilizando
@@ -168,17 +168,16 @@ Com a possibilidade de programação em dispositivos de redes, o presente trabal
 visa realizar a implementação do algoritmo Paxos nos dispositivos
 de rede, especificamente \textit{switches}, utilizando a linguagem $P4_{16}$. 
 Desta maneira, conseguindo uma melhora na performance do algoritmo, pois uma parte 
-que seria executado em um servidor se moveria para ser executado nesses dispositivos, assim
-as mensagens seriam processadas enquanto estão sendo roteadas e atravessando menos
+que seria executado em um servidor se moveria para ser executado nesses dispositivos, permitindo,
+assim, processar as mensagens enquanto as mesmas estão sendo roteadas e atravessar menos
 \textit{hops}, resultando na redução da latência.
 
-Inicialmente, alcançando os resultados obtidos em um projeto passado \citep{dang2016paxos},
-como citado pelos pesquisadores do projeto passado, o algoritmo Paxos é uma implementação
-não trivial para linguagem P4, e, como um dos principais pontos deixado pelos pesquisadores
-seria em relação ao desenvolvimento e evolução das linguagens de programação de plano de dados,
-um dos objetivos seria também uma nova perspectiva acerca das linguagens de programação de 
-planos de dados, especificamente a linguagem P4, que sofreu um amadurecimento com o tempo 
-percorrido desde o projeto passado.
+Inicialmente, alcançando os resultados obtidos no projeto de Tu Dang et. al. \citep{dang2016paxos},
+como citado pelos pesquisadores do projeto passado e, como um dos principais pontos 
+deixado pelos pesquisadores seria em relação ao desenvolvimento e evolução das linguagens
+de programação de plano de dados, um dos objetivos seria também uma nova perspectiva acerca
+das linguagens de programação de planos de dados, especificamente a linguagem P4, que 
+sofreu um amadurecimento com o tempo percorrido desde o projeto passado.
 
 \section{Método}
 O método utilizado para o desenvolvimento do projeto foi divido em três partes, para
@@ -186,9 +185,9 @@ ser realizado uma análise em cada uma das partes do projeto separadamente, assi
 visão mais clara acerca do decorrer do projeto.
 
 \subsection{Fase 1}
-Replicação do antigo projeto feito utilizando a linguagem $P4_{14}$, realização de simulações
-para verificar o funcionamento do projeto. As simulações serão realizadas utilizando o
-Mininet para construir a rede e comunicação.
+Replicação do projeto de Tu Dang et. al. \citep{dang2016paxos} utilizando a linguagem 
+$P4_{14}$, realização de simulações para verificar o funcionamento do projeto. As simulações
+serão realizadas utilizando o Mininet para construir a rede e comunicação.
 
 \subsection{Fase 2}
 Transposição do projeto da linguagem $P4_{14}$ para a linguagem $P4_{16}$, onde serão relatadas
@@ -255,18 +254,15 @@ Para seguirmos uma linha de raciocínio linear, e melhorar entendimento da teori
 para compreender o projeto, será abordado inicialmente informações sobre o 
 algoritmo Paxos, seu modo de operar e flexibilidade para resolução de problemas.
 
-Em seguida será explicado como é o funcionamento da linguagem P4, alguns exemplos
+Em seguida, será explicado como é o funcionamento da linguagem P4, alguns exemplos
 da sintaxe e como suas definições e um comparativo entre a versão utilizada neste 
-projeto e a versão passada, $P4_{16}$ e $P4_{14}$, respectivamente.
-
-E para finalizar o referencial teórico, será explicado sobre o Mininet, de que
-maneira funciona e qual o intuito na sua utilização no projeto.
+projeto e a versão passada, $P4_{16}$ e $P4_{14}$, respectivamente. 
+E para finalizar o referencial teórico, será explicado sobre o Mininet, seu funcionamento e 
+qual o intuito na sua utilização no projeto.
 
 \subsection{Paxos}
-Para iniciar a explicação sobre Paxos, será explicado de onde surgiu o algoritmo e qual
-problema ele busca resolver para uma melhor contextualização. Paxos foi criado por 
-Leslie Lamport e foi publicado inicialmente em 1989, e consiste em uma família de algoritmos
-voltada para resolução de problemas de consenso. 
+Paxos foi criado por Leslie Lamport, foi publicado inicialmente em 1989. Ele consiste em uma 
+família de algoritmos voltada para resolução de problemas de consenso. 
 
 A ideia de consenso é a de compartilhar informações entre um grupo de elementos
 processadores, de preferência com uma maneira tolerante a falhas \citep{barborak1993consensus}.
@@ -302,24 +298,23 @@ considerando os valores escolhidos no ciclo passado, cada um desses ciclos é co
 Os elementos participantes do Paxos, chamados de agentes, comunicam entre si, e assumem 
 um ou mais papéis para a evolução do algoritmo. Os papéis a serem desempenhados são, 
 utilizando a nomenclatura fornecida por Lamport \citep{lamport2001paxos}, 
-\textit{proposers}, são agentes que propõem algum valor, \textit{acceptors} 
-agentes que escolhem um único valor e \textit{learners} que são os agentes que aprendem
-qual foi o valor escolhido pelo algoritmo.
+\textit{proposers} (agentes que propõem algum valor), \textit{acceptors} 
+(agentes que escolhem um único valor) e \textit{learners} (agentes que aprendem
+qual foi o valor escolhido pelo algoritmo).
 Existem alguns papéis de coordenadores, que podem ou não ser utilizados no algoritmo, 
-sendo, por exemplo \textit{distinguished proposer}, que iremos explicar ao fim.
+sendo, por exemplo \textit{distinguished proposer}, que será explicado mais ao fim.
 
 A comunicação dos agentes se dá por troca de mensagens, utilizando um modelo assíncrono e
 não-bizantino, onde os agentes operam em diferentes velocidades, podem falhar e podem ser
-resetados, os agentes possuem um espaço de memória não volátil para armazenar informações.
-As mensagens podem levar um tempo arbitrário para serem entregues, podem ser perdidas, podem
-ser duplicadas, mas nunca são corrompidas \citep{lamport2001paxos}.
+resetados. Os agentes possuem um espaço de memória não volátil para armazenar informações e
+as mensagens podem levar um tempo arbitrário para serem entregues, podem ser perdidas e/ou 
+duplicadas, mas nunca corrompidas \citep{lamport2001paxos}.
 
 \subsubsection{Escolha do valor}
 A explicação para o entendimento do Paxos será iniciada pela escolha de um valor. 
-Quando uma mensagem, com algum
-valor proposto chega para o \textit{acceptor}, esse valor pode ou não ser aceito, logo,
-um \textit{acceptor} deve ser capaz de aceitar um valor proposto, desta maneira temos a seguinte 
-definição:
+Quando uma mensagem, com algum valor proposto chega para o \textit{acceptor}, esse valor pode 
+ser aceito ou não. Logo, um \textit{acceptor} deve ser capaz de aceitar um valor proposto, 
+assim sendo, sua definição é dada por:
 
 \begin{definition}
 $P_1$: um \textit{acceptor} deve aceitar o primeiro valor que receber.
@@ -331,13 +326,13 @@ ser capazes de aceitar mais de uma proposta e também devem conseguir identifica
 a proposta aceita, onde cada \textit{acceptor} possui um histórico de quais foram as
 propostas aceitas.
 
-As propostas enviadas devem possuir um identificador, possível de ser ordenado e que não 
-possa ser repetido por outra proposta, para não existir diferentes propostas com o mesmo
-identificador no algoritmo, adiante as propostas serão simbolizadas por 
-\textit{(n, v)}, sendo a proposta com identificador $n$ e valor $v$.
+As propostas enviadas devem possuir um identificador, passível de ser ordenado e que não 
+possa ser repetido por outra proposta de modo a impossibilitar diferentes propostas com o mesmo
+identificador no algoritmo. Adiante, as propostas serão simbolizadas por 
+\textit{(n, v)}, sendo $n$ a identificação da proposta e $v$ o valor da mesma.
 
-Mas para os \textit{acceptors} escolherem mais de uma proposta, deve-se existir a garantia de
-que todas as propostas enviadas possuam o mesmo valor, disso, surge a seguinte definição:
+Para que os \textit{acceptors} escolham mais de uma proposta, deve-se existir a garantia de
+que todas as propostas enviadas possuam o mesmo valor. Disso, surge a seguinte definição:
 
 \begin{definition}
 $P_2$: se uma proposta $(n, v)$ foi decidida, então todas propostas escolhidas com 
@@ -353,13 +348,13 @@ $P_2^a$: se uma proposta $(n, v)$ foi decidida, então todas propostas com ident
 $>n$ escolhidas por um \textit{acceptor}, possui valor $v$.
 \end{definition}
 
-Mas a definição $P_2$ ainda precisa ser reforçada, pois ainda existem cenários onde a 
-definição pode ser violada, um desses cenários exemplificado por Lamport, é o seguinte. 
+Como ainda existem cenários onde a definição de $P_2$ pode ser violada, a mesma precisa ser
+reforçada. Um desses cenários, exemplificado por Lamport, é o seguinte:
 Sempre se mantem $P_1$ para uma proposta ser escolhida, mas como
 a comunicação é assíncrona, uma proposta pode ser escolhida por um \textit{acceptor c} 
 que nunca tenha escolhido nenhuma proposta antes, e como os agentes podem falhar, suponha
 que um \textit{proposer} envie uma proposta com identificador maior e com um valor qualquer.
-O \textit{acceptor c} escolheria essa proposta, isso violaria a definição $P_2^a$. Para
+O \textit{acceptor c} escolheria essa proposta, o que violaria a definição $P_2^a$. Para
 fortalecer a definição, se tem o seguinte:
 
 \begin{definition}
@@ -382,21 +377,27 @@ menor identificador $<n$ escolhidas pelo conjunto $S$.
 \end{enumerate}
 \end{definition}
 
-Com essas definições, o algoritmo para envio de propostas funcionará da seguinte maneira,
-um \textit{proposer} envia proposta com identificador $n$ para conjunto de 
-\textit{acceptors}, esperando uma das seguintes respostas:
+Com essas definições, o algoritmo para envio de propostas funcionará da seguinte maneira:
 
 \begin{itemize}
-    \item Promessa de não aceitar valor $<n$
-    \item Se existir, proposta com maior identificador $<n$
+    \item[]\textit{Proposer} envia proposta com identificador $n$ para conjunto de 
+\textit{acceptors}, esperando uma das seguintes respostas:
+
+    \begin{itemize}
+        \item[] Promessa de não aceitar valor $<n$
+        \item[] Se existir, proposta com maior identificador $<n$
+    \end{itemize}
+    
+    \item[]Se receber uma resposta da maioria dos \textit{acceptors}:
+    \begin{itemize}
+        \item[] Enviar a proposta $(n, v)$, sendo $v$ o valor da proposta de maior identificador
+        recebido nas respostas
+        \item[] Um valor escolhido pelo próprio \textit{proposer}.
+    \end{itemize}
 \end{itemize}
 
-Se receber uma resposta da maioria dos \textit{acceptors}, enviar a proposta
-$(n, v)$, sendo $v$ o valor da proposta de maior identificador recebido nas respostas,
-senão, um valor escolhido pelo próprio \textit{proposer}.
-
 Esses passos do algoritmo receberam um nomenclatura, que são \textit{prepare} e
-\textit{accept}, respectivamente. O algoritmo em pseudo-código fica de seguinte maneira:
+\textit{accept}, respectivamente. O algoritmo em pseudo-código fica da seguinte maneira:
 
 \begin{algorithm}[H]
 \caption{Envio de propostas}
@@ -425,20 +426,20 @@ $respostas$ = []
 \end{algorithm}
 
 Com esse algoritmo para envio de propostas, tem-se que um \textit{acceptor} irá
-receber requisições do tipo \textit{prepare} e \textit{accept}, para evitar um \textit{overhead}
+receber requisições do tipo \textit{prepare} e \textit{accept}. Para evitar um \textit{overhead}
 de requisições e mensagens, o \textit{acceptor} pode ignorar requisições de qualquer tipo,
-mas pode responder requisições do tipo \textit{prepare}, se, e somente se, não estiver
+mas pode responder requisições do tipo \textit{prepare} se, e somente se, não estiver
 prometido a outra proposta. Assim, para finalizar, tem-se:
 
 \begin{definition}
-$P_1^a$: um \textit{acceptor} pode aceitar qualquer proposta $(n, v)$, sse não tiver
+$P_1^a$: um \textit{acceptor} pode aceitar qualquer proposta $(n, v)$, se, e somente se, não tiver
 respondido um requisição \textit{prepare} com identificador $>n$.
 \end{definition}
 
 Desta forma, o algoritmo para envio de proposta está totalmente definido. Para se definir
 o algoritmo para escolha de valores, deve-se assegurar que um \textit{acceptor} se
-lembre da proposta com maior identificador que já escolheu e lembrar o maior identificador
-que da requisição de \textit{prepare} que respondeu, essas informações devem ser mantidas
+lembre da proposta com maior identificador que já escolheu e do maior identificador
+que a requisição de \textit{prepare} respondeu. Essas informações devem ser mantidas
 em uma memória não volátil, para que não sejam perdidas em eventuais falhas.
 
 O algoritmo final para escolha é definido a seguir, separado em duas fases:
@@ -460,11 +461,11 @@ O algoritmo final para escolha é definido a seguir, separado em duas fases:
         \item [a] Se o \textit{proposer} recebe resposta de uma maioria de \textit{acceptors}
         para seu \textit{prepare} de identificador $n$, então, envia um \textit{accept} 
         com identificador $n$ e valor $v$, sendo $v$ o valor da resposta de \textit{prepare}
-        com maior identificador, senão, $v$ é um valor escolhido pelo \textit{proposer}.
+        com maior identificador; senão, $v$ é um valor escolhido pelo \textit{proposer}.
         
-        \item [b] Se um \textit{acceptor} recebe um \textit{accept} com identificador $n$
-        ele o aceita, caso no tempo transcorrido tenha respondido um \textit{prepare}
-        com identificador $>n$ poderá negar o \textit{accept} recebido.
+        \item [b] Se um \textit{acceptor} recebe um \textit{accept} com identificador $n$,
+        ele o aceita; caso, no tempo transcorrido tenha respondido um \textit{prepare}
+        com identificador $>n$, poderá negar o \textit{accept} recebido.
     \end{itemize}
 \end{itemize}
 
@@ -472,18 +473,18 @@ Após o valor ser decidido pelo algoritmo, o valor deve ser propagado para os \t
 que só conhecem o valor após ser definitivamente decidido.
 
 \subsubsection{Propagação do valor decidido}
-Após um valor ser decidido, os \textit{learners} devem conhecer o valor, isso pode ser realizado
-de diferentes maneiras, e fica a critério do arquiteto para escolher qual atende melhor o
+Após um valor ser decidido, os \textit{learners} devem conhecer o valor. Isso pode ser realizado
+de diferentes maneiras e fica a critério do arquiteto para escolher qual atende melhor o
 problema a ser resolvido.
 
-Uma das maneiras de se realizar, seria que cada um dos \textit{acceptors} respondessem para
-todos os \textit{learners} qual o valor decidido, assim, resultaria em uma troca de mensagens
-$n \cdot m$, o produto entre o número de \textit{acceptors} e o número de \textit{learners}.
+Uma das maneiras de se conhecer o valor, seria cada um dos \textit{acceptors} responder para
+todos os \textit{learners} qual o valor decidido. Assim, uma troca de $(n \cdot m)$ mensagens, 
+o produto entre o número de \textit{acceptors} e o número de \textit{learners}, seriam obtidas.
 
-Outra maneira de ser realizada essa propagação, aqui entra também o papel de coordenador
-citado anteriormente. Os \textit{acceptors} enviam o valor decidido para um
-\textit{distinguished learner}, que após conhecer o valor decidido, envia para os
-\textit{learners} o valor decidido, esse método teria $n + m$ troca de mensagens,
+Levando em consideração o papel de coordernador, citado anteriormente outra maneira de se 
+realizar a propagação de mensagens seria os \textit{acceptors} enviarem o valor decidido para um
+\textit{distinguished learner} que, após conhecer o valor decidido, envia para os
+\textit{learners} tal valor decidido. Esse método teria $(n + m)$ troca de mensagens,
 a soma entre o número de \textit{acceptors} e o número de \textit{learners}. Mas, como os
 agentes são suscetíveis a falhas, o \textit{distinguished learner} também pode falhar,
 assim impossibilitando a transmissão do valor decidido para os \textit{learners}.
@@ -496,11 +497,11 @@ plano do usuário.
 
 Pode ser feita uma analogia para se entender a diferença entre o 
 plano de controle e o plano de dados, foi eleito de forma honesta, um novo 
-funcionário para cuidar do transporte público 
-da cidade Zanzizânia. Antes de se enviar os veículos é necessário realizar o 
-planejamento de quais o caminhos serão utilizados, as pessoas ainda não foram 
-movidas pelos veículos, mas os caminhos e as paradas são conhecidos, essa parte é 
-semelhante ao plano de controle, onde são encontradas as rotas.\citep{dataVsControl}.
+funcionário para cuidar do transporte público da cidade Zanzizânia. Antes de se 
+enviar os veículos é necessário realizar o planejamento de quais o caminhos serão
+utilizados, as pessoas ainda não foram movidas pelos veículos, mas os caminhos 
+e as paradas são conhecidos, essa parte é semelhante ao plano de controle, onde 
+são encontradas as rotas.\citep{dataVsControl}.
 
 Numa rede de roteadores, esse planejamento, que é descobrir e aprender novas rotas 
 pode ser realizado por rotas estáticas, onde o roteador é ensinado sobre redes remotas
@@ -641,6 +642,14 @@ Com a arquitetura definida, é possível, por exemplo, implementar o roteamento 
 IPv4.
 
 \subsection{Mininet}
+Mininet é um simulador de redes, que executa uma coleção de hosts finais, switches, 
+roteadores e links, em uma única máquina. Os programas que utilizam dessa rede, podem enviar
+pacotes e estes são processados, de maneira a se assemelhar a rede Ethernet \citep{mininetDocs}.
+Desta forma, para o presente projeto, é possível construir a rede utilizando o mininet, e 
+assim ser testada a implementação do Paxos nos dispositivos dessa rede.
+
+
+
 
 \subsection{Docker}
 
