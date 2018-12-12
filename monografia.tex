@@ -12,6 +12,7 @@ brazil]{facom-ufu-abntex2}
 \usepackage{forest}
 \usepackage{listings}
 \usepackage{xcolor}
+\usepackage{minted}
 \usepackage[portuguese, ruled, linesnumbered]{algorithm2e}
 
 \definecolor{comment_green}{RGB}{0,128,0}
@@ -157,9 +158,14 @@ algoritmo alcance seu objetivo que é o consenso.
 
 Desta forma, essa comunicação poderiam influenciar na performance da aplicação e em 
 sua disponibilidade, visto que esse processamento é realizado pela própria aplicação ou 
-em servidores que tem essa função delegada.
+em servidores que tem essa função delegada. Visando esse problema, com a transferência
+da lógica de consenso da aplicação para dispositivos de rede, podemos reduzir a latência
+quando comparada a uma implementação em um servidor, e também é possível obter uma melhora
+na taxa de transferência, visto que um algoritmo como o Paxos é um serviço que possui
+alta comunicação entre as partes e não um algoritmo com alto processamento
+\citep{netchainRtt}.
 
-Visando esse problema, o presente projeto busca obter uma melhora na performance de 
+Desta maneira, o presente projeto busca obter uma melhora na performance de 
 execução do Paxos e obter uma resposta do algoritmo de forma mais rápida e menos 
 custosa, realizando a implementação do algoritmo em dispositivos de rede.
 
@@ -172,12 +178,13 @@ que seria executado em um servidor se moveria para ser executado nesses disposit
 assim, processar as mensagens enquanto as mesmas estão sendo roteadas e atravessar menos
 \textit{hops}, resultando na redução da latência.
 
-Inicialmente, alcançando os resultados obtidos no projeto de Tu Dang et. al. \citep{dang2016paxos},
-como citado pelos pesquisadores do projeto passado e, como um dos principais pontos 
-deixado pelos pesquisadores seria em relação ao desenvolvimento e evolução das linguagens
-de programação de plano de dados, um dos objetivos seria também uma nova perspectiva acerca
-das linguagens de programação de planos de dados, especificamente a linguagem P4, que 
-sofreu um amadurecimento com o tempo percorrido desde o projeto passado.
+Inicialmente, alcançando os resultados obtidos no projeto de Tu Dang et. al. 
+\citep{dang2016paxos}, como citado pelos pesquisadores do projeto passado e, 
+como um dos principais pontos deixado pelos pesquisadores seria em relação ao desenvolvimento
+e evolução das linguagens de programação de plano de dados, um dos objetivos seria 
+também uma nova perspectiva acerca das linguagens de programação de planos de dados, 
+especificamente a linguagem P4, que sofreu um amadurecimento com o tempo percorrido 
+desde o projeto passado.
 
 \section{Método}
 O método utilizado para o desenvolvimento do projeto foi divido em três partes, para
@@ -186,8 +193,7 @@ visão mais clara acerca do decorrer do projeto.
 
 \subsection{Fase 1}
 Replicação do projeto de Tu Dang et. al. \citep{dang2016paxos} utilizando a linguagem 
-$P4_{14}$, realização de simulações para verificar o funcionamento do projeto. As simulações
-serão realizadas utilizando o Mininet para construir a rede e comunicação.
+$P4_{14}$, realização de simulações para verificar o funcionamento do projeto.
 
 \subsection{Fase 2}
 Transposição do projeto da linguagem $P4_{14}$ para a linguagem $P4_{16}$, onde serão relatadas
@@ -197,13 +203,14 @@ sua versão mais atual e um comparativo entre as duas linguagens.
 \subsection{Fase 3}
 A terceira e última fase será composta pela análise e implementação de melhorias na versão
 utilizando a linguagem $P4_{16}$, serão realizadas simulações também utilizando o Mininet
-para verificação do comportamento na rede e uma comparação entre a nova e atual versão do
-projeto e possíveis pontos para futuras aplicações e pesquisas.
+e o Containernet para verificação do comportamento na rede e uma comparação entre a nova 
+e atual versão do projeto e possíveis pontos para futuras aplicações e pesquisas.
 
 \section{Cronograma}
 O projeto será realizado em dois semestres, cada semestre compreende 18 semanas, sendo assim,
 um tempo total de desenvolvimento de 36 semanas ou aproximadamente 8 meses. A tabela 
-\ref{tab:atividades} demonstra como serão realizadas as atividades no decorrer dos meses. \todo{preferiria um cronograma semana a semana, dado que o prazo de execução é tão curto}
+\ref{tab:atividades} demonstra como serão realizadas as atividades no decorrer dos meses. 
+% \todo{preferiria um cronograma semana a semana, dado que o prazo de execução é tão curto}
 
 \begin{table}[h!]
     \begin{tabular}{|p{8cm}|c|c|c|c|c|c|c|c|}
@@ -257,8 +264,9 @@ algoritmo Paxos, seu modo de operar e flexibilidade para resolução de problema
 Em seguida, será explicado como é o funcionamento da linguagem P4, alguns exemplos
 da sintaxe e como suas definições e um comparativo entre a versão utilizada neste 
 projeto e a versão passada, $P4_{16}$ e $P4_{14}$, respectivamente. 
-E para finalizar o referencial teórico, será explicado sobre o Mininet, seu funcionamento e 
-qual o intuito na sua utilização no projeto.
+Também será explicado sobre o Mininet, seu funcionamento e qual o intuito na sua 
+utilização no projeto. E para finalizar o referencial teórico, será explicado sobre o
+Containernet, de que maneira funciona com o Mininet e como será utilizado.
 
 \subsection{Paxos}
 Paxos foi criado por Leslie Lamport, foi publicado inicialmente em 1989. Ele consiste em uma 
@@ -639,20 +647,103 @@ seu funcionamento, o código é o seguinte:
 \lstinputlisting[language=c++, caption={simple-switch-model.p4}]{code/p4-example/simple-switch.p4}
 
 Com a arquitetura definida, é possível, por exemplo, implementar o roteamento de pacotes
-IPv4.
+IPv4. Assim, é possível notar que para implementação do projeto, a utilização da P4
+é uma ótima escolha, visto que ela é flexível para criação dos pacotes e campos de cabeçalho
+para execução do Paxos, e é possível realizar uma implementação que não fique atada a 
+dispositivos de rede específicos.
 
 \subsection{Mininet}
 Mininet é um simulador de redes, que executa uma coleção de hosts finais, switches, 
 roteadores e links, em uma única máquina. Os programas que utilizam dessa rede, podem enviar
-pacotes e estes são processados, de maneira a se assemelhar a rede Ethernet \citep{mininetDocs}.
-Desta forma, para o presente projeto, é possível construir a rede utilizando o mininet, e 
+pacotes e estes são processados, de maneira semelhante a rede Ethernet \citep{mininetDocs}.
+Desta forma, para o presente projeto, é possível construir a rede utilizando o Mininet, e 
 assim ser testada a implementação do Paxos nos dispositivos dessa rede.
 
+Internamente, o Mininet realiza a virtualização encontradas no kernel do Linux, onde é possível
+iniciar e escalar mais rápido do que sistemas que emulam a rede utilizando máquinas virtuais
+\citep{mininetDocs}. Nesse modelo de virtualização, um único sistema é separado em diversas
+partes menores, cada um destes possuindo uma parcela do poder de processamento e links virtuais
+\citep{mininetDocs}.
 
+Com a instalação do Mininet, é possível definir topologias de forma rápida e prática, a partir
+de um interface pela linha de comando ou utilizando uma API em Python para orquestração da rede.
+A partir da linha de comando, é possível executar comandos em nós específicos da rede 
+\citep{mininetDocs}. 
 
+\subsubsection{CLI}
+Para iniciar a interface do Mininet pela linha de comando, com a topologia
+\textit{minimal}, que consiste em 2 processos hosts, 1 processo switch e 1 controlador
+básico, basta executar \citep{mininetOrg}:
 
-\subsection{Docker}
+\begin{minted}{bash}
+  $ sudo mn
+\end{minted}
 
+Outras opções de topologia podem ser passadas com o argumento \texttt{--topo}. Para se testar a
+conectividade entre os hosts, basta executar:
+
+\begin{minted}{bash}
+  mininet> h1 ping -c 1 h2
+\end{minted}
+
+Para $h1$ descobrir o endereço de $h2$, ele realiza um ARP, fazendo com que o evento de 
+\texttt{packet\_in} vá para o controlador. O controlador realiza um broadcast em todas as portas
+com a mensagem de \texttt{packet\_out} no switch. Assim, quando $h2$ recebe a requisição ARP ele
+envia uma resposta, que passa pelo controlador e retorna para $h1$, que agora conhece o endereço
+de $h2$. Com $h1$ agora possuindo o endereço de $h2$, envia o \textit{echo request} utilizando
+protocolo ICMP, e $h2$ responde com \textit{echo reply}.
+
+\subsubsection{Python}
+Utilizando a API em Python, também é possível definir diferentes topologias para a rede. Um
+exemplo simples consiste em uma topologia que possui 2 hosts e 2 switches, distribuídos como
+a figura \ref{fig:custom-topology-example}. Para se definir essa topologia, utilizando
+Python, fica da seguinte maneira:
+
+\lstinputlisting[language=python,
+caption={custom-topology.py}]{code/mininet-example/topo-2sw-2host.py}
+
+Iniciando o Mininet no terminal, indicando qual a topologia utilizada, com o seguinte comando:
+
+\begin{minted}{bash}
+  $ sudo mn --custom custom-topology.py --topo custom_topo
+\end{minted}
+
+A API em Python possuem três níveis, definidos como API em baixo nível, API em nível médio e API
+em alto nível, essa distinção é feita com o intuito de se construir componentes de alto nível
+a partir de componentes de baixo nível \citep{mininetDocs}.
+
+Baixo nível consiste de classes para os nós e os links, utilizando instâncias dessas 
+classes é possível construir uma rede. Essas classes são \texttt{Host}, \texttt{Switch} e
+\texttt{Link} e suas subclasses \citep{mininetDocs}.
+
+O nível médio da API, consiste da classe \texttt{Mininet}, que se trata de um container,
+que encapsula a criação de nós e links da rede, assim como a sua configuração \citep{mininetDocs}.
+
+Em alto nível consiste a abstração \texttt{Topo}, para que se possa criar modelos de topologias 
+parametrizadas e reutilizáveis, de modo que esses modelos possam ser passados para Mininet
+pela linha de comando.
+
+\begin{figure}[h]
+    \caption{Topologia personalizada utilizando Python}
+    \centering
+    \includegraphics[width=\textwidth]{images/2sw-2host.png}
+    \label{fig:custom-topology-example}
+\end{figure}
+
+Visto que a utilização de verdadeiros switches e roteadores pode ser caro para simulação do
+projeto, podemos utilizar a simulação que o Mininet oferece para resolver esse problema.
+Como observado no exemplos, podemos utilizar diferentes topologias, que são criadas e 
+executadas de forma prática, assim facilitando nos experimentos.
+
+\subsection{Containernet}
+Containernet é um projeto derivado do Mininet, que possibilita a criação de topologias de
+redes em que os \textit{hosts} são \textit{containers}. Esse ferramenta estende 
+funcionalidades que não são possíveis de ser realizadas utilizando somente o Mininet
+\citep{mininetDocs}.
+
+Utilizando o Containernet, é possível adicionar e remover \textit{containers} em tempo
+de execução, podendo simular uma infraestrutura da nuvem, onde os \textit{hosts} podem
+ser desligados, inseridos, e podem ter os seus recursos alterados \citep{peuster2016medicine}.
 
 \section{Trabalhos Correlatos}
 Essa seção visa listar trabalhos relacionados com o presente projeto, alguns destes usados
