@@ -700,7 +700,7 @@ a figura \ref{fig:custom-topology-example}. Para se definir essa topologia, util
 Python, fica da seguinte maneira:
 
 \lstinputlisting[language=python,
-caption={custom-topology.py}]{code/mininet-example/topo-2sw-2host.py}
+caption={custom-topology.py}]{code/ninet-example/topo-2sw-2host.py}
 
 Iniciando o Mininet no terminal, indicando qual a topologia utilizada, com o seguinte comando:
 
@@ -736,23 +736,61 @@ Como observado no exemplos, podemos utilizar diferentes topologias, que são cri
 executadas de forma prática, assim facilitando nos experimentos.
 
 \subsection{Containernet}
-Containernet é um projeto derivado do Mininet, que possibilita a criação de topologias de
-redes em que os \textit{hosts} são \textit{containers}. Esse ferramenta estende 
-funcionalidades que não são possíveis de ser realizadas utilizando somente o Mininet
-\citep{mininetDocs}.
+Atualmente, diversas empresas utilizam o sistema de \textit{container} para disponibilizar seus 
+serviços, empresas como PayPal e Visa \citep{dockerSite}. Com esse sistema a aplicação 
+fica encapsulada em uma virtualização, onde tem tudo disponível para seu funcionamento, suas 
+dependências, bibliotecas e configurações, assim separando a aplicação e suas dependências 
+da infraestrutura \citep{dockerSite}. Assim, para realizar simulações o mais próximo possível
+de ambientes utilizados por aplicações, será utilizado o Containernet.
 
-Utilizando o Containernet, é possível adicionar e remover \textit{containers} em tempo
-de execução, podendo simular uma infraestrutura da nuvem, onde os \textit{hosts} podem
-ser desligados, inseridos, e podem ter os seus recursos alterados \citep{peuster2016medicine}.
+Containernet se trata de um projeto derivado do Mininet, que possibilita a criação de
+topologias de redes em que os \textit{hosts} são \textit{containers}. Esse ferramenta estende 
+funcionalidades que não são possíveis de ser realizadas utilizando somente o Mininet
+\citep{mininetDocs}. Utilizando o Containernet, é possível adicionar e remover 
+\textit{containers} em tempo de execução, podendo simular uma infraestrutura da nuvem, onde os 
+\textit{hosts} podem ser desligados, inseridos, e podem ter os seus recursos alterados
+\citep{peuster2016medicine}.
+
+\begin{figure}[h]
+    \caption{Topologia utilizando Containernet}
+    \centering
+    \includegraphics[width=\textwidth]{images/2d-2s-1c.png}
+    \label{fig:containernet-topology-example}
+\end{figure}
+
+Para exemplificar como é realizada a construção de uma topologia utilizando Containernet, será
+implementada uma topologia como da figura \ref{fig:containernet-topology-example}, utilizando
+código em Python para tal, ficando da seguinte maneira:
+
+\lstinputlisting[language=python,caption={containernet-topology.py}]{code/ninet-example/2dc-2sw-1c.py}
+
+Desta forma, os 2 containers utilizam a imagem \texttt{ubuntu:trusty}, que pode ser encontrada
+no Docker Hub \citep{dockerHub}, são adicionados 2 switches, que se comunicam com os
+containers e entre si, a comunicação entre os switches possui um \textit{delay} de 100 ms.
+Com a inicialização, a arquitetura definida será criada, em seguida o container \texttt{d1} envia um
+\textit{ping} para o container \texttt{d2}. Para criar a topologia definida pelo arquivo 
+\texttt{containernet-topology.py}, basta executar:
+
+\begin{minted}{bash}
+  $ sudo python containernet-topology.py
+\end{minted}
+
+Como notado pelo exemplo, a utilização do Containernet facilita a simulação do ambiente de 
+produção de aplicações, onde será possível verificar o desempenho da implementação do Paxos
+nos dispositivos de rede. Com a interface de utilização fácil, a criação de diferentes 
+topologias para experimentos, diferentes opções para manejar os containers na rede,
+faz com que o Containernet seja uma ferramente interessante para se utilizar no projeto.
 
 \section{Trabalhos Correlatos}
 Essa seção visa listar trabalhos relacionados com o presente projeto, alguns destes usados
-como material de referência para o desenvolvimento.
+como material de referência para o desenvolvimento, esses trabalhos possuem experimentos
+realizados previamente, utilizando ferramentas semelhantes as utilizadas no presente projeto 
+e tais trabalhos deixaram áreas para futuras pesquisas sobre o tema.
 
 Existe um trabalho na área, publicado em 2016 \citep{dang2016paxos}. Neste trabalho,
 os pesquisadores utilizaram $P4_{14}$ na versão 1.0.2, e deixaram pontos que podem ser
 melhorados no trabalho com a evolução da linguagem, que atualmente se encontra na versão
-$P4_{16}$ 1.0.0, que é uma revisão da P4 de 2016 \citep{paxos16spec}.
+$P4_{16}$ 1.0.0, que é uma revisão da $P4_{14}$ de 2016 \citep{paxos16spec}.
 
 
 %######################### DESENVOLVIMENTO ##################################
