@@ -787,15 +787,40 @@ como material de referência para o desenvolvimento, esses trabalhos possuem exp
 realizados previamente, utilizando ferramentas semelhantes as utilizadas no presente projeto 
 e tais trabalhos deixaram áreas para futuras pesquisas sobre o tema.
 
-Existe um trabalho na área, publicado em 2016 \citep{dang2016paxos}. Neste trabalho,
-os pesquisadores utilizaram $P4_{14}$ na versão 1.0.2, e deixaram pontos que podem ser
-melhorados no trabalho com a evolução da linguagem, que atualmente se encontra na versão
-$P4_{16}$ 1.0.0, que é uma revisão da $P4_{14}$ de 2016 \citep{paxos16spec}.
-
+\subsection{Paxos Made Switch-y}
+Trabalho publicado em 2016, realizado por pesquisadores da Università della Svizzera italiana
+e Université catholique de Louvain. Neste trabalho, foi realizada uma pesquisa com o intuito
+de se realizar a implementação do Paxos para dispositivos de rede utilizando a linguagem
+de programação de plano de dados P4, onde os testes para isso foram utilizando o Mininet. 
+A pesquisa realiza também uma discussão sobre as linguagens de programação de plano de dados,
+em específico a linguagem P4, onde foi relatado que a implementação é uma
+implementação não trivial para linguagem, também abordam pontos como tratamento de erros,
+dentre outros pontos. Foi realizada também uma discussão sobre protocolos de consenso,
+onde os protocolos normalmente só assumem uma conexão ponto-a-ponto, seria interessante a
+construção de protocolos que assumem outras propriedades da rede, pois existe um avanço
+no hardware utilizado, assim, a performance dos protocolos poderiam ser melhoradas 
+\citep{dang2016paxos}.
 
 %######################### DESENVOLVIMENTO ##################################
 \chapter{Desenvolvimento}
- 
+O desenvolvimento do projeto seguirá como descrito no cronograma, sendo divido em 
+3 fases. Para cada uma das fases realizadas, seguirá uma explicação do que foi realizado,
+dos códigos utilizados e uma breve explicação de qual o intuito que se deseja realizar.
+
+O desenvolvimento foi realizado em uma máquina 64 bits utilizando Linux, especificamente a 
+distribuição $Arch$ com o $kernel 4.20.1-arch1-1-ARCH$, possuindo processador Intel i3-3217U
+que possui 4 núcleos, sendo 2 físicos e 2 virtuais com $clock$ 1.8 GHz e com 11454 MB de 
+memória RAM.
+
+\subsection{Fase 1}
+Nessa subseção descreverá como se deu a replicação do projeto de Tu Dang et. al. 
+\citep{dang2016paxos}, como foi realizada a criação do ambiente e quais foram os testes
+realizados. O código utilizado no projeto passado pode ser encontrado no $GitHub$
+\footnote{https://github.com/usi-systems/p4xos-public}, possuindo os passos que
+se deve realizar para execução do projeto e dos testes. Para o presente projeto foi 
+realizado um $fork$ do projeto original, que também pode ser encontrado no $GitHub$
+\footnote{https://github.com/jabolina/p4xos-public.git}, assim o código e passos aqui
+citados para replicação são referentes ao $fork$.
 \subsection{Arquitetura do projeto}
 \subsection{Arquitetura da rede}
 \subsubsection{Cabeçalhos}
