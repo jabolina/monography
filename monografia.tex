@@ -821,6 +821,54 @@ se deve realizar para execução do projeto e dos testes. Para o presente projet
 realizado um $fork$ do projeto original, que também pode ser encontrado no $GitHub$
 \footnote{https://github.com/jabolina/p4xos-public.git}, assim o código e passos aqui
 citados para replicação são referentes ao $fork$.
+
+\subsubsection{Ambiente}
+Para execução do projeto, é criada uma máquina virtual que utiliza $Vagrant$ para
+manutenção, instalação das dependências e pacotes necessários. O sistema operacional
+utilizado é o Ubuntu, da imagem $ubuntu/trusty64$, fornecido pela própria
+$Vagrant$ \citep{ubuntuTrusty}. Para o funcionamento é necessário indicar qual será
+o provedor, para o projeto foi utilizado como provedor a $VirtualBox$, onde foi
+alocado 2048 $MBs$ de memória RAM e 2 núcleos do processador para a máquina
+virtual.
+
+As dependências instaladas são descritas no arquivo $Vagrantfile$, nesse caso,
+as dependências são descritas em scripts $bash$, que funcionam como forma
+de provisão para máquina, podendo ser scripts que simples que criam pastas e arquivos
+como também para instalação e preparação do ambiente, como é o caso. O primeiro script 
+instala o Mininet, utilizando a versão que possui a $tag 2.2.1$, logo após é instalado 
+o $POX$, que se trata de um $framework$ para comunicação com os $switches$ podendo 
+utilizar tanto o protocolo $OpenFlow$  como $OVSDB$ \citep{poxWiki}. Para o $POX$ 
+é utilizado um $commit$ específico. Um segundo script irá instalar as dependências 
+relacionadas a P4, a primeira dependência é o $thrift$ que é utilizado por
+algumas bibliotecas da P4. Em seguida são instalados dos repositórios da própria P4
+as dependências $bmv2$ e $p4c-bm$, que são relacionadas a maneira de executar programas em P4.
+Os programas em P4 são descritos em $JSON$ \footnote{JavaScript Object Notation} utilizando
+$p4c-bm$, depois as estruturas são carregadas no $bmv2$ utilizando a definição do arquivo
+$JSON$, assim é possível obter o modo de roteamento desejado.
+\todo{Essa referencia veio de um email que um dos caras da P4 respondeu
+$http://lists.p4.org/pipermail/p4-dev_lists.p4.org/2016-June/002112.html$ não sei se pode 
+ser considerado uma referencia boa.}
+
+Logando dentro da máquina virtual que se montou, é encontrado a implementação do projeto
+passado, possuindo uma demonstração para utilização. Com essa demonstração, é possível
+inserir valores relacionados a uma chaves e buscar por valores dado uma chave, utilizando
+a linha de comando do Mininet é possível simular falhas na rede. Existe também um $script$
+para testar inserção e pesquisa de valores, o $script$ insere um valor, pesquisa pela chave
+associada a esse valor e pesquisa por uma chave não existente.
+
+\begin{figure}[h]
+    \caption{Topologia da demonstração}
+    \centering
+    \includegraphics[scale=0.8]{images/demo-topo.png}
+    \label{fig:demo-topo}
+\end{figure}
+
+Essa demonstração segue a topologia descrita por \ref{fig:demo-topo}, em que os
+$hosts$ 2 e 3 são os $learners$ do algoritmo Paxos, enquanto o $host$ 1 é um
+$proposer$ onde também executa um servidor para receber as requisições de 
+inserção e pesquisa de valores
+
+
 \subsection{Arquitetura do projeto}
 \subsection{Arquitetura da rede}
 \subsubsection{Cabeçalhos}
