@@ -171,8 +171,8 @@ custosa, realizando a implementação do algoritmo em dispositivos de rede.
 
 \section{Objetivos}
 Com a possibilidade de programação em dispositivos de redes, o presente trabalho 
-visa realizar a implementação do algoritmo Paxos nos dispositivos
-de rede, especificamente \textit{switches}, utilizando a linguagem $P4_{16}$. 
+visa realizar a implementação do algoritmo Paxos nos dispositivos de rede, especificamente
+\textit{switches}, utilizando a linguagem $P4_{14}$. 
 Desta maneira, conseguindo uma melhora na performance do algoritmo, pois uma parte 
 que seria executado em um servidor se moveria para ser executado nesses dispositivos, permitindo,
 assim, processar as mensagens enquanto as mesmas estão sendo roteadas e atravessar menos
@@ -183,8 +183,7 @@ Inicialmente, alcançando os resultados obtidos no projeto de Tu Dang et. al.
 como um dos principais pontos deixado pelos pesquisadores seria em relação ao desenvolvimento
 e evolução das linguagens de programação de plano de dados, um dos objetivos seria 
 também uma nova perspectiva acerca das linguagens de programação de planos de dados, 
-especificamente a linguagem P4, que sofreu um amadurecimento com o tempo percorrido 
-desde o projeto passado.
+especificamente a linguagem P4.
 
 \section{Método}
 O método utilizado para o desenvolvimento do projeto foi divido em três partes, para
@@ -196,15 +195,14 @@ Replicação do projeto de Tu Dang et. al. \citep{dang2016paxos} utilizando a li
 $P4_{14}$, realização de simulações para verificar o funcionamento do projeto.
 
 \subsection{Fase 2}
-Transposição do projeto da linguagem $P4_{14}$ para a linguagem $P4_{16}$, onde serão relatadas
-o que foi possível ou não de ser realizado com as funcionalidades ofertadas pela linguagem na
-sua versão mais atual e um comparativo entre as duas linguagens.
+Após realizada a replicação, será realizada uma verificação de possíveis fatores que podem ser 
+melhorados no antigo projeto, onde será explicado o que pode ser feito para melhorar e como será
+realizada a implementação.
 
 \subsection{Fase 3}
-A terceira e última fase será composta pela análise e implementação de melhorias na versão
-utilizando a linguagem $P4_{16}$, serão realizadas simulações também utilizando o Mininet
-e o Containernet para verificação do comportamento na rede e uma comparação entre a nova 
-e atual versão do projeto e possíveis pontos para futuras aplicações e pesquisas.
+A terceira e última fase será composta pela implementação e análise das melhorias, serão realizadas
+simulações também utilizando o Mininet para verificação do comportamento na rede e uma comparação
+entre a nova e atual versão do projeto e possíveis pontos para futuras aplicações e pesquisas.
 
 \section{Cronograma}
 O projeto será realizado em dois semestres, cada semestre compreende 18 semanas, sendo assim,
@@ -252,9 +250,9 @@ um tempo total de desenvolvimento de 36 semanas ou aproximadamente 8 meses. A ta
 
 %######################### FUNDAMENTACAO ##################################
 \chapter{Fundamentação Teórica}
-Esse capítulo manterá o foco em detalhar e explicar as técnicas utilizadas
-para realização do projeto. Não serão abordadas questões de implementação,
-serão explicadas somente de modo teórico, a fim de auxiliar o entendimento do leitor.
+Esse capítulo manterá o foco em detalhar e explicar as técnicas utilizadas para realização 
+do projeto. Não serão abordadas questões de implementação, serão explicadas somente de modo
+teórico, a fim de auxiliar o entendimento do leitor.
 
 \section{Referencial Teórico}
 Para seguirmos uma linha de raciocínio linear, e melhorar entendimento da teoria
@@ -262,11 +260,9 @@ para compreender o projeto, será abordado inicialmente informações sobre o
 algoritmo Paxos, seu modo de operar e flexibilidade para resolução de problemas.
 
 Em seguida, será explicado como é o funcionamento da linguagem P4, alguns exemplos
-da sintaxe e como suas definições e um comparativo entre a versão utilizada neste 
-projeto e a versão passada, $P4_{16}$ e $P4_{14}$, respectivamente. 
-Também será explicado sobre o Mininet, seu funcionamento e qual o intuito na sua 
-utilização no projeto. E para finalizar o referencial teórico, será explicado sobre o
-Containernet, de que maneira funciona com o Mininet e como será utilizado.
+da sintaxe e como suas definições na versão $P4_{14} - 1.0.5$. para finalizar o 
+referencial teórico, será  explicado sobre o Mininet, seu funcionamento e qual o 
+intuito na sua utilização no projeto.
 
 \subsection{Paxos}
 Paxos foi criado por Leslie Lamport, foi publicado inicialmente em 1989. Ele consiste em uma 
@@ -541,6 +537,34 @@ trabalhar \citep{bosshart2014p4}.
 
 \subsubsection{Funcionamento da linguagem}
 
+A máquina abstrata que representa o funcionamento da linguagem é o de um dispositivo
+de alto desempenho para o processamento de pacotes, esse modelo é chamado de PISA,
+um acrônimo $Protocol-Independent Switch Architecture$, que possui alguns componentes
+básicos, esses componentes também são definidos pela linguagem. O primeiro desses 
+componentes é o parser programável, podendo ser definido pelo programador, juntamente 
+com seu funcionamento. O segundo componente, o coração do modelo, é um pipeline de tabelas,
+que combinam com algum dado e executam a ação correspondente. Após o pipeline, e executado
+o processamento, o pacote passa por um $deparser$, que faz a função "inversa" do parser,
+preparando o pacote na forma correta para ser transmitido \citep{p4LangTutorial}.
+
+\begin{figure}[h]
+    \caption{Protocol Independent Switch Architecture}
+    \centering
+    \includegraphics[width=\textwidth]{images/pisa.png}
+    \label{fig:pisa-model}
+\end{figure}
+
+De forma geral, a linguagem funciona de forma bem direta, onde o programador define
+os cabeçalhos que serão utilizados, assim, quando um novo pacote chega para processamento
+seus campos são separados em campos individuais de acordo com as regras descritas e são
+passados para as tabelas. As tabelas possuem como entrada os campos do cabeçalhos e 
+resultados parciais, com essas informações, as tabelas executam diferentes ações,
+como remover ou adicionar cabeçalhos, funções aritméticas e mover valores. Após o 
+processamento pelas tabelas, as informações são passadas para o deparser, que 
+monta os pacotes e transmite de volta para rede \citep{p4LangTutorial}.
+
+\subsubsection{Componentes da linguagem}
+
 A linguagem utiliza um modelo abstrato para redirecionamento de pacotes, que possui
 dois tipos de operações, \textit{configure} e \textit{populate}. Durante a operação
 de \textit{configure}, o parser é criado, é definida a ordem de estágios nas tabelas
@@ -551,11 +575,11 @@ durante \textit{configure}, é definido qual protocolo será utilizado e como se
 o processamento dos pacotes, e durante \textit{populate} é determinada qual a 
 política utilizada nos pacotes \citep{bosshart2014p4}.
 
-A linguagem possui alguns componentes centrais,
-o primeiro desses componentes é o cabeçalho, cada cabeçalho é definido seguindo 
-o nome do campo em conjunto com seu tamanho, campos que possui tamanho variável,
-devem ser definidos com o tamanho máximo que esse campo pode possuir, um exemplo
-da definição de cabeçalho seria:
+A linguagem possui alguns componentes centrais, o primeiro desses componentes 
+é o cabeçalho, cada cabeçalho é definido seguindo o nome do campo em conjunto 
+com seu tamanho, campos que possui tamanho variável, devem ser definidos com o
+tamanho máximo que esse campo pode possuir, um exemplo da definição de cabeçalho
+seria:
 
 \lstinputlisting[language=c++, caption={header.p4}]{code/p4-example/header.p4}
 
@@ -614,40 +638,19 @@ e verificar quais campos de cabeçalho podem ser processados em paralelo. A segu
 utiliza o grafo resultante da primeira etapa, que é mapeado para utilizar os recursos
 específicos do dispositivo alvo em que se vai trabalhar \citep{bosshart2014p4}.
 
-Esse foi o funcionamento proposto para linguagem em seu artigo de 2014 \citep{bosshart2014p4}.
-Após seu lançamento, a linguagem passou por mudanças e diferentes versões já foram 
-distribuídas. Para finalizar sobre a P4, será realizado um breve explicação sobre as
-alterações que aconteceram da versão $P4_{14}$ para a versão $P4_{16}$.
+\subsubsection{Ferramentas oferecidas}
+Outras ferramentas também são oferecidas pelo P4 Lang Consortium, dentre elas estão o 
+$behavioral model$, também chamado de $bmv2$ e o $p4c-bm$. O $behavioral model$ é utilizado 
+para executar os programas escritos em P4, oferece também na linha de comando uma interface 
+para popular as tabelas inicialmente, se conectando através de um servidor $thrift$ e podendo 
+assim, por exemplo, definir qual a ação padrão de uma tabela. Através da linha de comando do 
+$behavioral model$ também é possível configurar como será o $multicast$. Para executar esses 
+comandos, é preciso fornecer a representação do programa P4 em formato $JSON$
+\footnote{JavaScript Object Notation}, isso pode ser obtido utilizando o $p4c-bm$, que gera a 
+representação pronta para ser utilizada no $behavioral model$.
 
-\subsubsection{Comparação com a versão anterior}
-Com a versão $P4_{16}$, foi realizado um trabalho, em que deixou uma lacuna de
-incompatibilidade na semântica e sintaxe, quando comparada com a versão
-$P4_{14}$, devido ao fato que diversos elementos da linguagem foram movidos
-para arquivos externos, funcionando como bibliotecas, assim sendo necessário
-importa os arquivos necessários para se utilizar dessas funcionalidades.
-
-\begin{figure}[h]
-    \caption{Mudança entre $P4_{14}$ para $P4_{16}$}
-    \centering
-    \includegraphics[width=\textwidth]{images/p414To16.png}
-    \label{fig:language-comparison}
-\end{figure}
-
-Esse processo foi realizado para criar uma linguagem mais consistente, onde o núcleo da 
-linguagem não sofrerá muitas alterações e se manterá compatível com futuras versões 
-distribuídas, e caso não for possível manter a compatibilidade, viabilizar uma maneira 
-fácil de realizar a migração entre versões da linguagem \citep{paxos16spec}.
-
-Um exemplo fornecido pelo documento de especificação da linguagem, demonstra a implementação
-da arquitetura de um switch simples, de forma a demonstrar um exemplo  da linguagem,
-utilizando a versão $P4_{16}$\citep{paxos16spec}. O exemplo a seguir define a arquitetura,
-assim, o exemplo pode ser importado em outro projeto, que se utiliza da arquitetura para
-seu funcionamento, o código é o seguinte:
-
-\lstinputlisting[language=c++, caption={simple-switch-model.p4}]{code/p4-example/simple-switch.p4}
-
-Com a arquitetura definida, é possível, por exemplo, implementar o roteamento de pacotes
-IPv4. Assim, é possível notar que para implementação do projeto, a utilização da P4
+Com a arquitetura e ferramentas definidas, é possível, por exemplo, implementar o roteamento 
+de pacotes IPv4. Assim, é possível notar que para implementação do projeto, a utilização da P4
 é uma ótima escolha, visto que ela é flexível para criação dos pacotes e campos de cabeçalho
 para execução do Paxos, e é possível realizar uma implementação que não fique atada a 
 dispositivos de rede específicos.
@@ -735,52 +738,6 @@ projeto, podemos utilizar a simulação que o Mininet oferece para resolver esse
 Como observado no exemplos, podemos utilizar diferentes topologias, que são criadas e 
 executadas de forma prática, assim facilitando nos experimentos.
 
-\subsection{Containernet}
-Atualmente, diversas empresas utilizam o sistema de \textit{container} para disponibilizar seus 
-serviços, empresas como PayPal e Visa \citep{dockerSite}. Com esse sistema a aplicação 
-fica encapsulada em uma virtualização, onde tem tudo disponível para seu funcionamento, suas 
-dependências, bibliotecas e configurações, assim separando a aplicação e suas dependências 
-da infraestrutura \citep{dockerSite}. Assim, para realizar simulações o mais próximo possível
-de ambientes utilizados por aplicações, será utilizado o Containernet.
-
-Containernet se trata de um projeto derivado do Mininet, que possibilita a criação de
-topologias de redes em que os \textit{hosts} são \textit{containers}. Esse ferramenta estende 
-funcionalidades que não são possíveis de ser realizadas utilizando somente o Mininet
-\citep{mininetDocs}. Utilizando o Containernet, é possível adicionar e remover 
-\textit{containers} em tempo de execução, podendo simular uma infraestrutura da nuvem, onde os 
-\textit{hosts} podem ser desligados, inseridos, e podem ter os seus recursos alterados
-\citep{peuster2016medicine}.
-
-\begin{figure}[h]
-    \caption{Topologia utilizando Containernet}
-    \centering
-    \includegraphics[width=\textwidth]{images/2d-2s-1c.png}
-    \label{fig:containernet-topology-example}
-\end{figure}
-
-Para exemplificar como é realizada a construção de uma topologia utilizando Containernet, será
-implementada uma topologia como da figura \ref{fig:containernet-topology-example}, utilizando
-código em Python para tal, ficando da seguinte maneira:
-
-\lstinputlisting[language=python,caption={containernet-topology.py}]{code/ninet-example/2dc-2sw-1c.py}
-
-Desta forma, os 2 containers utilizam a imagem \texttt{ubuntu:trusty}, que pode ser encontrada
-no Docker Hub \citep{dockerHub}, são adicionados 2 switches, que se comunicam com os
-containers e entre si, a comunicação entre os switches possui um \textit{delay} de 100 ms.
-Com a inicialização, a arquitetura definida será criada, em seguida o container \texttt{d1} envia um
-\textit{ping} para o container \texttt{d2}. Para criar a topologia definida pelo arquivo 
-\texttt{containernet-topology.py}, basta executar:
-
-\begin{minted}{bash}
-  $ sudo python containernet-topology.py
-\end{minted}
-
-Como notado pelo exemplo, a utilização do Containernet facilita a simulação do ambiente de 
-produção de aplicações, onde será possível verificar o desempenho da implementação do Paxos
-nos dispositivos de rede. Com a interface de utilização fácil, a criação de diferentes 
-topologias para experimentos, diferentes opções para manejar os containers na rede,
-faz com que o Containernet seja uma ferramente interessante para se utilizar no projeto.
-
 \section{Trabalhos Correlatos}
 Essa seção visa listar trabalhos relacionados com o presente projeto, alguns destes usados
 como material de referência para o desenvolvimento, esses trabalhos possuem experimentos
@@ -818,9 +775,9 @@ Nessa subseção descreverá como se deu a replicação do projeto de Tu Dang et
 realizados. O código utilizado no projeto passado pode ser encontrado no $GitHub$
 \footnote{https://github.com/usi-systems/p4xos-public}, possuindo os passos que
 se deve realizar para execução do projeto e dos testes. Para o presente projeto foi 
-realizado um $fork$ do projeto original, que também pode ser encontrado no $GitHub$
-\footnote{https://github.com/jabolina/p4xos-public.git}, assim o código e passos aqui
-citados para replicação são referentes ao $fork$.
+criado um repositório contendo todo código, que também pode ser encontrado no $GitHub$
+\footnote{https://github.com/jabolina/monography-code}, desta forma ficando aberto
+para contribuições e para ser utilizado em outras pesquisas e projetos.
 
 \subsubsection{Ambiente}
 Para execução do projeto, é criada uma máquina virtual que utiliza $Vagrant$ para
@@ -842,12 +799,12 @@ utilizar tanto o protocolo $OpenFlow$  como $OVSDB$ \citep{poxWiki}. Para o $POX
 relacionadas a P4, a primeira dependência é o $thrift$ que é utilizado por
 algumas bibliotecas da P4. Em seguida são instalados dos repositórios da própria P4
 as dependências $bmv2$ e $p4c-bm$, que são relacionadas a maneira de executar programas em P4.
-Os programas em P4 são descritos em $JSON$ \footnote{JavaScript Object Notation} utilizando
-$p4c-bm$, depois as estruturas são carregadas no $bmv2$ utilizando a definição do arquivo
-$JSON$, assim é possível obter o modo de roteamento desejado.
-\todo{Essa referencia veio de um email que um dos caras da P4 respondeu
-$http://lists.p4.org/pipermail/p4-dev_lists.p4.org/2016-June/002112.html$ não sei se pode 
-ser considerado uma referencia boa.}
+Os programas em P4 são descritos em $JSON$ utilizando $p4c-bm$, depois as estruturas são 
+carregadas no $bmv2$ utilizando a definição do arquivo $JSON$, assim é possível obter o modo
+de roteamento desejado. Juntamente com as dependências, é clonado o repositório do projeto, 
+com todo código necessário para executar testes.
+
+\subsubsection{Teste}
 
 Logando dentro da máquina virtual que se montou, é encontrado a implementação do projeto
 passado, possuindo uma demonstração para utilização. Com essa demonstração, é possível
@@ -859,15 +816,57 @@ associada a esse valor e pesquisa por uma chave não existente.
 \begin{figure}[h]
     \caption{Topologia da demonstração}
     \centering
-    \includegraphics[scale=0.8]{images/demo-topo.png}
+    \includegraphics[scale=0.8]{images/arq.png}
     \label{fig:demo-topo}
 \end{figure}
 
-Essa demonstração segue a topologia descrita por \ref{fig:demo-topo}, em que os
-$hosts$ 2 e 3 são os $learners$ do algoritmo Paxos, enquanto o $host$ 1 é um
-$proposer$ onde também executa um servidor para receber as requisições de 
-inserção e pesquisa de valores
+Essa demonstração e o projeto segue a topologia descrita por \ref{fig:demo-topo}, em que os
+que estão coloridos em branco são executados em servidores.
 
+\subsubsection{Funcionamento do projeto}
+Para iniciar a execução da demonstração, é executado um script em Python, que irá definir a
+topologia com o Minininet, que irá utilizar $switches$ programados, que executam os $acceptors$
+e $coordinator$, com a topologia definida, as tabelas nos $switches$ são populadas, definindo
+quais os valores utilizados na tabelas para executar o $match$ no tipo de mensagem, definindo o
+grupo de $multicast$. Após execução do script, será possível realizar requisições no servidor
+que foi aberto no $proposer$.
+
+Quando o servidor recebe uma requisição, irá criar um novo pacote e inserir as informações no
+cabeçalho para serem transportados, o formato do cabeçalho segue como definido em \ref{cod:p4-header}, 
+possuindo o campo definindo o tipo da mensagem, com tamanho de 8 bits, o número da instância com tamanho 16 bits,
+um campo definindo o round da instancia e o round em que o voto foi realizado, ambos com tamanho de
+8 bits, o campo \texttt{acceptor} contém o identificador do $switch$ com tamanho de 64 bits e o valor do
+voto com tamanho de 512 bits.
+
+\lstinputlisting[language=c,caption={Cabeçalho do P4xos}, label={cod:p4-header}]{code/p4xos/explanation/headers.p4}
+
+Assim, o $propopser$ irá enviar a requisição, que irá chegar no $coordinator$. O $coordinator$ garante que
+somente um processo envie uma mensagem para o protocolo para uma dada instância, isso garante 
+que o protocolo irá finalizar e impõe uma ordenação nas mensagens, como existe somente um
+$coordinator$ para identificação e ordenação das mensagens, uma simples sequência crescente pode ser
+utilizada. A ação que o $coordinator$ deve executar, quando em posse de uma pacote válido do Paxos,
+deve ser de definir o tipo de mensagem do protocolo, definir o valor do \texttt{round} como 0, pois
+uma nova instância foi iniciada, ler da memória não-volátil qual o número da última instância e atualizar
+o valor\citep{dang2016paxos}.
+
+\lstinputlisting[language=c,caption={P4xos coordinator}]{code/p4xos/explanation/coordinator.p4}
+
+
+Após realizar as ações, o $coordinator$ irá realizar um $broadcast$ do pacote para todos $acceptors$.
+Os $acceptors$ que irão assegurar que somente um valor seja escolhido por instância, eles também deve tolerar
+mensagens perdidas ou duplicadas. As mensagens que serão tratadas são do tipo 1A ou 2A, as mensagens do
+tipo 1A são utilizadas durante a inicialização do protocolo, enquanto mensagens do tipo 2A são utilizadas
+para votação. Em ambos os casos, as ações dos $acceptors$ consistem em definir o tipo seguinte da mensagem,
+atualizar o valor do $round$ na memória não-volátil, armazenar no cabeçalho o valor votado, o número do
+round que foi realizado o voto e o identificador do $acceptor$ que realizou o voto. Para realizar
+essas ações, deve ser verificado de qual $round$ pertence a mensagem que chegou para ser processada,
+caso o $round$ presente no cabeçalho seja menor do que o valor armazenado na memória, o pacote será 
+dropado\cite{dang2016paxos}.
+
+\lstinputlisting[language=c,caption={P4xos coordinator}]{code/p4xos/explanation/acceptor.p4}
+
+Após a realização do processamento, quando o consenso é obtido, as mensagens vão para os $learners$,
+que foram implementados em Python e são executados em servidores.
 
 \subsection{Arquitetura do projeto}
 \subsection{Arquitetura da rede}
