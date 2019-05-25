@@ -136,7 +136,7 @@ realizar um processamento customizado dos pacotes sendo transportados, de forma 
 se diminuir a latência do algoritmo e os pacotes atravessariam menos \textit{hops}.
 
 Alguns exemplos de aplicações que realizam replicação de máquinas de estados, são,
-por exemplo OpenReplica \citep{openreplica} e Google Chubby \citep{27897}. Aplicações
+por exemplo OpenReplica \cite{openreplica} e Google Chubby \citep{27897}. Aplicações
 de replicação são críticas em data centers, que precisam sempre manter o serviço 
 disponível, com informações consistentes, logo, a maneira como um algoritmo de consenso
 funciona para realizar a replicação de máquina de estados influencia na performance 
@@ -769,9 +769,8 @@ distribuição $Arch$ com o $kernel 4.20.1-arch1-1-ARCH$, possuindo processador 
 que possui 4 núcleos, sendo 2 físicos e 2 virtuais com $clock$ 1.8 GHz e com 11454 MB de 
 memória RAM.
 
-\subsection{Fase 1}
-Nessa subseção descreverá como se deu a replicação do projeto de Tu Dang et. al. 
-\citep{dang2016paxos}, como foi realizada a criação do ambiente e quais foram os testes
+\section{Fase 1}
+Nessa subseção descreverá como se deu a replicação do projeto de \cite{dang2016paxos}, como foi realizada a criação do ambiente e quais foram os testes
 realizados. O código utilizado no projeto passado pode ser encontrado no $GitHub$
 \footnote{https://github.com/usi-systems/p4xos-public}, possuindo os passos que
 se deve realizar para execução do projeto e dos testes. Para o presente projeto foi 
@@ -779,7 +778,7 @@ criado um repositório contendo todo código, que também pode ser encontrado no
 \footnote{https://github.com/jabolina/monography-code}, desta forma ficando aberto
 para contribuições e para ser utilizado em outras pesquisas e projetos.
 
-\subsubsection{Ambiente}
+\subsection{Ambiente}
 Para execução do projeto, é criada uma máquina virtual que utiliza $Vagrant$ para
 manutenção, instalação das dependências e pacotes necessários. O sistema operacional
 utilizado é o Ubuntu, da imagem $ubuntu/trusty64$, fornecido pela própria
@@ -804,7 +803,7 @@ carregadas no $bmv2$ utilizando a definição do arquivo $JSON$, assim é possí
 de roteamento desejado. Juntamente com as dependências, é clonado o repositório do projeto, 
 com todo código necessário para executar testes.
 
-\subsubsection{Teste}
+\subsection{Teste}
 
 Logando dentro da máquina virtual que se montou, é encontrado a implementação do projeto
 passado, possuindo uma demonstração para utilização. Com essa demonstração, é possível
@@ -823,7 +822,7 @@ associada a esse valor e pesquisa por uma chave não existente.
 Essa demonstração e o projeto segue a topologia descrita por \ref{fig:demo-topo}, em que os
 que estão coloridos em branco são executados em servidores.
 
-\subsubsection{Funcionamento do projeto}
+\subsection{Funcionamento do projeto}
 Para iniciar a execução da demonstração, é executado um script em Python, que irá definir a
 topologia com o Minininet, que irá utilizar $switches$ programados, que executam os $acceptors$
 e $coordinator$, com a topologia definida, as tabelas nos $switches$ são populadas, definindo
@@ -854,7 +853,7 @@ o valor\citep{dang2016paxos}.
 
 Após realizar as ações, o $coordinator$ irá realizar um $broadcast$ do pacote para todos $acceptors$.
 Os $acceptors$ que irão assegurar que somente um valor seja escolhido por instância, eles também deve tolerar
-mensagens perdidas ou duplicadas. As mensagens que serão tratadas são do tipo 1A ou 2A, as mensagens do
+mensagens perdidas ou duplicadas. As mensagens que tratadas são do tipo 1A ou 2A, as mensagens do
 tipo 1A são utilizadas durante a inicialização do protocolo, enquanto mensagens do tipo 2A são utilizadas
 para votação. Em ambos os casos, as ações dos $acceptors$ consistem em definir o tipo seguinte da mensagem,
 atualizar o valor do $round$ na memória não-volátil, armazenar no cabeçalho o valor votado, o número do
@@ -865,23 +864,238 @@ dropado\cite{dang2016paxos}.
 
 \lstinputlisting[language=c,caption={P4xos coordinator}]{code/p4xos/explanation/acceptor.p4}
 
-Após a realização do processamento, quando o consenso é obtido, as mensagens vão para os $learners$,
-que foram implementados em Python e são executados em servidores.
+Após realizado o processamento pelo $switch$, cada um deles realiza um $broadcast$ do pacote,
+com as alterações, caso existam. Com o $broadcast$ realizado, as mensagem chegam aos
+$learners$, que são aplicações que estão sendo executadas em servidores \ref{fig:demo-topo}, 
+na demo disponível, existem 2 $learners$, que executam a mesma aplicação.
 
-\subsection{Arquitetura do projeto}
-\subsection{Arquitetura da rede}
-\subsubsection{Cabeçalhos}
-\subsubsection{Experimento}
+A aplicação executada pelos $learners$ ficam realizando um $sniff$ na rede, filtrando pacotes
+\texttt{UDP} que vierem por uma porta específica, no caso a porta \texttt{34952}. Quando um
+pacote é capturado, é realizado um $parse$ para ter acesso as campos disponíveis no pacote, dentre
+eles o tipo da mensagem, referente ao tipo da mensagem do Paxos. Os $learners$ realizam o processamento
+de mensagens do tipo \texttt{1B} e \texttt{2B}. Mensagens do tipo \texttt{1B} são salvas no históricos
+disponível no $learner$ e então são enviadas de volta para rede como mensagem do tipo \texttt{2A}.
+
+Para as mensagens do tipo \texttt{2B}, é verificado se já existe o valor da mensagem no histórico
+do $learner$ e se já está finalizada, caso a instância já tenha sido finalizada, é retornado o
+número de requisição e o valor definido pelo consenso. Caso a instância não tenha sido finalizada,
+o novo $acceptor$ que votou é adicionado no histórico de votos da instância e assim é verificado
+se a maioria de $acceptors$ já votaram na instância, para assim ser encerrada e salva na histórico
+do $learner$. Quando em posse do valor definido em uma instância, o $learner$ irá enviar um pacote de 
+volta para o servidor que realizou a requisição, contendo o identificador da requisição e o valor definido.
+
+\subsection{Fase 2}
+Está seção irá analisar alguns pontos em que o projeto pode ser melhorado, o porquê de ser um ponto de
+melhora e será apresentado de que maneira será realizada essa melhoria.
+
+\subsubsection{Pontos de melhora}
+Os pontos de melhora perceptíveis foram na questão do número de instâncias possíveis de serem executadas,
+esse valor é definido pelo campo \texttt{instance} no cabeçalho. o número de instâncias que pode ser 
+computado na primeira fase do Paxos é limitado por esse valor, dessa forma, se for utilizado um valor
+muito pequeno o consenso será executado por um pequeno período de tempo, mas por ser realizadas operações
+utilizando esse valor, caso seja muito grande, pode impactar na performance \citep{dang2016paxos}. 
+Quando realizados testes para simular um valor que exceda o valor que os bits conseguem representar 
+para o valor da instância, o projeto para e não se consegue obter mais respostas para as requisições.
+
+Pelo arquitetura utilizada para o $switch$, quando ocorre um $overflow$ no campo de cabeçalho, assim,
+o valor volta pra 0, isso poderia ajudar o algoritmo a seguir computando novas instâncias, mas como
+os registradores utilizados estão com valores utilizados previamente, isso impossibilita a continuação
+do algoritmo.
+
+A melhora aqui proposta seria a utilização do algoritmo da janela deslizante para manejar as instâncias,
+desta forma, poderia ser definido um valor razoável para o número de instâncias, que mesmo após atingir
+esse valor continuaria a ser realizado o consenso. Com a implementação da janela deslizante é necessário
+se manter atento a alguns problemas que podem surgir. Como lidar caso chegue uma mensagem
+de uma instância antiga, e, possivelmente, já encerrada? Como lidar com os registradores que identificam
+o número do $round$ e de valores de uma instância que precisam ser limpos?
+
+Para o primeiro problema, foi definido que existirão três intervalos possíveis, sendo eles o intervalo
+de instâncias ativas e que podem ser executadas imediatamente, o intervalo de instâncias antigas que
+estão marcadas para morrer e o intervalo de futuras instâncias. Com a chegada de uma nova mensagem, se o 
+número da instância que ela pertence estiver no intervalo de instâncias marcadas para morrer, a mensagem
+será ignorada, assim forçando que a instância chegue a um fim. Caso o número da instância estiver no
+intervalo de futuras instâncias, a janela irá deslizar 1 casa, em outras palavras, os registradores terão
+os valores atualizados com os novos valores dos intervalos, e em seguida, o pacote será enviado de volta 
+para o ingresso do \textit{switch}. No último caso, caso o número de instância seja válido,
+a execução seguirá seu fluxo normal.
+
+Para limpeza dos registradores que armazenam os valores dos $rounds$ e os valores votados, foi implementado
+juntamente com o deslizar da janela. Sempre que uma uma instância se inicia e está presente no intervalo de
+futuras instâncias, antes da janela deslizar para direita, os registradores presentes na fronteira de 
+instâncias marcadas para morrer terão seus valores sobrescritos com o valor 0, assim, o algoritmo poderá
+seguir sabendo que quando os registradores forem reutilizado não irá conter nenhum valor que poderá atrapalhar
+no desenvolvimento do algoritmo.
+
+\subsection{Fase 3}
+Esta seção relatará como foi realizada a implementação das melhorias propostas, discutirá como foi realizado
+os testes e também de possíveis melhorias que podem ser criadas nessa nova versão.
+
+\subsubsection{Alterações}
+Para as melhorias relatadas, as alterações se concentraram principalmente nos $acceptors$, onde cada um armazena 
+em seus registradores os valores dos intervalos das janelas. Com a inserção de novos registradores, foram
+realizados alterações nos comandos para popular as tabelas no $switches$ e definir quais seriam os comandos padrões
+de cada uma delas.
+
+Algumas alterações mínimas foram criadas, como uma campo para marcar se um pacote deve ou não ser descartado no egresso,
+para assim não existir a necessidade de chamar uma função de drop no mesmo espaço em que se chama funções para o
+processamento do pacote, dessa maneira, é necessário somente marcar uma $flag$ presente nos metadados do pacote,
+caso exista necessidade de descarte.
+
+O funcionamento do projeto segue o mesmo definido anteriormente, onde as alterações agora ocorrem no processamento
+do pacote nos $acceptors$, onde são realizadas mais validações para verificar o intervalo da janela em que a instância
+está presente.
+
 \subsubsection{Código}
-\subsubsection{Testes}
+Referente ao coordenador, não houve alterações em relação a versão anterior, o funcionamento permanece o mesmo.
+Quando um novo pacote com os cabeçalhos do tipo $paxos$ é aplicada a tabela para recuperar o valor da última instância
+processada, é adicionado 1 a esse valor e reescreve esse valor no registrador que mantém o valor da instância, após isso,
+o pacote segue para o egresso. Relembrando, a arquitetura utilizada para o experimento é fornecida pela P4 Consortium, é
+chamada como $simple switch$, nessa arquitetura, quando o valor é adicionado no número de instância o $overflow$ vai para
+0, dependendo da arquitetura utilizada, esse $overflow$ deve ser tratado de maneira diferente, pois poderia acarretar em
+erro no processamento do pacote.
 
-%######################### CONCLUSAO ##################################
-\section{Conclusão}
+\lstinputlisting[language=c,caption={Registradores adicionados no acceptor},label={cod:changes:register}]{code/p4xos/changes/register.p4}
+
+O próximo passo, é o processamento realizado pelo $acceptor$, e é onde reside a maior parte das alterações realizadas no projeto.
+Onde antes existiam 3 registradores, foram adicionados outros 3, que são para armazenar o valor da margem de instâncias marcadas
+para morrer, o valor da margem das instâncias válidas e para armazenar a margem das novas instâncias. Todos os registradores
+comportam valores que podem ser representados por 16 bits, ou seja, valores no intervalo de 0 até\ref{cod:changes:register}.
+
+\lstinputlisting[language=c,caption={Tabelas e ações adicionadas no acceptor},label={cod:changes:tables}]{code/p4xos/changes/tables.p4}
+
+Para lidar com os novos registradores, foram adicionadas novas tabelas e ações. Foi adicionada um tabela para lidar com os
+valores dos intervalos da janela, com nome \texttt{tbl\_inst} que executa a ação \texttt{read\_instance}, essa ação é executada
+sempre que um novo pacote $paxos$ válido chega para o processamento, ela é encarregada de ler os valores dos registradores
+que armazenam os valores dos intervalos de instâncias marcadas para morrer, de instâncias válidas e de novas instâncias, 
+e armazenar esses valores nos metadados do pacote. Outra tabela adicionada foi a \texttt{tbl\_clean\_register}, que executa
+a ação \texttt{clean\_register}, esse função irá realizar a limpeza dos registradores sempre que a janela se deslocar, colocando
+0 nos registradores de $round$, valores e $vround$. A última tabela adicionada foi a \texttt{tbl\_slide\_window}, que executa a
+ação \texttt{slide\_window}, essa ação irá adicionar 1 aos valores da janela e irá reescrever o novo valor nos registradores referentes
+a cada um, ao fim irá realizar um \texttt{submit}, visto na linha 26 em \ref{cod:changes:tables}. Essa ação pertence a P4, recebe uma
+lista de campos para para ser ressubmetidas ao processamento, mas antes de ir para o ingresso do $switch$, o pacote prossegue o
+fluxo normal até o egresso, ou seja, caso o pacote esteja marcado para descarte a ressubmissão não será executada, isso ajuda
+no processamento, pois caso existissem mais casos para se tratar, o pacote segue o fluxo normal de execução, ativando
+tabelas e ações.
+
+Essas adições são utilizadas pelo $acceptor$ no ingresso, para o processamento de pacote válido do $paxos$. Inicialmente se
+aplica as tabelas \texttt{tbl\_inst} e \texttt{tbl\_rnd}, para recuperar dos registradores os intervalos da janela e o valor 
+do round. Com esses valores presentes nos metadados do pacote, verifica se o último round salvo em registrador é menor
+ou igual ao round do atual pacote, caso o round seja válido, o processamento prossegue, onde então será verificado o intervalo
+da atual instância. Para explicar os diferentes casos, a imagem \ref{fig:window-intervals} será utilizada como referência.
+
+\begin{figure}[h]
+    \caption{Intervalos da janela}
+    \centering
+    \includegraphics[scale=0.8]{images/window.png}
+    \label{fig:window-intervals}
+\end{figure}
+
+Com a janela dividida em três intervalos, existem 3 cenários diferentes que uma nova instância pode se encontrar durante o
+processamento. O primeiro e mais simples de ser tratado, é quando uma nova instância de número \texttt{X} chega para
+o processamento, e X possui valor $j \leq x < k$, ou seja, o número está presente no intervalo de instâncias válidas. 
+Desta forma, o pacote prosseguirá o fluxo normal de processamento.
+
+Existe também a possibilidade de um pacote se atrasar e chegar para o $proposer$ um pacote de uma instância de número
+\texttt{X} com valor $i \leq X < j$, ou até mesmo $X < i$, isso significa que o número está no intervalo de instâncias
+marcadas para morrer. Instâncias que residem nesse intervalos, terão os pacotes marcados para descarte, assim, quando
+chegarem no egresso os pacotes serão dropados.
+O terceiro e último cenário para o valor de uma instância \texttt{X} é o valor $k \leq X$, ou seja, a janela deve deslizar,
+assim primeiramente serão limpos os registradores de índice \texttt{i}, em seguida serão atualizado os valores de
+intervalos nos registradores e por fim, executa o \texttt{resubmit} do pacote.
+
+Com o deslizamento da janela, chegaram o ponto que deve existir um restart dos intervalos, desta maneira, é possível
+imaginar a janela como um anel, onde numa janela de tamanho $N$, o primeiro número logo após o $N$ é o 0. Pela 
+existência de 3 intervalos, existirão também 3 cenários existentes. O mais simples é o quando a janela é iniciada,
+e segue deslizando da esquerda para direito, e, utilizando \ref{fig:window-intervals} como referência, os intervalos
+se mantém com $i < j < k$, que é exatamente o caso demonstrado pela figura. No decorrer do algoritmo, o primeiro intervalo
+que precisará ser resetado é o de novas instâncias, com esse reset, existe um novo cenário, o caso em que $k < i < j$.
+O próximo e último caso, ocorre quando ocorre ambos o reset do valor $k$ e em seguida do valor $j$, tendo assim,
+os intervalos da janela como $j < k < i$. Quando o reset do último intervalo ocorre, se retorna para o estado normal,
+tendo os valores como $i < j < k$.
+
+\begin{algorithm}[H]
+\label{alg:slide-window}
+\caption{Processamento de pacote de acordo com intervalos}
+\SetAlgoLined
+\Inicio{
+$X$ = número da instância
+
+$i$ = intervalo marcado para morrer\\
+$j$ = intervalo válido\\
+$k$ = intervalo novas instâncias
+
+\Se{i < j < k}{
+    \Se{$(i < X) \land (j \leq X) \land (X < k)$}{
+        processar mensagem;
+    }
+    
+    \SenaoSe{$(k \leq X) \land (i < k)$}{
+        limpar registradores;\\
+        resubmit;
+    }
+}
+\SenaoSe{$k < i < j$}{
+    \Se{$(j \leq X) \lor (X < k)$}{
+        processar mensagem;
+    }
+    \SenaoSe{$(k \leq X) \land (X < i)$}{
+        limpar registradores;\\
+        resubmit;
+    }
+}
+\SenaoSe{$j < k < i$}{
+    \Se{$(j \leq X) \land (X < k)$}{
+        processar mensagem;
+    }
+    \SenaoSe{$(k \leq X) \land (X < i)$}{
+        limpar registradores;\\
+        resubmit;
+    }
+}
+}
+\end{algorithm}
+
+Para conseguir tratar os possíveis cenários que podem surgir, foi implementado no ingresso do $switch$ o algoritmo
+apresentado em \ref{alg:slide-window}. Como existe um encadeamento de $se$ e $senão$, o compilador da P4 não deixará
+finalizar a compilação e criação do arquivo $JSON$ que representa o $switch$, desta forma, as expressões apresentadas
+no algoritmo devem ser reduzidas, isso ajuda também no tempo de processamento de um pacote, visto que o $switch$
+não deve realizar uma tarefa pesada que comprometa a velocidade da transmissão, sendo esse um dos motivos de não
+se existir $loops$ na linguagem. Observando pelo algoritmo, todas instâncias que estiverem presentes no intervalo de 
+instâncias marcadas para morrer, ou se o $round$ da instância não for válido, não passarão em nenhuma das verificações, esses 
+pacotes serão descartados no egresso do $switch$.
 
 
+\subsubsection{Experimento}
+Para realizar o experimento, foi reutilizada a estrutura dos projeto passado, tanto a estrutura da rede como das 
+aplicações utilizadas para teste. A estrutura da rede utiliza 4 $switches$ e 4 $hosts$,
+dentre os $switches$, 1 foi designado para ser o coordenador e os outros 3 foram designados como $acceptors$.
+Para os $hosts$, 1 deles executa um servidor aberto na porta 8080, que irá receber requisições de leitura
+e escrita em um dicionário, outros 2 $hosts$ executam a função de $learners$ e 1 dos $hosts$ é executado
+somente para realizar requisições no servidor \ref{fig:demo-topo}.
 
+\begin{center}
+    Falar de como foi realizado o experimento;\\
+    Demonstrar virada completa da janela.
+\end{center}
+
+\subsubsection{Melhorias}
+\begin{center}
+    Citar possíveis melhorias, dentre elas TTL para o switch não parar\\
+    Ver com Lasaro:\\
+        Se é possível processar multiplas instâncias simultaneamente, particionando o registrador com janelas para cada parte
+\end{center}
+
+%######################### CONCLUSÃO ##################################
+\chapter{Conclusão}
+\begin{center}
+    É um experimento conceitual;\\
+    Pode ser implementado;\\
+    Atenção a arquitetura utilizada;
+\end{center}
+
+% \bibliographystyle{alpha}
 \bibliography{references.bib}
-\bibliographystyle{plain}
+
 
 \end{document}
 
