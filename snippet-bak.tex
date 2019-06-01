@@ -1,3 +1,11 @@
+\documentclass[12pt,
+openright, 
+oneside,
+%twoside, %TCC: Se seu texto tem mais de 100 páginas, descomente esta linha e comente a anterior
+a4paper,
+brazil]{facom-ufu-abntex2}
+
+
 ######################### FUNDAMENTAÇÃO #############################33
 \section{Referencial Teórico}
 Para seguirmos uma linha de raciocínio linear, e melhorar entendimento da teoria
@@ -88,3 +96,60 @@ produção de aplicações, onde será possível verificar o desempenho da imple
 nos dispositivos de rede. Com a interface de utilização fácil, a criação de diferentes 
 topologias para experimentos, diferentes opções para manejar os containers na rede,
 faz com que o Containernet seja uma ferramente interessante para se utilizar no projeto.
+
+
+\section{Cronograma}
+O projeto foi realizado em dois semestres, cada semestre compreende 18 semanas, sendo assim,
+um tempo total de desenvolvimento de 36 semanas ou aproximadamente 8 meses. A tabela 
+\ref{tab:atividades} demonstra como foram realizadas as atividades no decorrer dos meses. 
+% \todo{preferiria um cronograma semana a semana, dado que o prazo de execução é tão curto}
+
+\begin{table}[!ht]
+    \begin{tabular}{|p{8cm}|c|c|c|c|c|c|c|c|}
+    \hline
+    Atividades & 1 & 2 & 3 & 4 & 5 & 6 & 7 & 8 \\
+    \hline
+    \hline
+     
+    Revisão trabalhos correlatos & X & X & & & & & &  \\
+    \hline 
+    
+    Revisão Paxos & & X & X & & & & & \\
+    \hline
+    
+    Revisão P4 & & & X & X & & & & \\
+    \hline
+    
+    Primeira fase do método & & & & X & & & & \\
+    \hline
+    
+    Segunda fase do método & & & & & X & & & \\
+    \hline
+    
+    Terceira fase do método & & & & & & X & & \\
+    \hline
+    
+    Correção da monografia & & & & & & & X & \\
+    \hline
+    
+    Monografia & & X & X & X & X & X & & \\
+    \hline
+    
+    Defesa do trabalho de conclusão de curso & & & & & & & & X \\
+    \hline
+\end{tabular}
+    \caption{Tabela de atividades}
+    \label{tab:atividades}
+\end{table}
+
+
+
+\chapter{Conclusão}
+Neste trabalho foi realizada a replicação e implementação de melhorias em um trabalho prévio \cite{dang2016paxos} utilizando
+a linguagem de programação P4. Com a possibilidade de programação dos planos de dados em \textit{switches}, - foi demonstrado conceitualmente, 
+utilizando simuladores - é possível mover a lógica de certas aplicações que são executadas em servidores para dispositivos de redes. O
+exemplo utilizado para demonstração foi o algoritmo de consenso Paxos, que não é uma implementação trivial de ser realizada utilizando P4.
+Algoritmos de consensos são centrais para construção de aplicações tolerante a falhas, uma mudança como trazer o algoritmo para dispositivos 
+de rede, poderia melhorar na performance de \textit{data centers}. É possível observar que a possibilidade de implementação em dispositivos de redes 
+viabiliza o desenvolvimento de novas pesquisas em um área ainda não tao explorada. Enquanto pesquisas em algoritmos de consensos já são bem maduras, 
+pesquisas na implementação desses algoritmos para serem executados em dispositivos de redes, ainda não é uma área tão avançada \cite{dang2016paxos}. 

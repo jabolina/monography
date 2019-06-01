@@ -95,14 +95,15 @@
 \usepackage{color}				% Controle das cores
 \usepackage{graphicx}			% Inclusão de gráficos
 % ---
-\usepackage{natbib}		
+\usepackage[alf,abnt-emphasize=bf,abnt-repeated-author-omit=yes]{abntex2cite}	% Citações padrão ABNT
+%\usepackage[style=abnt]{biblatex}
+% \usepackage{natbib}
 \usepackage{lipsum}				% para geração de dummy text
 
 % ---
 % Pacotes de citações
 % ---
 \usepackage[brazilian,hyperpageref]{backref}	 % Paginas com as citações na bibl
-%\usepackage[alf]{abntex2cite}	% Citações padrão ABNT
 
 
 \renewcommand\thesection{\arabic{section}}
@@ -126,7 +127,6 @@
 		Citado #1 vezes nas páginas #2.%
 	\fi}%
 % ---
-
 
 % ---
 % Informações de dados para CAPA e FOLHA DE ROSTO

@@ -1,9 +1,13 @@
-\documentclass[12pt,
-openright, 
-oneside,
-%twoside, %TCC: Se seu texto tem mais de 100 páginas, descomente esta linha e comente a anterior
-a4paper,
-brazil]{facom-ufu-abntex2}
+\documentclass[
+    12pt,
+    openright, 
+    oneside,
+    %twoside, %TCC: Se seu texto tem mais de 100 páginas, descomente esta linha e comente a anterior
+    a4paper,
+    french,
+    english,
+    brazil
+    ]{facom-ufu-abntex2}
 
 %\usepackage[disable]{todonotes}
 \usepackage[colorinlistoftodos]{todonotes}	%use a linha anterior para esconder os todos.
@@ -32,8 +36,7 @@ brazil]{facom-ufu-abntex2}
     breakautoindent=true,
     breakatwhitespace=true,
 }
-\newcommand{\codigo}{
-}
+\newcommand{\codigo}{}
 
 \renewcommand{\lstlistingname}{Listagem}
 
@@ -115,7 +118,7 @@ normal.
 
 Uma maneira de possuir uma aplicação tolerante a falhas é a replicação de máquinas
 de estado, onde o serviço é modelado como uma máquina de estados determinísticos, e o
-serviço é executado em cada réplica \citep{santos2012state}, dessa maneira é mantida
+serviço é executado em cada réplica \cite{santos2012state}, dessa maneira é mantida
 a consistência da aplicação, mas um \textit{overhead} é adicionado na execução
 de comandos, pois as réplicas precisam ser consistentes entre si. No centro da replicação
 de máquina de estados, existe um problema de consenso, onde o conjunto de réplicas deve 
@@ -123,12 +126,12 @@ chegar a um consenso e decidir sobre qual é o estado válido e decidir sobre qu
 transição será realizada. 
 
 Para alcançar o consenso e obter uma aplicação tolerante a falhas, o algoritmo
-Paxos é extensivamente utilizado com esse intuito \citep{dang2016paxos}. 
+Paxos é extensivamente utilizado com esse intuito \cite{dang2016paxos}. 
 O algoritmo realiza uma custosa trocas de mensagens entre seus agentes. Por se 
 tratar de um ambiente distribuído as mensagens podem demorar um tempo arbitrário 
 para chegar ao destinatário ou se perder durante a transmissão. Para conseguir 
 uma melhora na performance na execução do algoritmo, pode-se realizar a 
-implementação do Paxos no dispositivos físicos da rede \citep{dang2016paxos}.
+implementação do Paxos no dispositivos físicos da rede \cite{dang2016paxos}.
 
 Com a utilização da linguagem P4, é aberta a possibilidade de se programar dispositivos
 de rede. Com a utilização de uma tabela \textit{match+action} é possível 
@@ -136,13 +139,13 @@ realizar um processamento customizado dos pacotes sendo transportados, de forma 
 se diminuir a latência do algoritmo e os pacotes atravessariam menos \textit{hops}.
 
 Alguns exemplos de aplicações que realizam replicação de máquinas de estados, são,
-por exemplo OpenReplica \cite{openreplica} e Google Chubby \citep{27897}. Aplicações
+por exemplo OpenReplica \cite{openreplica} e Google Chubby \cite{27897}. Aplicações
 de replicação são críticas em data centers, que precisam sempre manter o serviço 
 disponível, com informações consistentes, logo, a maneira como um algoritmo de consenso
 funciona para realizar a replicação de máquina de estados influencia na performance 
 de um data center.
 
-O presente trabalho se baseia no trabalho de Tu Dang et. al. \citep{dang2016paxos}, publicado
+O presente trabalho se baseia no trabalho de \cite{dang2016paxos}, publicado
 em 2016. Tal trabalho possui visões promissoras para o desenvolvimento
 e pesquisa nas linguagens de programação de planos de dados e vislumbra o que pode ser
 novos desafios nas pesquisas de protocolos de consenso. O presente projeto dá atenção maior
@@ -163,7 +166,7 @@ da lógica de consenso da aplicação para dispositivos de rede, podemos reduzir
 quando comparada a uma implementação em um servidor, e também é possível obter uma melhora
 na taxa de transferência, visto que um algoritmo como o Paxos é um serviço que possui
 alta comunicação entre as partes e não um algoritmo com alto processamento
-\citep{netchainRtt}.
+\cite{netchainRtt}.
 
 Desta maneira, o presente projeto busca obter uma melhora na performance de 
 execução do Paxos e obter uma resposta do algoritmo de forma mais rápida e menos 
@@ -171,16 +174,16 @@ custosa, realizando a implementação do algoritmo em dispositivos de rede.
 
 \section{Objetivos}
 Com a possibilidade de programação em dispositivos de redes, o presente trabalho 
-visa realizar a implementação do algoritmo Paxos nos dispositivos de rede, especificamente
+realizou a implementação do algoritmo Paxos nos dispositivos de rede, especificamente
 \textit{switches}, utilizando a linguagem $P4_{14}$. 
 Desta maneira, conseguindo uma melhora na performance do algoritmo, pois uma parte 
 que seria executado em um servidor se moveria para ser executado nesses dispositivos, permitindo,
 assim, processar as mensagens enquanto as mesmas estão sendo roteadas e atravessar menos
 \textit{hops}, resultando na redução da latência.
 
-Inicialmente, alcançando os resultados obtidos no projeto de Tu Dang et. al. 
-\citep{dang2016paxos}, como citado pelos pesquisadores do projeto passado e, 
-como um dos principais pontos deixado pelos pesquisadores seria em relação ao desenvolvimento
+Inicialmente, alcançando os resultados obtidos no projeto de \cite{dang2016paxos}, 
+como citado pelos pesquisadores do projeto passado e, como um dos principais pontos deixado pelos 
+pesquisadores seria em relação ao desenvolvimento
 e evolução das linguagens de programação de plano de dados, um dos objetivos seria 
 também uma nova perspectiva acerca das linguagens de programação de planos de dados, 
 especificamente a linguagem P4.
@@ -190,63 +193,22 @@ O método utilizado para o desenvolvimento do projeto foi divido em três partes
 ser realizado uma análise em cada uma das partes do projeto separadamente, assim deixando uma
 visão mais clara acerca do decorrer do projeto.
 
-\subsection{Fase 1}
-Replicação do projeto de Tu Dang et. al. \citep{dang2016paxos} utilizando a linguagem 
+\subsection{Reprodução}
+Replicação do projeto de \cite{dang2016paxos} utilizando a linguagem 
 $P4_{14}$, realização de simulações para verificar o funcionamento do projeto.
 
-\subsection{Fase 2}
-Após realizada a replicação, será realizada uma verificação de possíveis fatores que podem ser 
-melhorados no antigo projeto, onde será explicado o que pode ser feito para melhorar e como será
+\subsection{Extensão}
+Após realizada a replicação, foi realizada uma verificação de possíveis fatores que podem ser 
+melhorados no antigo projeto, sendo explicado o que pode ser feito para melhorar e como foi
 realizada a implementação.
 
-\subsection{Fase 3}
-A terceira e última fase será composta pela implementação e análise das melhorias, serão realizadas
+\subsection{Validação}
+A terceira e última foi composta pela implementação e análise das melhorias, foram realizadas
 simulações também utilizando o Mininet para verificação do comportamento na rede e uma comparação
 entre a nova e atual versão do projeto e possíveis pontos para futuras aplicações e pesquisas.
 
-\section{Cronograma}
-O projeto será realizado em dois semestres, cada semestre compreende 18 semanas, sendo assim,
-um tempo total de desenvolvimento de 36 semanas ou aproximadamente 8 meses. A tabela 
-\ref{tab:atividades} demonstra como serão realizadas as atividades no decorrer dos meses. 
-% \todo{preferiria um cronograma semana a semana, dado que o prazo de execução é tão curto}
 
-\begin{table}[h!]
-    \begin{tabular}{|p{8cm}|c|c|c|c|c|c|c|c|}
-    \hline
-    Atividades & 1 & 2 & 3 & 4 & 5 & 6 & 7 & 8 \\
-    \hline
-    \hline
-     
-    Revisão trabalhos correlatos & X & X & & & & & &  \\
-    \hline 
-    
-    Revisão Paxos & & X & X & & & & & \\
-    \hline
-    
-    Revisão P4 & & & X & X & & & & \\
-    \hline
-    
-    Primeira fase do método & & & & X & & & & \\
-    \hline
-    
-    Segunda fase do método & & & & & X & & & \\
-    \hline
-    
-    Terceira fase do método & & & & & & X & & \\
-    \hline
-    
-    Correção da monografia & & & & & & & X & \\
-    \hline
-    
-    Monografia & & X & X & X & X & X & & \\
-    \hline
-    
-    Defesa do trabalho de conclusão de curso & & & & & & & & X \\
-    \hline
-\end{tabular}
-    \caption{Tabela de atividades}
-    \label{tab:atividades}
-\end{table}
+\todo{Comentar a seção de cronograma. :Feito}
 
 %######################### FUNDAMENTACAO ##################################
 \chapter{Fundamentação Teórica}
@@ -269,7 +231,7 @@ Paxos foi criado por Leslie Lamport, foi publicado inicialmente em 1989. Ele con
 família de algoritmos voltada para resolução de problemas de consenso. 
 
 A ideia de consenso é a de compartilhar informações entre um grupo de elementos
-processadores, de preferência com uma maneira tolerante a falhas \citep{barborak1993consensus}.
+processadores, de preferência com uma maneira tolerante a falhas \cite{barborak1993consensus}.
 Normalmente esse compartilhamento de informações é realizado com o intuito de tomar
 uma decisão, por exemplo, os elementos devem decidir se \textit{commitam} ou não
 uma transação realizada no banco de dados. 
@@ -297,11 +259,11 @@ segurança são:
 Algoritmos para consenso funcionam em estágios que refletem o próprio problema, e para
 serem algoritmos tolerante a falhas, devem estar preparados para repetir esses ciclos,
 considerando os valores escolhidos no ciclo passado, cada um desses ciclos é conhecido como
-\textit{round} \citep{camargos2008multicoordinated}.
+\textit{round} \cite{camargos2008multicoordinated}.
 
 Os elementos participantes do Paxos, chamados de agentes, comunicam entre si, e assumem 
 um ou mais papéis para a evolução do algoritmo. Os papéis a serem desempenhados são, 
-utilizando a nomenclatura fornecida por Lamport \citep{lamport2001paxos}, 
+utilizando a nomenclatura fornecida por Lamport \cite{lamport2001paxos}, 
 \textit{proposers} (agentes que propõem algum valor), \textit{acceptors} 
 (agentes que escolhem um único valor) e \textit{learners} (agentes que aprendem
 qual foi o valor escolhido pelo algoritmo).
@@ -312,7 +274,7 @@ A comunicação dos agentes se dá por troca de mensagens, utilizando um modelo 
 não-bizantino, onde os agentes operam em diferentes velocidades, podem falhar e podem ser
 resetados. Os agentes possuem um espaço de memória não volátil para armazenar informações e
 as mensagens podem levar um tempo arbitrário para serem entregues, podem ser perdidas e/ou 
-duplicadas, mas nunca corrompidas \citep{lamport2001paxos}.
+duplicadas, mas nunca corrompidas \cite{lamport2001paxos}.
 
 \subsubsection{Escolha do valor}
 A explicação para o entendimento do Paxos será iniciada pela escolha de um valor. 
@@ -495,7 +457,7 @@ assim impossibilitando a transmissão do valor decidido para os \textit{learners
 
 \subsection{P4}
 P4 é uma linguagem utilizada para programação do plano de dados em  dispositivos de 
-rede \citep{paxos16spec}. Dispositivos de rede possuem dois planos, sendo eles o 
+rede \cite{paxos16spec}. Dispositivos de rede possuem dois planos, sendo eles o 
 plano de controle e o plano de encaminhamento, também chamado de plano de dados ou 
 plano do usuário. 
 
@@ -505,26 +467,26 @@ funcionário para cuidar do transporte público da cidade Zanzizânia. Antes de 
 enviar os veículos é necessário realizar o planejamento de quais o caminhos serão
 utilizados, as pessoas ainda não foram movidas pelos veículos, mas os caminhos 
 e as paradas são conhecidos, essa parte é semelhante ao plano de controle, onde 
-são encontradas as rotas.\citep{dataVsControl}.
+são encontradas as rotas.\cite{dataVsControl}.
 
 Numa rede de roteadores, esse planejamento, que é descobrir e aprender novas rotas 
 pode ser realizado por rotas estáticas, onde o roteador é ensinado sobre redes remotas
 e como acessar essas redes. Pode também ser utilizado protocolos de roteamento dinâmicos,
-onde os roteadores aprendem entre si sobre a existência de redes remotas.\citep{dataVsControl}.
+onde os roteadores aprendem entre si sobre a existência de redes remotas.\cite{dataVsControl}.
 
 Com o plano de rotas definidos para a cidade, agora é possível transportar os cidadãos
 para os locais desejados através das ruas. Isso se trata do plano de dados, onde 
 um pacote chega e é transportado para outro local, ou interface, através das rotas 
-conhecidas \citep{dataVsControl}.
+conhecidas \cite{dataVsControl}.
 
 A linguagem P4 trabalha exatamente com o objetivo de expressar como os pacotes serão 
 processados pelo plano de dados em um dispositivo de redirecionamento programável, 
-como placas de redes, FPGA, switch em software, e ASICs \citep{paxos16spec}. Existe 
+como placas de redes, FPGA, switch em software, e ASICs \cite{paxos16spec}. Existe 
 protocolo de comunicação como o OpenFlow, em que é possível controlar o fluxo dos 
 pacotes de um roteador ou switch, mas para isso, é necessário explicitar os 
 cabeçalhos em que se está trabalhando, tal método causou um aumento na complexidade 
 especificação da linguagem enquanto não a tornou flexível para se adicionar campos 
-nos cabeçalhos \citep{bosshart2014p4}.
+nos cabeçalhos \cite{bosshart2014p4}.
 
 Com isso, a P4 veio para ser independente do protocolo com que se está trabalhando,
 vide seu nome no artigo em que foi publicado, 
@@ -533,7 +495,7 @@ construída visando a reconfigurabilidade e ser independente do dispositivo em q
 deseja trabalhar, ou seja, é possível processar e analisar os pacotes enquanto o programador
 não precisa se preocupar com detalhes do switch, onde esse trabalho fica para o compilador 
 em transformar um código independente em um código para o dispositivo em que se vai 
-trabalhar \citep{bosshart2014p4}.
+trabalhar \cite{bosshart2014p4}.
 
 \subsubsection{Funcionamento da linguagem}
 
@@ -545,10 +507,12 @@ componentes é o parser programável, podendo ser definido pelo programador, jun
 com seu funcionamento. O segundo componente, o coração do modelo, é um pipeline de tabelas,
 que combinam com algum dado e executam a ação correspondente. Após o pipeline, e executado
 o processamento, o pacote passa por um $deparser$, que faz a função "inversa" do parser,
-preparando o pacote na forma correta para ser transmitido \citep{p4LangTutorial}.
+preparando o pacote na forma correta para ser transmitido \cite{p4LangTutorial}.
 
-\begin{figure}[h]
-    \caption{Protocol Independent Switch Architecture}
+\todo{Feito. referencia na figura}
+
+\begin{figure}[ht]
+    \caption{Protocol Independent Switch Architecture \cite{paxos14spec}}
     \centering
     \includegraphics[width=\textwidth]{images/pisa.png}
     \label{fig:pisa-model}
@@ -561,7 +525,7 @@ passados para as tabelas. As tabelas possuem como entrada os campos do cabeçalh
 resultados parciais, com essas informações, as tabelas executam diferentes ações,
 como remover ou adicionar cabeçalhos, funções aritméticas e mover valores. Após o 
 processamento pelas tabelas, as informações são passadas para o deparser, que 
-monta os pacotes e transmite de volta para rede \citep{p4LangTutorial}.
+monta os pacotes e transmite de volta para rede \cite{p4LangTutorial}.
 
 \subsubsection{Componentes da linguagem}
 
@@ -573,7 +537,7 @@ durante a operação de \textit{populate} adicionam e removem entradas nas tabel
 \textit{match+action} construídas durante operação de \textit{configure}. Assim,
 durante \textit{configure}, é definido qual protocolo será utilizado e como será
 o processamento dos pacotes, e durante \textit{populate} é determinada qual a 
-política utilizada nos pacotes \citep{bosshart2014p4}.
+política utilizada nos pacotes \cite{bosshart2014p4}.
 
 A linguagem possui alguns componentes centrais, o primeiro desses componentes 
 é o cabeçalho, cada cabeçalho é definido seguindo o nome do campo em conjunto 
@@ -593,16 +557,16 @@ segue a seguinte definição:
 \lstinputlisting[language=c++, caption={header.p4}]{code/p4-example/parser.p4}
 
 O parser é iniciado em \texttt{start}, é segue até encontrar um \texttt{stop} ou não
-encontrar nenhum match, o que seria um erro \citep{bosshart2014p4}. O parser cria um 
+encontrar nenhum match, o que seria um erro \cite{bosshart2014p4}. O parser cria um 
 \textit{parsed packet} em que a tabela de \textit{match+action} irá utilizar,
 assim, valores que serão utilizados no processamento devem estar contidos nesse
-\textit{parsed packet} \citep{p4USITutorial}.
+\textit{parsed packet} \cite{p4USITutorial}.
 
 O componente fornecido pela linguagem para o processamento dos pacotes são as tabelas,
 de acordo com matches em campos do cabeçalho, esse match  pode ser exato, parcial 
 ou ser algum "coringa", são especificados quais as ações serão executadas no
 pacote. Utilizando a definição da tabela, o compilador pode decidir quanta memória 
-é necessária e qual o tipo de memória necessária \citep{bosshart2014p4}. A
+é necessária e qual o tipo de memória necessária \cite{bosshart2014p4}. A
 tabela é um componente que aponta qual ação deve ser realizada, assim, não é a 
 tabela que executa a ação em si. A definição da tabela segue a seguinte forma:
 
@@ -610,22 +574,22 @@ tabela que executa a ação em si. A definição da tabela segue a seguinte form
 
 Pela definição da tabela pode se notar assim, que a ação é outro componente presente
 na linguagem. Com a ação, é possível criar comandos mais complexos para primitivas
-presentes no cabeçalho dos pacotes \citep{bosshart2014p4}. Ações funcionam de
+presentes no cabeçalho dos pacotes \cite{bosshart2014p4}. Ações funcionam de
 maneira imperativa através de suas primitivas, podendo modificar, adicionar ou 
 remover campos do cabeçalho, alterar campos dos metadados, realizar operações
-que mantém um estado \citep{p4USITutorial}. O exemplo da estrutura de uma ação
+que mantém um estado \cite{p4USITutorial}. O exemplo da estrutura de uma ação
 é a seguinte:
 
 \lstinputlisting[language=c++, caption={header.p4}]{code/p4-example/action.p4}
 
 Caso uma ação necessite de parâmetros para ser executada, como no exemplo com
 \texttt{value} e \texttt{egr\_spec}, esses parâmetros são fornecidos pela tabela em tempo 
-de execução \citep{bosshart2014p4}.
+de execução \cite{bosshart2014p4}.
 
 O último componente é o controle de programa, utilizando funções, condições e referências
 a tabelas, é definido o fluxo de uma tabela para a próxima, assim, o controle de programa
 consiste em um programa imperativo que descreve o fluxo entre tabelas \textit{match+action} 
-\citep{bosshart2014p4}. Um exemplo de como é o controle do programa: 
+\cite{bosshart2014p4}. Um exemplo de como é o controle do programa: 
 
 \lstinputlisting[language=c++, caption={header.p4}]{code/p4-example/program.p4}
 
@@ -636,7 +600,7 @@ trabalhar. A compilação do controle de programa é realizada em duas etapas, i
 dependências entre tabelas, que é analisado para verificar dependências entre as tabelas
 e verificar quais campos de cabeçalho podem ser processados em paralelo. A segunda etapa
 utiliza o grafo resultante da primeira etapa, que é mapeado para utilizar os recursos
-específicos do dispositivo alvo em que se vai trabalhar \citep{bosshart2014p4}.
+específicos do dispositivo alvo em que se vai trabalhar \cite{bosshart2014p4}.
 
 \subsubsection{Ferramentas oferecidas}
 Outras ferramentas também são oferecidas pelo P4 Lang Consortium, dentre elas estão o 
@@ -658,25 +622,25 @@ dispositivos de rede específicos.
 \subsection{Mininet}
 Mininet é um simulador de redes, que executa uma coleção de hosts finais, switches, 
 roteadores e links, em uma única máquina. Os programas que utilizam dessa rede, podem enviar
-pacotes e estes são processados, de maneira semelhante a rede Ethernet \citep{mininetDocs}.
+pacotes e estes são processados, de maneira semelhante a rede Ethernet \cite{mininetDocs}.
 Desta forma, para o presente projeto, é possível construir a rede utilizando o Mininet, e 
 assim ser testada a implementação do Paxos nos dispositivos dessa rede.
 
 Internamente, o Mininet realiza a virtualização encontradas no kernel do Linux, onde é possível
 iniciar e escalar mais rápido do que sistemas que emulam a rede utilizando máquinas virtuais
-\citep{mininetDocs}. Nesse modelo de virtualização, um único sistema é separado em diversas
+\cite{mininetDocs}. Nesse modelo de virtualização, um único sistema é separado em diversas
 partes menores, cada um destes possuindo uma parcela do poder de processamento e links virtuais
-\citep{mininetDocs}.
+\cite{mininetDocs}.
 
 Com a instalação do Mininet, é possível definir topologias de forma rápida e prática, a partir
 de um interface pela linha de comando ou utilizando uma API em Python para orquestração da rede.
 A partir da linha de comando, é possível executar comandos em nós específicos da rede 
-\citep{mininetDocs}. 
+\cite{mininetDocs}. 
 
 \subsubsection{CLI}
 Para iniciar a interface do Mininet pela linha de comando, com a topologia
 \textit{minimal}, que consiste em 2 processos hosts, 1 processo switch e 1 controlador
-básico, basta executar \citep{mininetOrg}:
+básico, basta executar \cite{mininetOrg}:
 
 \begin{minted}{bash}
   $ sudo mn
@@ -713,20 +677,20 @@ Iniciando o Mininet no terminal, indicando qual a topologia utilizada, com o seg
 
 A API em Python possuem três níveis, definidos como API em baixo nível, API em nível médio e API
 em alto nível, essa distinção é feita com o intuito de se construir componentes de alto nível
-a partir de componentes de baixo nível \citep{mininetDocs}.
+a partir de componentes de baixo nível \cite{mininetDocs}.
 
 Baixo nível consiste de classes para os nós e os links, utilizando instâncias dessas 
 classes é possível construir uma rede. Essas classes são \texttt{Host}, \texttt{Switch} e
-\texttt{Link} e suas subclasses \citep{mininetDocs}.
+\texttt{Link} e suas subclasses \cite{mininetDocs}.
 
 O nível médio da API, consiste da classe \texttt{Mininet}, que se trata de um container,
-que encapsula a criação de nós e links da rede, assim como a sua configuração \citep{mininetDocs}.
+que encapsula a criação de nós e links da rede, assim como a sua configuração \cite{mininetDocs}.
 
 Em alto nível consiste a abstração \texttt{Topo}, para que se possa criar modelos de topologias 
 parametrizadas e reutilizáveis, de modo que esses modelos possam ser passados para Mininet
 pela linha de comando.
 
-\begin{figure}[h]
+\begin{figure}[ht]
     \caption{Topologia personalizada utilizando Python}
     \centering
     \includegraphics[width=\textwidth]{images/2sw-2host.png}
@@ -756,7 +720,7 @@ dentre outros pontos. Foi realizada também uma discussão sobre protocolos de c
 onde os protocolos normalmente só assumem uma conexão ponto-a-ponto, seria interessante a
 construção de protocolos que assumem outras propriedades da rede, pois existe um avanço
 no hardware utilizado, assim, a performance dos protocolos poderiam ser melhoradas 
-\citep{dang2016paxos}.
+\cite{dang2016paxos}.
 
 %######################### DESENVOLVIMENTO ##################################
 \chapter{Desenvolvimento}
@@ -765,12 +729,11 @@ O desenvolvimento do projeto seguirá como descrito no cronograma, sendo divido 
 dos códigos utilizados e uma breve explicação de qual o intuito que se deseja realizar.
 
 O desenvolvimento foi realizado em uma máquina 64 bits utilizando Linux, especificamente a 
-distribuição $Arch$ com o $kernel 4.20.1-arch1-1-ARCH$, possuindo processador Intel i3-3217U
-que possui 4 núcleos, sendo 2 físicos e 2 virtuais com $clock$ 1.8 GHz e com 11454 MB de 
-memória RAM.
+distribuição $Arch$ com o $kernel 5.1.4-arch1-1-ARCH$.
 
-\section{Fase 1}
-Nessa subseção descreverá como se deu a replicação do projeto de \cite{dang2016paxos}, como foi realizada a criação do ambiente e quais foram os testes
+\section{Reprodução}
+Nessa subseção descreverá como se deu a replicação do projeto de \cite{dang2016paxos}, como foi realizada 
+a criação do ambiente e quais foram os testes
 realizados. O código utilizado no projeto passado pode ser encontrado no $GitHub$
 \footnote{https://github.com/usi-systems/p4xos-public}, possuindo os passos que
 se deve realizar para execução do projeto e dos testes. Para o presente projeto foi 
@@ -782,7 +745,7 @@ para contribuições e para ser utilizado em outras pesquisas e projetos.
 Para execução do projeto, é criada uma máquina virtual que utiliza $Vagrant$ para
 manutenção, instalação das dependências e pacotes necessários. O sistema operacional
 utilizado é o Ubuntu, da imagem $ubuntu/trusty64$, fornecido pela própria
-$Vagrant$ \citep{ubuntuTrusty}. Para o funcionamento é necessário indicar qual será
+$Vagrant$ \cite{ubuntuTrusty}. Para o funcionamento é necessário indicar qual será
 o provedor, para o projeto foi utilizado como provedor a $VirtualBox$, onde foi
 alocado 2048 $MBs$ de memória RAM e 2 núcleos do processador para a máquina
 virtual.
@@ -793,7 +756,7 @@ de provisão para máquina, podendo ser scripts que simples que criam pastas e a
 como também para instalação e preparação do ambiente, como é o caso. O primeiro script 
 instala o Mininet, utilizando a versão que possui a $tag 2.2.1$, logo após é instalado 
 o $POX$, que se trata de um $framework$ para comunicação com os $switches$ podendo 
-utilizar tanto o protocolo $OpenFlow$  como $OVSDB$ \citep{poxWiki}. Para o $POX$ 
+utilizar tanto o protocolo $OpenFlow$  como $OVSDB$ \cite{poxWiki}. Para o $POX$ 
 é utilizado um $commit$ específico. Um segundo script irá instalar as dependências 
 relacionadas a P4, a primeira dependência é o $thrift$ que é utilizado por
 algumas bibliotecas da P4. Em seguida são instalados dos repositórios da própria P4
@@ -812,8 +775,8 @@ a linha de comando do Mininet é possível simular falhas na rede. Existe també
 para testar inserção e pesquisa de valores, o $script$ insere um valor, pesquisa pela chave
 associada a esse valor e pesquisa por uma chave não existente.
 
-\begin{figure}[h]
-    \caption{Topologia da demonstração}
+\begin{figure}[ht]
+    \caption{Topologia da demonstração \cite{dang2016paxos}}
     \centering
     \includegraphics[scale=0.8]{images/arq.png}
     \label{fig:demo-topo}
@@ -846,7 +809,7 @@ $coordinator$ para identificação e ordenação das mensagens, uma simples sequ
 utilizada. A ação que o $coordinator$ deve executar, quando em posse de uma pacote válido do Paxos,
 deve ser de definir o tipo de mensagem do protocolo, definir o valor do \texttt{round} como 0, pois
 uma nova instância foi iniciada, ler da memória não-volátil qual o número da última instância e atualizar
-o valor\citep{dang2016paxos}.
+o valor\cite{dang2016paxos}.
 
 \lstinputlisting[language=c,caption={P4xos coordinator}]{code/p4xos/explanation/coordinator.p4}
 
@@ -884,16 +847,16 @@ se a maioria de $acceptors$ já votaram na instância, para assim ser encerrada 
 do $learner$. Quando em posse do valor definido em uma instância, o $learner$ irá enviar um pacote de 
 volta para o servidor que realizou a requisição, contendo o identificador da requisição e o valor definido.
 
-\subsection{Fase 2}
+\section{Extensão}
 Está seção irá analisar alguns pontos em que o projeto pode ser melhorado, o porquê de ser um ponto de
 melhora e será apresentado de que maneira será realizada essa melhoria.
 
-\subsubsection{Pontos de melhora}
+\subsection{Pontos de melhora}
 Os pontos de melhora perceptíveis foram na questão do número de instâncias possíveis de serem executadas,
 esse valor é definido pelo campo \texttt{instance} no cabeçalho. o número de instâncias que pode ser 
 computado na primeira fase do Paxos é limitado por esse valor, dessa forma, se for utilizado um valor
 muito pequeno o consenso será executado por um pequeno período de tempo, mas por ser realizadas operações
-utilizando esse valor, caso seja muito grande, pode impactar na performance \citep{dang2016paxos}. 
+utilizando esse valor, caso seja muito grande, pode impactar na performance \cite{dang2016paxos}. 
 Quando realizados testes para simular um valor que exceda o valor que os bits conseguem representar 
 para o valor da instância, o projeto para e não se consegue obter mais respostas para as requisições.
 
@@ -926,18 +889,18 @@ instâncias marcadas para morrer terão seus valores sobrescritos com o valor 0,
 seguir sabendo que quando os registradores forem reutilizado não irá conter nenhum valor que poderá atrapalhar
 no desenvolvimento do algoritmo.
 
-\subsection{Fase 3}
+\section{Validação}
 Esta seção relatará como foi realizada a implementação das melhorias propostas, discutirá como foi realizado
 os testes e também de possíveis melhorias que podem ser criadas nessa nova versão.
 
-\subsubsection{Alterações}
+\subsection{Alterações}
 Para as melhorias relatadas, as alterações se concentraram principalmente nos $acceptors$, onde cada um armazena 
 em seus registradores os valores dos intervalos das janelas. Com a inserção de novos registradores, foram
 realizados alterações nos comandos para popular as tabelas no $switches$ e definir quais seriam os comandos padrões
 de cada uma delas.
 
 Algumas alterações mínimas foram criadas, como uma campo para marcar se um pacote deve ou não ser descartado no egresso,
-para assim não existir a necessidade de chamar uma função de drop no mesmo espaço em que se chama funções para o
+para assim não existir a necessidade de chamar uma função de \textit{drop} no mesmo espaço em que se chama funções para o
 processamento do pacote, dessa maneira, é necessário somente marcar uma $flag$ presente nos metadados do pacote,
 caso exista necessidade de descarte.
 
@@ -945,7 +908,7 @@ O funcionamento do projeto segue o mesmo definido anteriormente, onde as altera�
 do pacote nos $acceptors$, onde são realizadas mais validações para verificar o intervalo da janela em que a instância
 está presente.
 
-\subsubsection{Código}
+\subsection{Código}
 Referente ao coordenador, não houve alterações em relação a versão anterior, o funcionamento permanece o mesmo.
 Quando um novo pacote com os cabeçalhos do tipo $paxos$ é aplicada a tabela para recuperar o valor da última instância
 processada, é adicionado 1 a esse valor e reescreve esse valor no registrador que mantém o valor da instância, após isso,
@@ -959,7 +922,7 @@ erro no processamento do pacote.
 O próximo passo, é o processamento realizado pelo $acceptor$, e é onde reside a maior parte das alterações realizadas no projeto.
 Onde antes existiam 3 registradores, foram adicionados outros 3, que são para armazenar o valor da margem de instâncias marcadas
 para morrer, o valor da margem das instâncias válidas e para armazenar a margem das novas instâncias. Todos os registradores
-comportam valores que podem ser representados por 16 bits, ou seja, valores no intervalo de 0 até\ref{cod:changes:register}.
+comportam valores que podem ser representados por 16 bits, ou seja, valores no intervalo de 0 até $(2^{16} - 1)$ \ref{cod:changes:register}.
 
 \lstinputlisting[language=c,caption={Tabelas e ações adicionadas no acceptor},label={cod:changes:tables}]{code/p4xos/changes/tables.p4}
 
@@ -983,7 +946,7 @@ do round. Com esses valores presentes nos metadados do pacote, verifica se o úl
 ou igual ao round do atual pacote, caso o round seja válido, o processamento prossegue, onde então será verificado o intervalo
 da atual instância. Para explicar os diferentes casos, a imagem \ref{fig:window-intervals} será utilizada como referência.
 
-\begin{figure}[h]
+\begin{figure}[ht]
     \caption{Intervalos da janela}
     \centering
     \includegraphics[scale=0.8]{images/window.png}
@@ -1056,46 +1019,80 @@ $k$ = intervalo novas instâncias
 \end{algorithm}
 
 Para conseguir tratar os possíveis cenários que podem surgir, foi implementado no ingresso do $switch$ o algoritmo
-apresentado em \ref{alg:slide-window}. Como existe um encadeamento de $se$ e $senão$, o compilador da P4 não deixará
-finalizar a compilação e criação do arquivo $JSON$ que representa o $switch$, desta forma, as expressões apresentadas
-no algoritmo devem ser reduzidas, isso ajuda também no tempo de processamento de um pacote, visto que o $switch$
-não deve realizar uma tarefa pesada que comprometa a velocidade da transmissão, sendo esse um dos motivos de não
-se existir $loops$ na linguagem. Observando pelo algoritmo, todas instâncias que estiverem presentes no intervalo de 
+apresentado em \ref{alg:slide-window}. Observando pelo algoritmo, todas instâncias que estiverem presentes no intervalo de 
 instâncias marcadas para morrer, ou se o $round$ da instância não for válido, não passarão em nenhuma das verificações, esses 
 pacotes serão descartados no egresso do $switch$.
 
 
-\subsubsection{Experimento}
-Para realizar o experimento, foi reutilizada a estrutura dos projeto passado, tanto a estrutura da rede como das 
+\subsection{Experimento}
+Para realizar o experimento, foi reutilizada a estrutura do projeto passado, tanto a estrutura da rede como das 
 aplicações utilizadas para teste. A estrutura da rede utiliza 4 $switches$ e 4 $hosts$,
 dentre os $switches$, 1 foi designado para ser o coordenador e os outros 3 foram designados como $acceptors$.
 Para os $hosts$, 1 deles executa um servidor aberto na porta 8080, que irá receber requisições de leitura
 e escrita em um dicionário, outros 2 $hosts$ executam a função de $learners$ e 1 dos $hosts$ é executado
 somente para realizar requisições no servidor \ref{fig:demo-topo}.
 
-\begin{center}
-    Falar de como foi realizado o experimento;\\
-    Demonstrar virada completa da janela.
-\end{center}
+Para execução da demonstração, foi utilizada a máquina virtual, a mesma utilizada para replicação do projeto
+passado \cite{dang2016paxos}. Com a rede criada, é aberto um terminal no \textit{host} 4, e, a partir dele,
+é executado um \textit{script} para realizar requisições no servidor presente no \textit{host} 1, são realizadas
+3 requisições diferentes por iteração do \textit{loop}. Realizada uma requisição para inserção de um novo valor juntamente
+com uma nova chave na memória da aplicação sendo executada nos \textit{hosts}, em seguida é realizada uma requisição para 
+leitura passando a mesma chave inserida anteriormente e por fim uma requisição para uma chave que não existe.
 
-\subsubsection{Melhorias}
+Para experimentação foram criados alguns cenários, para testar como a nova implementação se sairia. A primeira, e mais simples
+foi a de simplesmente iniciar a demonstração e as requisições a partir do \textit{host} 4, acompanhando os \textit{logs} dos
+\textit{learners} presentes nos \textit{hosts} 2 e 3 é possível verificar o número de instância aumentando e verificando que 
+o valor só é retornado quando o consenso entre os 3 \textit{acceptors} é atingido. Acompanhando também o \textit{log} dos
+\textit{switches} é possível acompanhar o fluxo que o pacote realiza dentro do \textit{switch}, das leituras/escritas de registradores,
+comparações realizadas, do ingresso até o egresso. Nesse cenário, a execução acontece normalmente.
+
+Outro cenário criado foi em que o número da instância se inicia em um valor \texttt{X}, que reside no intervalo de novas instâncias,
+assim, o funcionamento esperado seria o de que a janela deslizasse de 1 em 1, até o número de instância \texttt{X} pertencer ao intervalo
+de instâncias aceitas. Quando iniciado o experimento, para primeira requisição a resposta na é obtida de imediato, dependendo do valor de
+\texttt{X} escolhido, pode demorar um tempo, após a primeira resposta ser obtida, as próximas são obtidas uma após a outra, sem muita 
+demora da requisição. Acompanhando esse início pelo \textit{log} dos \textit{switches}, é possível ver os registradores sendo limpos,
+a janela deslizando e o pacote sendo ressubmetido.
+
+O último cenário criado, foi para verificar a virada da janela. Acompanhando pelo \textit{log} do \textit{switch}, é possível
+verificar os valores sendo lidos pelos registradores realizam a virada de N para 0 e as requisições seguem normalmente.
+Com a virada, os valores dos antigos \textit{rounds} não influenciaram nas novas instâncias, verificando também que as limpezas
+no deslizar da janela também funcionaram. Na implementação utilizada, foi aproveitado o fator da arquitetura do \textit{switch},
+em que nos casos que se ocorre um \textit{overflow} no número, ele vai para 0.
+
+\subsection{Melhorias}
 \begin{center}
     Citar possíveis melhorias, dentre elas TTL para o switch não parar\\
     Ver com Lasaro:\\
         Se é possível processar multiplas instâncias simultaneamente, particionando o registrador com janelas para cada parte
 \end{center}
 
-%######################### CONCLUSÃO ##################################
-\chapter{Conclusão}
+\subsection{Discussão}
+
 \begin{center}
-    É um experimento conceitual;\\
-    Pode ser implementado;\\
-    Atenção a arquitetura utilizada;
+    Comentar sobre P4\\
+    Problemas de performance que poderiam acontecer\\
+    Dificuldades encontradas \\
 \end{center}
 
-% \bibliographystyle{alpha}
-\bibliography{references.bib}
+%######################### CONCLUSÃO ##################################
+\chapter{Conclusão}
+Neste trabalho foi realizada a replicação e implementação de melhorias em um trabalho prévio \cite{dang2016paxos} utilizando
+a linguagem de programação P4. Visto que em um sistema de consenso, o número de instâncias a ser executadas é indefinido, foi realizada
+a melhoria para o tratamento das instâncias onde antes não havia. Com essa melhoria, conceitualmente, é possível executar
+quantas instâncias for necessárias, existindo também o tratamento para valores definidos escritos em registradores por instâncias
+antigas não influenciem nas novas instâncias computadas.
 
+Previamente, não existia tratamento paras os valores das instâncias já computadas, e existia um limite definido pelo registrador
+que armazena o número da instância, que possui tamanhos de 16 bits, podendo armazenar até $2^{16} - 1$. Como o tamanho da janela pode
+ser definido, pode existir um tamanho ótimo, que garante mais processamento é um pequeno número de reingressos dos pacotes para
+deslizar a janela. Com a flexibilidade de escolher o tamanho da janela, é possível definir um tamanho, de modo que durante a execução,
+os intervalos das janelas se sobreponham, impossibilitando a execução corretamente.
+
+Com o presente trabalho, foi visto que com a possibilidade de programação em dispositivos de redes, é possível executar um algoritmo
+de consenso nos próprios dispositivos da rede. Onde foi realizada a extensão em um projeto passado e adicionados métodos para execução
+de diversas um número indefinido de instâncias. 
+
+\bibliography{references}
 
 \end{document}
 
