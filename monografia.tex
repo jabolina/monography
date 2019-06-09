@@ -35,7 +35,9 @@
     breaklines=true,
     breakautoindent=true,
     breakatwhitespace=true,
+    morekeywords={table, action, actions, parse, resubmit, add\_to\_field, register\_write, register\_read},
 }
+
 \newcommand{\codigo}{}
 
 \renewcommand{\lstlistingname}{Listagem}
@@ -47,7 +49,7 @@
 \data{2018}
 \orientador{Lásaro Jonas Camargos} %TCC
 
-\titulo{Revisitando o P4 Paxos} %TCC
+\titulo{Revisitando P4 Paxos} %TCC
 
 \renewcommand{\thesection}{\arabic{chapter}.\arabic{section}}
 
@@ -105,52 +107,45 @@
 % ######################### INICIO ###########################################
 \chapter{Introdução}
 
-Com o avanço da tecnologia a interação com a computação se tornou diária, mesmo
-nos mínimos detalhes sempre se interage com algum software no dia a dia. Com
-esse grande aumento na utilização de softwares e do aprimoramento de novas tecnologias, 
-surge a necessidade de aplicações resilientes e tolerantes a falhas. 
+Com o avanço da tecnologia a interação com dispositivos computacionais se tornou diária; mesmo
+nos mínimos afazeres do dia-a-dia, como fazer uma lista de compras para o supermercado, interage-se com algum software. 
+Associado a este uso extensivo de softwares e do aprimoramento de novas tecnologias,  reforça-se a necessidade de aplicações serem resilientes e tolerantes a falhas.
 
 Uma aplicação tolerante a falhas consegue manter o funcionamento mesmo com a eventual 
-falha de um de seus componentes. Como é possível existir eventos inesperados que podem
-causar a eventual falha - ou \textit{crash} - de um servidor, são necessários métodos
-para garantir a consistência quando a aplicação retornar com seu funcionamento
-normal. 
+falha de um de seus componentes. 
+Como é possível existir eventos inesperados que podem causar a eventual falha - ou \emph{crash} - de um servidor, são necessários métodos para garantir a consistência quando a aplicação retornar com seu funcionamento normal. 
 
-Uma maneira de possuir uma aplicação tolerante a falhas é a replicação de máquinas
-de estado, onde o serviço é modelado como uma máquina de estados determinísticos, e o
-serviço é executado em cada réplica \cite{santos2012state}, dessa maneira é mantida
-a consistência da aplicação, mas um \textit{overhead} é adicionado na execução
-de comandos, pois as réplicas precisam ser consistentes entre si. No centro da replicação
-de máquina de estados, existe um problema de consenso, onde o conjunto de réplicas deve 
-chegar a um consenso e decidir sobre qual é o estado válido e decidir sobre qual 
+Uma maneira de possuir uma aplicação tolerante a falhas é a replicação de máquinas de estado, onde o serviço é modelado como uma máquina de estados determinísticos, e o serviço é executado em cada réplica \cite{santos2012state}, dessa maneira é mantida a consistência da aplicação, mas um \emph{overhead} é adicionado na execução de comandos, pois as réplicas precisam ser sincronizadas para manterem-se consistentes entre si. 
+No centro da replicação de máquina de estados, existe um problema de consenso, onde o conjunto de réplicas deve chegar a um consenso e decidir sobre qual é o estado válido e decidir sobre qual 
 transição será realizada. 
 
 Para alcançar o consenso e obter uma aplicação tolerante a falhas, o algoritmo
 Paxos é extensivamente utilizado com esse intuito \cite{dang2016paxos}. 
-O algoritmo realiza uma custosa trocas de mensagens entre seus agentes. Por se 
+O algoritmo realiza uma custosa troca de mensagens entre seus agentes. Por se 
 tratar de um ambiente distribuído as mensagens podem demorar um tempo arbitrário 
 para chegar ao destinatário ou se perder durante a transmissão. Para conseguir 
 uma melhora na performance na execução do algoritmo, pode-se realizar a 
 implementação do Paxos no dispositivos físicos da rede \cite{dang2016paxos}.
 
-Com a utilização da linguagem P4, é aberta a possibilidade de se programar dispositivos
-de rede. Com a utilização de uma tabela \textit{match+action} é possível 
-realizar um processamento customizado dos pacotes sendo transportados, de forma a
-se diminuir a latência do algoritmo e os pacotes atravessariam menos \textit{hops}.
+Com a utilização da linguagem P4, é aberta a possibilidade de se programar dispositivos de rede. 
+Com a utilização de uma tabela \emph{match+action}\todo{use emph em vez de texit para destacar palavras em outras línguas.} é possível realizar um processamento customizado dos pacotes sendo transportados, de forma a se diminuir a latência do algoritmo e os pacotes atravessariam menos \emph{hops}.
 
-Alguns exemplos de aplicações que realizam replicação de máquinas de estados, são,
-por exemplo OpenReplica \cite{openreplica} e Google Chubby \cite{27897}. Aplicações
-de replicação são críticas em data centers, que precisam sempre manter o serviço 
-disponível, com informações consistentes, logo, a maneira como um algoritmo de consenso
-funciona para realizar a replicação de máquina de estados influencia na performance 
-de um data center.
+Alguns exemplos de \emph{frameworks} que realizam permitem a replicação de máquinas de estados, são, por exemplo OpenReplica \cite{openreplica} e o Atomix \cite{atomixio}\todo{FEITO.OpenReplica é um framework para replicacao. Chubby é uma aplicação, um serviço de locks distribuído. Então, essencialmente, estão em categorias diferentes. Se quiser ficar com a primeira, cite, em vez do chubby, o atomix, que implementa o raft}. 
+Aplicações de replicação são críticas em data centers, que precisam sempre manter o serviço  disponível, com informações consistentes, logo, a maneira como um algoritmo de consenso funciona para realizar a replicação de máquina de estados influencia na performance de um data center.
 
-O presente trabalho se baseia no trabalho de \cite{dang2016paxos}, publicado
-em 2016. Tal trabalho possui visões promissoras para o desenvolvimento
-e pesquisa nas linguagens de programação de planos de dados e vislumbra o que pode ser
-novos desafios nas pesquisas de protocolos de consenso. O presente projeto dá atenção maior
-ao primeiro fator citado, realizando a implementação do algoritmo de consenso Paxos utilizando
-a linguagem de programação de planos de dados P4.
+O presente trabalho se baseia no trabalho de \cite{dang2016paxos}, que apresenta visão
+promissora para o desenvolvimento e pesquisa nas linguagens de programação de planos de dados 
+e vislumbra o que pode ser novos desafios nas pesquisas de protocolos de consenso.
+O presente projeto dá atenção maior ao primeiro fator citado, realizando a implementação do algoritmo de consenso Paxos utilizando a linguagem de programação de planos de dados P4. 
+
+Em \cite{dang2016paxos}, a implementação possui algumas limitações, dentre elas, a limitação na execução de instâncias do Paxos. 
+O número de instâncias que podem ser computadas, é limitado pelo valor do registrador que armazena o número de instância, tal registrador, foi definido com tamanho de 16 bits, assim podendo executar $2^{16}$ instâncias. De acordo com a arquitetura de \emph{switch} utilizada, o \emph{overflow} pode ser tratado de modo que não ocorra erro, e sim que o próximo número após 65535 seja o número 0. 
+Mesmo que o próprio \emph{switch} recomece as instancias a partir de 0, não existe nenhum mecanismo que trate dos registradores em valores utilizados anteriormente. 
+
+Desta forma, o presente projeto trata dessas limitações, criando um mecanismo utilizando uma
+janela deslizante para lidar com os valores das instâncias, podendo realizar mais que
+65536 instâncias e não precisando se preocupar com os valores utilizados anteriormente
+que estão presentes no registradores.
 
 \section{Justificativas}
 Com a utilização do algoritmo Paxos para resolução do problema de consenso e para a 
@@ -159,7 +154,7 @@ agentes pertencentes a aplicação. Essa comunicação, pode se tornar dispendio
 a troca de mensagens entre as partes podem ter falhas e ser prolongada até que o 
 algoritmo alcance seu objetivo que é o consenso.
 
-Desta forma, essa comunicação poderiam influenciar na performance da aplicação e em 
+Desta forma, essa comunicação pode influenciar na performance da aplicação e em 
 sua disponibilidade, visto que esse processamento é realizado pela própria aplicação ou 
 em servidores que tem essa função delegada. Visando esse problema, com a transferência
 da lógica de consenso da aplicação para dispositivos de rede, podemos reduzir a latência
@@ -170,16 +165,16 @@ alta comunicação entre as partes e não um algoritmo com alto processamento
 
 Desta maneira, o presente projeto busca obter uma melhora na performance de 
 execução do Paxos e obter uma resposta do algoritmo de forma mais rápida e menos 
-custosa, realizando a implementação do algoritmo em dispositivos de rede.
+custosa, estendendo uma implementação do algoritmo em dispositivos de rede.
 
 \section{Objetivos}
 Com a possibilidade de programação em dispositivos de redes, o presente trabalho 
-realizou a implementação do algoritmo Paxos nos dispositivos de rede, especificamente
-\textit{switches}, utilizando a linguagem $P4_{14}$. 
+visa estender um projeto anterior que realizou a implementação do algoritmo Paxos nos 
+dispositivos de rede, especificamente \emph{switches}, utilizando a linguagem $P4_{14}$. 
 Desta maneira, conseguindo uma melhora na performance do algoritmo, pois uma parte 
 que seria executado em um servidor se moveria para ser executado nesses dispositivos, permitindo,
 assim, processar as mensagens enquanto as mesmas estão sendo roteadas e atravessar menos
-\textit{hops}, resultando na redução da latência.
+\emph{hops}, resultando na redução da latência.
 
 Inicialmente, alcançando os resultados obtidos no projeto de \cite{dang2016paxos}, 
 como citado pelos pesquisadores do projeto passado e, como um dos principais pontos deixado pelos 
@@ -198,17 +193,16 @@ Replicação do projeto de \cite{dang2016paxos} utilizando a linguagem
 $P4_{14}$, realização de simulações para verificar o funcionamento do projeto.
 
 \subsection{Extensão}
-Após realizada a replicação, foi realizada uma verificação de possíveis fatores que podem ser 
+Após realizada a reprodução, foi realizada uma verificação de possíveis fatores que podem ser 
 melhorados no antigo projeto, sendo explicado o que pode ser feito para melhorar e como foi
 realizada a implementação.
 
 \subsection{Validação}
-A terceira e última foi composta pela implementação e análise das melhorias, foram realizadas
-simulações também utilizando o Mininet para verificação do comportamento na rede e uma comparação
-entre a nova e atual versão do projeto e possíveis pontos para futuras aplicações e pesquisas.
+A terceira e última fase, foi composta pela implementação e foram realizadas
+simulações também utilizando o Mininet para validação do comportamento na rede.
+\cite{dang2015netpaxos}
 
-
-\todo{Comentar a seção de cronograma. :Feito}
+\todo{FEITO. Comentar a seção de cronograma.}
 
 %######################### FUNDAMENTACAO ##################################
 \chapter{Fundamentação Teórica}
@@ -221,10 +215,7 @@ Para seguirmos uma linha de raciocínio linear, e melhorar entendimento da teori
 para compreender o projeto, será abordado inicialmente informações sobre o 
 algoritmo Paxos, seu modo de operar e flexibilidade para resolução de problemas.
 
-Em seguida, será explicado como é o funcionamento da linguagem P4, alguns exemplos
-da sintaxe e como suas definições na versão $P4_{14} - 1.0.5$. para finalizar o 
-referencial teórico, será  explicado sobre o Mininet, seu funcionamento e qual o 
-intuito na sua utilização no projeto.
+Em seguida, será explicado como é o funcionamento da linguagem P4, alguns exemplos da sintaxe e como suas definições na versão $P4_{14}$.Finalizando o referencial teórico, será  explicado sobre o Mininet, seu funcionamento e qual o intuito na sua utilização no projeto.
 
 \subsection{Paxos}
 Paxos foi criado por Leslie Lamport, foi publicado inicialmente em 1989. Ele consiste em uma 
@@ -233,42 +224,42 @@ família de algoritmos voltada para resolução de problemas de consenso.
 A ideia de consenso é a de compartilhar informações entre um grupo de elementos
 processadores, de preferência com uma maneira tolerante a falhas \cite{barborak1993consensus}.
 Normalmente esse compartilhamento de informações é realizado com o intuito de tomar
-uma decisão, por exemplo, os elementos devem decidir se \textit{commitam} ou não
+uma decisão, por exemplo, os elementos devem decidir se \emph{commitam} ou não
 uma transação realizada no banco de dados. 
 
 De maneira básica, os elementos devem propor valores para serem escolhidos, 
 comunicar entre si para tomar uma decisão e o valor final é escolhido pela maioria de 
 elementos do conjunto.
-A escolha da maioria não é necessariamente $\frac{n}{2}+1$, --- sendo $n$ o número
-total de elementos processadores --- a decisão do que será maioria para tomada de decisão
+A escolha do quorum não é necessariamente $\frac{n}{2}+1$, --- sendo $n$ o número
+total de elementos processadores --- a decisão do que será o quorum para tomada de decisão
 pode ser criada pelo projetista, mas sempre visando atender o projeto, levando
 em consideração que dentre esses $n$ elementos existirão alguns que falharão, essa maioria
-é o quorum.
+é o quorum.\todo{FEITO. entendo o que quer dizer, mas tem um problema aqui. maioria é bem definido. quorum é que é variável. acho que os conceitos estão invertidos aqui.}
 
 Para garantir a escolha de um valor e a propagação do valor decidido, o problema
 possui alguns requisitos que devem ser atendidos pelos algoritmos. Os requisitos de
-segurança são:
+segurança são: \todo{FEITO. itemizações seguem a mesma regra gramatical que listas corridas no texto, isto é, ; separando as partes, e uma conjunção para terminar.}
 
 \begin{itemize}
-    \item Um valor proposto talvez seja aceito
+    \item Somente um valor proposto pode ser aceito;
     \item Os elementos não aprendem qual o valor decidido até que um valor 
-    tenha sido realmente decidido
-    \item Um único valor é decidido
+    tenha sido realmente decidido;
+    \item Um único valor é decidido.
 \end{itemize}
 
 Algoritmos para consenso funcionam em estágios que refletem o próprio problema, e para
 serem algoritmos tolerante a falhas, devem estar preparados para repetir esses ciclos,
 considerando os valores escolhidos no ciclo passado, cada um desses ciclos é conhecido como
-\textit{round} \cite{camargos2008multicoordinated}.
+\emph{round} \cite{camargos2008multicoordinated}.
 
 Os elementos participantes do Paxos, chamados de agentes, comunicam entre si, e assumem 
 um ou mais papéis para a evolução do algoritmo. Os papéis a serem desempenhados são, 
 utilizando a nomenclatura fornecida por Lamport \cite{lamport2001paxos}, 
-\textit{proposers} (agentes que propõem algum valor), \textit{acceptors} 
-(agentes que escolhem um único valor) e \textit{learners} (agentes que aprendem
+\emph{proposers} (agentes que propõem algum valor), \emph{acceptors} 
+(agentes que escolhem um único valor) e \emph{learners} (agentes que aprendem
 qual foi o valor escolhido pelo algoritmo).
 Existem alguns papéis de coordenadores, que podem ou não ser utilizados no algoritmo, 
-sendo, por exemplo \textit{distinguished proposer}, que será explicado mais ao fim.
+sendo, por exemplo \emph{distinguished proposer}, que será explicado mais ao fim.
 
 A comunicação dos agentes se dá por troca de mensagens, utilizando um modelo assíncrono e
 não-bizantino, onde os agentes operam em diferentes velocidades, podem falhar e podem ser
@@ -278,26 +269,26 @@ duplicadas, mas nunca corrompidas \cite{lamport2001paxos}.
 
 \subsubsection{Escolha do valor}
 A explicação para o entendimento do Paxos será iniciada pela escolha de um valor. 
-Quando uma mensagem, com algum valor proposto chega para o \textit{acceptor}, esse valor pode 
-ser aceito ou não. Logo, um \textit{acceptor} deve ser capaz de aceitar um valor proposto, 
+Quando uma mensagem, com algum valor proposto chega para o \emph{acceptor}, esse valor pode 
+ser aceito ou não. Logo, um \emph{acceptor} deve ser capaz de aceitar um valor proposto, 
 assim sendo, sua definição é dada por:
 
 \begin{definition}
-$P_1$: um \textit{acceptor} deve aceitar o primeiro valor que receber.
+$P_1$: um \emph{acceptor} deve aceitar o primeiro valor que receber.
 \end{definition}
 
 Mas para se chegar a um consenso e um único valor ser decidido pelos agentes, cada um
-dos agentes deve ter escolhido o mesmo valor. Desta forma, os \textit{acceptors} devem
+dos agentes deve ter escolhido o mesmo valor. Desta forma, os \emph{acceptors} devem
 ser capazes de aceitar mais de uma proposta e também devem conseguir identificar qual
-a proposta aceita, onde cada \textit{acceptor} possui um histórico de quais foram as
+a proposta aceita, onde cada \emph{acceptor} possui um histórico de quais foram as
 propostas aceitas.
 
 As propostas enviadas devem possuir um identificador, passível de ser ordenado e que não 
 possa ser repetido por outra proposta de modo a impossibilitar diferentes propostas com o mesmo
 identificador no algoritmo. Adiante, as propostas serão simbolizadas por 
-\textit{(n, v)}, sendo $n$ a identificação da proposta e $v$ o valor da mesma.
+\emph{(n, v)}, sendo $n$ a identificação da proposta e $v$ o valor da mesma.
 
-Para que os \textit{acceptors} escolham mais de uma proposta, deve-se existir a garantia de
+Para que os \emph{acceptors} escolham mais de uma proposta, deve-se existir a garantia de
 que todas as propostas enviadas possuam o mesmo valor. Disso, surge a seguinte definição:
 
 \begin{definition}
@@ -307,35 +298,35 @@ identificador $>n$ devem possuir valor $v$.
 
 Como os identificadores podem ser ordenados, a propriedade de que somente um valor é escolhido
 é mantida pelo algoritmo. Como, para ser decidida, uma proposta tem que ter sido escolhida
-por pelo menos um \textit{acceptor}, para fortalecer $P_2$, surge a seguinte definição:
+por pelo menos um \emph{acceptor}, para fortalecer $P_2$, surge a seguinte definição:
 
 \begin{definition}
 $P_2^a$: se uma proposta $(n, v)$ foi decidida, então todas propostas com identificador
-$>n$ escolhidas por um \textit{acceptor}, possui valor $v$.
+$>n$ escolhidas por um \emph{acceptor}, possuem valor $v$.
 \end{definition}
 
 Como ainda existem cenários onde a definição de $P_2$ pode ser violada, a mesma precisa ser
 reforçada. Um desses cenários, exemplificado por Lamport, é o seguinte:
 Sempre se mantem $P_1$ para uma proposta ser escolhida, mas como
-a comunicação é assíncrona, uma proposta pode ser escolhida por um \textit{acceptor c} 
+a comunicação é assíncrona, uma proposta pode ser escolhida por um \emph{acceptor c} 
 que nunca tenha escolhido nenhuma proposta antes, e como os agentes podem falhar, suponha
-que um \textit{proposer} envie uma proposta com identificador maior e com um valor qualquer.
-O \textit{acceptor c} escolheria essa proposta, o que violaria a definição $P_2^a$. Para
+que um \emph{proposer} envie uma proposta com identificador maior e com um valor qualquer.
+O \emph{acceptor c} escolheria essa proposta, o que violaria a definição $P_2^a$. Para
 fortalecer a definição, se tem o seguinte:
 
 \begin{definition}
 $P_2^b$: se uma proposta $(n, v)$ foi decidida, então todas propostas com identificador
-$>n$ enviadas por um \textit{proposer}, possui valor $v$.
+$>n$ enviadas por um \emph{proposer}, possui valor $v$.
 \end{definition}
 
 Finalmente, para assegurar $P_2$, se tem a seguinte definição:
 
 \begin{definition}
 $P_2^c$: Para qualquer proposta $(n, v)$ enviada, existe um conjunto $S$ de
-\textit{acceptors}, que cairá em um dos casos:
+\emph{acceptors}, que cairá em um dos casos:
 
 \begin{enumerate}
-    \item $S$ não possui nenhum \textit{acceptor} que tenha escolhido uma proposta com 
+    \item $S$ não possui nenhum \emph{acceptor} que tenha escolhido uma proposta com 
 identificador $<n$.
 
     \item $v$ é o valor da proposta com o maior identificador dentre as propostas com o 
@@ -346,30 +337,30 @@ menor identificador $<n$ escolhidas pelo conjunto $S$.
 Com essas definições, o algoritmo para envio de propostas funcionará da seguinte maneira:
 
 \begin{itemize}
-    \item[]\textit{Proposer} envia proposta com identificador $n$ para conjunto de 
-\textit{acceptors}, esperando uma das seguintes respostas:
+    \item[]\emph{Proposer} envia proposta com identificador $n$ para conjunto de 
+\emph{acceptors}, esperando uma das seguintes respostas:
 
     \begin{itemize}
         \item[] Promessa de não aceitar valor $<n$
         \item[] Se existir, proposta com maior identificador $<n$
     \end{itemize}
     
-    \item[]Se receber uma resposta da maioria dos \textit{acceptors}:
+    \item[]Se receber uma resposta da maioria dos \emph{acceptors}:
     \begin{itemize}
         \item[] Enviar a proposta $(n, v)$, sendo $v$ o valor da proposta de maior identificador
         recebido nas respostas
-        \item[] Um valor escolhido pelo próprio \textit{proposer}.
+        \item[] Um valor escolhido pelo próprio \emph{proposer}.
     \end{itemize}
 \end{itemize}
 
-Esses passos do algoritmo receberam um nomenclatura, que são \textit{prepare} e
-\textit{accept}, respectivamente. O algoritmo em pseudo-código fica da seguinte maneira:
+Esses passos do algoritmo receberam um nomenclatura, que são \emph{prepare} e
+\emph{accept}, respectivamente. O algoritmo em pseudo-código fica da seguinte maneira:
 
 \begin{algorithm}[H]
 \caption{Envio de propostas}
 \SetAlgoLined
 \Inicio{
-$A$ = conjunto de \textit{acceptors}
+$A$ = conjunto de \emph{acceptors}
 
 $n$ = identificador
 
@@ -391,21 +382,21 @@ $respostas$ = []
 }
 \end{algorithm}
 
-Com esse algoritmo para envio de propostas, tem-se que um \textit{acceptor} irá
-receber requisições do tipo \textit{prepare} e \textit{accept}. Para evitar um \textit{overhead}
-de requisições e mensagens, o \textit{acceptor} pode ignorar requisições de qualquer tipo,
-mas pode responder requisições do tipo \textit{prepare} se, e somente se, não estiver
+Com esse algoritmo para envio de propostas, tem-se que um \emph{acceptor} irá
+receber requisições do tipo \emph{prepare} e \emph{accept}. Para evitar um \emph{overhead}
+de requisições e mensagens, o \emph{acceptor} pode ignorar requisições de qualquer tipo,
+mas pode responder requisições do tipo \emph{prepare} se, e somente se, não estiver
 prometido a outra proposta. Assim, para finalizar, tem-se:
 
 \begin{definition}
-$P_1^a$: um \textit{acceptor} pode aceitar qualquer proposta $(n, v)$, se, e somente se, não tiver
-respondido um requisição \textit{prepare} com identificador $>n$.
+$P_1^a$: um \emph{acceptor} pode aceitar qualquer proposta $(n, v)$, se, e somente se, não tiver
+respondido um requisição \emph{prepare} com identificador $>n$.
 \end{definition}
 
 Desta forma, o algoritmo para envio de proposta está totalmente definido. Para se definir
-o algoritmo para escolha de valores, deve-se assegurar que um \textit{acceptor} se
+o algoritmo para escolha de valores, deve-se assegurar que um \emph{acceptor} se
 lembre da proposta com maior identificador que já escolheu e do maior identificador
-que a requisição de \textit{prepare} respondeu. Essas informações devem ser mantidas
+que a requisição de \emph{prepare} respondeu. Essas informações devem ser mantidas
 em uma memória não volátil, para que não sejam perdidas em eventuais falhas.
 
 O algoritmo final para escolha é definido a seguir, separado em duas fases:
@@ -413,10 +404,10 @@ O algoritmo final para escolha é definido a seguir, separado em duas fases:
 \begin{itemize}
     \item [Fase 1]
     \begin{itemize}
-        \item [a] Um \textit{proposer} envia um requisição de \textit{prepare} com
+        \item [a] Um \emph{proposer} envia um requisição de \emph{prepare} com
         identificador $n$.
         
-        \item [b] Se um \textit{acceptor} recebe um \textit{prepare} com identificador
+        \item [b] Se um \emph{acceptor} recebe um \emph{prepare} com identificador
         $n$ sendo o maior identificador que já recebeu, responde com a promessa de não
         aceitar nenhuma proposta com identificador $<n$, juntamente com a proposta com
         maior identificador $<n$, se existir.
@@ -424,42 +415,41 @@ O algoritmo final para escolha é definido a seguir, separado em duas fases:
     
     \item [Fase 2]
     \begin{itemize}
-        \item [a] Se o \textit{proposer} recebe resposta de uma maioria de \textit{acceptors}
-        para seu \textit{prepare} de identificador $n$, então, envia um \textit{accept} 
-        com identificador $n$ e valor $v$, sendo $v$ o valor da resposta de \textit{prepare}
-        com maior identificador; senão, $v$ é um valor escolhido pelo \textit{proposer}.
+        \item [a] Se o \emph{proposer} recebe resposta de uma maioria de \emph{acceptors}
+        para seu \emph{prepare} de identificador $n$, então, envia um \emph{accept} 
+        com identificador $n$ e valor $v$, sendo $v$ o valor da resposta de \emph{prepare}
+        com maior identificador; senão, $v$ é um valor escolhido pelo \emph{proposer}.
         
-        \item [b] Se um \textit{acceptor} recebe um \textit{accept} com identificador $n$,
-        ele o aceita; caso, no tempo transcorrido tenha respondido um \textit{prepare}
-        com identificador $>n$, poderá negar o \textit{accept} recebido.
+        \item [b] Se um \emph{acceptor} recebe um \emph{accept} com identificador $n$,
+        ele o aceita; caso, no tempo transcorrido tenha respondido um \emph{prepare}
+        com identificador $>n$, poderá negar o \emph{accept} recebido.
     \end{itemize}
 \end{itemize}
 
-Após o valor ser decidido pelo algoritmo, o valor deve ser propagado para os \textit{learners},
+Após o valor ser decidido pelo algoritmo, o valor deve ser propagado para os \emph{learners},
 que só conhecem o valor após ser definitivamente decidido.
 
 \subsubsection{Propagação do valor decidido}
-Após um valor ser decidido, os \textit{learners} devem conhecer o valor. Isso pode ser realizado
+Após um valor ser decidido, os \emph{learners} devem conhecer o valor. Isso pode ser realizado
 de diferentes maneiras e fica a critério do arquiteto para escolher qual atende melhor o
 problema a ser resolvido.
 
-Uma das maneiras de se conhecer o valor, seria cada um dos \textit{acceptors} responder para
-todos os \textit{learners} qual o valor decidido. Assim, uma troca de $(n \cdot m)$ mensagens, 
-o produto entre o número de \textit{acceptors} e o número de \textit{learners}, seriam obtidas.
+Uma das maneiras de se conhecer o valor, seria cada um dos \emph{acceptors} responder para
+todos os \emph{learners} qual o valor decidido. Assim, uma troca de $(n \cdot m)$ mensagens, 
+o produto entre o número de \emph{acceptors} e o número de \emph{learners}, seriam obtidas.
 
 Levando em consideração o papel de coordernador, citado anteriormente outra maneira de se 
-realizar a propagação de mensagens seria os \textit{acceptors} enviarem o valor decidido para um
-\textit{distinguished learner} que, após conhecer o valor decidido, envia para os
-\textit{learners} tal valor decidido. Esse método teria $(n + m)$ troca de mensagens,
-a soma entre o número de \textit{acceptors} e o número de \textit{learners}. Mas, como os
-agentes são suscetíveis a falhas, o \textit{distinguished learner} também pode falhar,
-assim impossibilitando a transmissão do valor decidido para os \textit{learners}.
+realizar a propagação de mensagens seria os \emph{acceptors} enviarem o valor decidido para um
+\emph{distinguished learner} que, após conhecer o valor decidido, envia para os
+\emph{learners} tal valor decidido. Esse método teria $(n + m)$ troca de mensagens,
+a soma entre o número de \emph{acceptors} e o número de \emph{learners}. Mas, como os
+agentes são suscetíveis a falhas, o \emph{distinguished learner} também pode falhar,
+assim impossibilitando a transmissão do valor decidido para os \emph{learners}.
 
 \subsection{P4}
 P4 é uma linguagem utilizada para programação do plano de dados em  dispositivos de 
 rede \cite{paxos16spec}. Dispositivos de rede possuem dois planos, sendo eles o 
-plano de controle e o plano de encaminhamento, também chamado de plano de dados ou 
-plano do usuário. 
+plano de controle e o plano de encaminhamento, também chamado de plano de dados. 
 
 Pode ser feita uma analogia para se entender a diferença entre o 
 plano de controle e o plano de dados, foi eleito de forma honesta, um novo 
@@ -467,7 +457,7 @@ funcionário para cuidar do transporte público da cidade Zanzizânia. Antes de 
 enviar os veículos é necessário realizar o planejamento de quais o caminhos serão
 utilizados, as pessoas ainda não foram movidas pelos veículos, mas os caminhos 
 e as paradas são conhecidos, essa parte é semelhante ao plano de controle, onde 
-são encontradas as rotas.\cite{dataVsControl}.
+são encontradas as rotas.\cite{dataVsControl}.\todo{está faltando algo aqui.}
 
 Numa rede de roteadores, esse planejamento, que é descobrir e aprender novas rotas 
 pode ser realizado por rotas estáticas, onde o roteador é ensinado sobre redes remotas
@@ -490,7 +480,7 @@ nos cabeçalhos \cite{bosshart2014p4}.
 
 Com isso, a P4 veio para ser independente do protocolo com que se está trabalhando,
 vide seu nome no artigo em que foi publicado, 
-\textit{Programming protocol-independent packet processor}. A linguagem foi 
+\emph{Programming protocol-independent packet processor}. A linguagem foi 
 construída visando a reconfigurabilidade e ser independente do dispositivo em que se 
 deseja trabalhar, ou seja, é possível processar e analisar os pacotes enquanto o programador
 não precisa se preocupar com detalhes do switch, onde esse trabalho fica para o compilador 
@@ -506,7 +496,7 @@ básicos, esses componentes também são definidos pela linguagem. O primeiro de
 componentes é o parser programável, podendo ser definido pelo programador, juntamente 
 com seu funcionamento. O segundo componente, o coração do modelo, é um pipeline de tabelas,
 que combinam com algum dado e executam a ação correspondente. Após o pipeline, e executado
-o processamento, o pacote passa por um $deparser$, que faz a função "inversa" do parser,
+o processamento, o pacote passa por um \emph{deparser}, que faz a função ``inversa`` \todo{FEITO aspas são ``assim''} do parser, 
 preparando o pacote na forma correta para ser transmitido \cite{p4LangTutorial}.
 
 \todo{Feito. referencia na figura}
@@ -530,13 +520,13 @@ monta os pacotes e transmite de volta para rede \cite{p4LangTutorial}.
 \subsubsection{Componentes da linguagem}
 
 A linguagem utiliza um modelo abstrato para redirecionamento de pacotes, que possui
-dois tipos de operações, \textit{configure} e \textit{populate}. Durante a operação
-de \textit{configure}, o parser é criado, é definida a ordem de estágios nas tabelas
-\textit{match+action} e quais os campos do cabeçalhos são processados em cada estágio,
-durante a operação de \textit{populate} adicionam e removem entradas nas tabelas
-\textit{match+action} construídas durante operação de \textit{configure}. Assim,
-durante \textit{configure}, é definido qual protocolo será utilizado e como será
-o processamento dos pacotes, e durante \textit{populate} é determinada qual a 
+dois tipos de operações, \emph{configure} e \emph{populate}. Durante a operação
+de \emph{configure}, o parser é criado, é definida a ordem de estágios nas tabelas
+\emph{match+action} e quais os campos do cabeçalhos são processados em cada estágio,
+durante a operação de \emph{populate} adicionam e removem entradas nas tabelas
+\emph{match+action} construídas durante operação de \emph{configure}. Assim,
+durante \emph{configure}, é definido qual protocolo será utilizado e como será
+o processamento dos pacotes, e durante \emph{populate} é determinada qual a 
 política utilizada nos pacotes \cite{bosshart2014p4}.
 
 A linguagem possui alguns componentes centrais, o primeiro desses componentes 
@@ -549,7 +539,7 @@ seria:
 
 Outro componente é o parser, o parser especifica quais campos do cabeçalhos estão
 bem definidos e como encontrar esses campos. Os campos extraídos dos cabeçalhos e 
-são enviados para tabela de \textit{match+action}, onde será processado e seguirá
+são enviados para tabela de \emph{match+action}, onde será processado e seguirá
 para o próximo passo, agindo de maneira semelhante a uma máquina de estados, em 
 que as transições são realizadas por valores nos campos do cabeçalho. Um parser
 segue a seguinte definição:
@@ -558,9 +548,9 @@ segue a seguinte definição:
 
 O parser é iniciado em \texttt{start}, é segue até encontrar um \texttt{stop} ou não
 encontrar nenhum match, o que seria um erro \cite{bosshart2014p4}. O parser cria um 
-\textit{parsed packet} em que a tabela de \textit{match+action} irá utilizar,
+\emph{parsed packet} em que a tabela de \emph{match+action} irá utilizar,
 assim, valores que serão utilizados no processamento devem estar contidos nesse
-\textit{parsed packet} \cite{p4USITutorial}.
+\emph{parsed packet} \cite{p4USITutorial}.
 
 O componente fornecido pela linguagem para o processamento dos pacotes são as tabelas,
 de acordo com matches em campos do cabeçalho, esse match  pode ser exato, parcial 
@@ -588,7 +578,7 @@ de execução \cite{bosshart2014p4}.
 
 O último componente é o controle de programa, utilizando funções, condições e referências
 a tabelas, é definido o fluxo de uma tabela para a próxima, assim, o controle de programa
-consiste em um programa imperativo que descreve o fluxo entre tabelas \textit{match+action} 
+consiste em um programa imperativo que descreve o fluxo entre tabelas \emph{match+action} 
 \cite{bosshart2014p4}. Um exemplo de como é o controle do programa: 
 
 \lstinputlisting[language=c++, caption={header.p4}]{code/p4-example/program.p4}
@@ -604,14 +594,14 @@ específicos do dispositivo alvo em que se vai trabalhar \cite{bosshart2014p4}.
 
 \subsubsection{Ferramentas oferecidas}
 Outras ferramentas também são oferecidas pelo P4 Lang Consortium, dentre elas estão o 
-$behavioral model$, também chamado de $bmv2$ e o $p4c-bm$. O $behavioral model$ é utilizado 
+\emph{behavioral model}\todo{FEITO use emph para enfatizar texto. deixe $ $ apenas para conteúdo matemático.}, também chamado de \emph{bmv2} e o \emph{p4c-bm}. O \emph{behavioral model} é utilizado 
 para executar os programas escritos em P4, oferece também na linha de comando uma interface 
-para popular as tabelas inicialmente, se conectando através de um servidor $thrift$ e podendo 
+para popular as tabelas inicialmente, se conectando através de um servidor \emph{thrift} e podendo 
 assim, por exemplo, definir qual a ação padrão de uma tabela. Através da linha de comando do 
-$behavioral model$ também é possível configurar como será o $multicast$. Para executar esses 
-comandos, é preciso fornecer a representação do programa P4 em formato $JSON$
-\footnote{JavaScript Object Notation}, isso pode ser obtido utilizando o $p4c-bm$, que gera a 
-representação pronta para ser utilizada no $behavioral model$.
+\emph{behavioral model} também é possível configurar como será o \emph{multicast}. Para executar esses 
+comandos, é preciso fornecer a representação do programa P4 em formato \emph{JSON}
+\footnote{JavaScript Object Notation}, isso pode ser obtido utilizando o \emph{p4c-bm}, que gera a 
+representação pronta para ser utilizada no \emph{behavioral model}.
 
 Com a arquitetura e ferramentas definidas, é possível, por exemplo, implementar o roteamento 
 de pacotes IPv4. Assim, é possível notar que para implementação do projeto, a utilização da P4
@@ -639,7 +629,7 @@ A partir da linha de comando, é possível executar comandos em nós específico
 
 \subsubsection{CLI}
 Para iniciar a interface do Mininet pela linha de comando, com a topologia
-\textit{minimal}, que consiste em 2 processos hosts, 1 processo switch e 1 controlador
+\emph{minimal}, que consiste em 2 processos hosts, 1 processo switch e 1 controlador
 básico, basta executar \cite{mininetOrg}:
 
 \begin{minted}{bash}
@@ -653,12 +643,12 @@ conectividade entre os hosts, basta executar:
   mininet> h1 ping -c 1 h2
 \end{minted}
 
-Para $h1$ descobrir o endereço de $h2$, ele realiza um ARP, fazendo com que o evento de 
-\texttt{packet\_in} vá para o controlador. O controlador realiza um broadcast em todas as portas
-com a mensagem de \texttt{packet\_out} no switch. Assim, quando $h2$ recebe a requisição ARP ele
-envia uma resposta, que passa pelo controlador e retorna para $h1$, que agora conhece o endereço
-de $h2$. Com $h1$ agora possuindo o endereço de $h2$, envia o \textit{echo request} utilizando
-protocolo ICMP, e $h2$ responde com \textit{echo reply}.
+Para \emph{h1} descobrir o endereço de \emph{h2}, ele realiza um ARP, fazendo com que o evento de 
+\texttt{packet\_in} vá para o controlador. O controlador realiza um \emph{broadcast} em todas as portas
+com a mensagem de \texttt{packet\_out} no \emph{switch}. Assim, quando \emph{h2} recebe a requisição ARP ele
+envia uma resposta, que passa pelo controlador e retorna para \emph{h1}, que agora conhece o endereço
+de \emph{h2}. Com \emph{h1} agora possuindo o endereço de \emph{h2}, envia o \emph{echo request} utilizando
+protocolo ICMP, e \emph{h2} responde com \emph{echo reply}.
 
 \subsubsection{Python}
 Utilizando a API em Python, também é possível definir diferentes topologias para a rede. Um
@@ -697,7 +687,7 @@ pela linha de comando.
     \label{fig:custom-topology-example}
 \end{figure}
 
-Visto que a utilização de verdadeiros switches e roteadores pode ser caro para simulação do
+Visto que a utilização de verdadeiros \emph{switches} e roteadores pode ser caro para simulação do
 projeto, podemos utilizar a simulação que o Mininet oferece para resolver esse problema.
 Como observado no exemplos, podemos utilizar diferentes topologias, que são criadas e 
 executadas de forma prática, assim facilitando nos experimentos.
@@ -720,7 +710,7 @@ dentre outros pontos. Foi realizada também uma discussão sobre protocolos de c
 onde os protocolos normalmente só assumem uma conexão ponto-a-ponto, seria interessante a
 construção de protocolos que assumem outras propriedades da rede, pois existe um avanço
 no hardware utilizado, assim, a performance dos protocolos poderiam ser melhoradas 
-\cite{dang2016paxos}.
+\cite{dang2016paxos}.\todo{alem do paxos made switch-y, tem a dissertação e um outro artigo publicado depois.}
 
 %######################### DESENVOLVIMENTO ##################################
 \chapter{Desenvolvimento}
@@ -729,40 +719,40 @@ O desenvolvimento do projeto seguirá como descrito no cronograma, sendo divido 
 dos códigos utilizados e uma breve explicação de qual o intuito que se deseja realizar.
 
 O desenvolvimento foi realizado em uma máquina 64 bits utilizando Linux, especificamente a 
-distribuição $Arch$ com o $kernel 5.1.4-arch1-1-ARCH$.
+distribuição \emph{Arch} com o \emph{kernel 5.1.4-arch1-1-ARCH}.
 
 \section{Reprodução}
 Nessa subseção descreverá como se deu a replicação do projeto de \cite{dang2016paxos}, como foi realizada 
 a criação do ambiente e quais foram os testes
-realizados. O código utilizado no projeto passado pode ser encontrado no $GitHub$
+realizados. O código utilizado no projeto passado pode ser encontrado no \emph{GitHub}
 \footnote{https://github.com/usi-systems/p4xos-public}, possuindo os passos que
 se deve realizar para execução do projeto e dos testes. Para o presente projeto foi 
-criado um repositório contendo todo código, que também pode ser encontrado no $GitHub$
+criado um repositório contendo todo código, que também pode ser encontrado no \emph{GitHub}
 \footnote{https://github.com/jabolina/monography-code}, desta forma ficando aberto
 para contribuições e para ser utilizado em outras pesquisas e projetos.
 
 \subsection{Ambiente}
-Para execução do projeto, é criada uma máquina virtual que utiliza $Vagrant$ para
+Para execução do projeto, é criada uma máquina virtual que utiliza \emph{Vagrant} para
 manutenção, instalação das dependências e pacotes necessários. O sistema operacional
-utilizado é o Ubuntu, da imagem $ubuntu/trusty64$, fornecido pela própria
-$Vagrant$ \cite{ubuntuTrusty}. Para o funcionamento é necessário indicar qual será
-o provedor, para o projeto foi utilizado como provedor a $VirtualBox$, onde foi
-alocado 2048 $MBs$ de memória RAM e 2 núcleos do processador para a máquina
+utilizado é o Ubuntu, da imagem \emph{ubuntu/trusty64}, fornecido pela própria
+\emph{Vagrant} \cite{ubuntuTrusty}. Para o funcionamento é necessário indicar qual será
+o provedor, para o projeto foi utilizado como provedor a \emph{VirtualBox}, onde foi
+alocado 2048 \emph{MBs} de memória RAM e 2 núcleos do processador para a máquina
 virtual.
 
-As dependências instaladas são descritas no arquivo $Vagrantfile$, nesse caso,
-as dependências são descritas em scripts $bash$, que funcionam como forma
-de provisão para máquina, podendo ser scripts que simples que criam pastas e arquivos
+As dependências instaladas são descritas no arquivo \emph{Vagrantfile}, nesse caso,
+as dependências são descritas em \emph{scripts bash}, que funcionam como forma
+de provisão para máquina, podendo ser \emph{scripts} que simples que criam pastas e arquivos
 como também para instalação e preparação do ambiente, como é o caso. O primeiro script 
-instala o Mininet, utilizando a versão que possui a $tag 2.2.1$, logo após é instalado 
-o $POX$, que se trata de um $framework$ para comunicação com os $switches$ podendo 
-utilizar tanto o protocolo $OpenFlow$  como $OVSDB$ \cite{poxWiki}. Para o $POX$ 
-é utilizado um $commit$ específico. Um segundo script irá instalar as dependências 
-relacionadas a P4, a primeira dependência é o $thrift$ que é utilizado por
+instala o Mininet, utilizando a versão que possui a \emph{tag 2.2.1}, logo após é instalado 
+o \emph{POX}, que se trata de um \emph{framework} para comunicação com os \emph{switches} podendo 
+utilizar tanto o protocolo \emph{OpenFlow} como \emph{OVSDB} \cite{poxWiki}. Para o \emph{POX} 
+é utilizado um \emph{commit} específico. Um segundo script irá instalar as dependências 
+relacionadas a P4, a primeira dependência é o \emph{thrift} que é utilizado por
 algumas bibliotecas da P4. Em seguida são instalados dos repositórios da própria P4
-as dependências $bmv2$ e $p4c-bm$, que são relacionadas a maneira de executar programas em P4.
-Os programas em P4 são descritos em $JSON$ utilizando $p4c-bm$, depois as estruturas são 
-carregadas no $bmv2$ utilizando a definição do arquivo $JSON$, assim é possível obter o modo
+as dependências \emph{bmv2} e \emph{p4c-bm}, que são relacionadas a maneira de executar programas em P4.
+Os programas em P4 são descritos em \emph{JSON} utilizando \emph{p4c-bm}, depois as estruturas são 
+carregadas no \emph{bmv2} utilizando a definição do arquivo \emph{JSON}, assim é possível obter o modo
 de roteamento desejado. Juntamente com as dependências, é clonado o repositório do projeto, 
 com todo código necessário para executar testes.
 
@@ -771,8 +761,8 @@ com todo código necessário para executar testes.
 Logando dentro da máquina virtual que se montou, é encontrado a implementação do projeto
 passado, possuindo uma demonstração para utilização. Com essa demonstração, é possível
 inserir valores relacionados a uma chaves e buscar por valores dado uma chave, utilizando
-a linha de comando do Mininet é possível simular falhas na rede. Existe também um $script$
-para testar inserção e pesquisa de valores, o $script$ insere um valor, pesquisa pela chave
+a linha de comando do Mininet é possível simular falhas na rede. Existe também um \emph{script}
+para testar inserção e pesquisa de valores, o \emph{script} insere um valor, pesquisa pela chave
 associada a esse valor e pesquisa por uma chave não existente.
 
 \begin{figure}[ht]
@@ -787,26 +777,26 @@ que estão coloridos em branco são executados em servidores.
 
 \subsection{Funcionamento do projeto}
 Para iniciar a execução da demonstração, é executado um script em Python, que irá definir a
-topologia com o Minininet, que irá utilizar $switches$ programados, que executam os $acceptors$
-e $coordinator$, com a topologia definida, as tabelas nos $switches$ são populadas, definindo
-quais os valores utilizados na tabelas para executar o $match$ no tipo de mensagem, definindo o
-grupo de $multicast$. Após execução do script, será possível realizar requisições no servidor
-que foi aberto no $proposer$.
+topologia com o Minininet, que irá utilizar \emph{switches} programados, que executam os \emph{acceptors}
+e \emph{coordinator}, com a topologia definida, as tabelas nos \emph{switches} são populadas, definindo
+quais os valores utilizados na tabelas para executar o \emph{match} no tipo de mensagem, definindo o
+grupo de \emph{multicast}. Após execução do script, será possível realizar requisições no servidor
+que foi aberto no \emph{proposer}.
 
 Quando o servidor recebe uma requisição, irá criar um novo pacote e inserir as informações no
 cabeçalho para serem transportados, o formato do cabeçalho segue como definido em \ref{cod:p4-header}, 
 possuindo o campo definindo o tipo da mensagem, com tamanho de 8 bits, o número da instância com tamanho 16 bits,
 um campo definindo o round da instancia e o round em que o voto foi realizado, ambos com tamanho de
-8 bits, o campo \texttt{acceptor} contém o identificador do $switch$ com tamanho de 64 bits e o valor do
+8 bits, o campo \texttt{acceptor} contém o identificador do switch com tamanho de 64 bits e o valor do
 voto com tamanho de 512 bits.
 
 \lstinputlisting[language=c,caption={Cabeçalho do P4xos}, label={cod:p4-header}]{code/p4xos/explanation/headers.p4}
 
-Assim, o $propopser$ irá enviar a requisição, que irá chegar no $coordinator$. O $coordinator$ garante que
+Assim, o \emph{propopser} irá enviar a requisição, que irá chegar no \emph{coordinator}. O \emph{coordinator} garante que
 somente um processo envie uma mensagem para o protocolo para uma dada instância, isso garante 
 que o protocolo irá finalizar e impõe uma ordenação nas mensagens, como existe somente um
-$coordinator$ para identificação e ordenação das mensagens, uma simples sequência crescente pode ser
-utilizada. A ação que o $coordinator$ deve executar, quando em posse de uma pacote válido do Paxos,
+\emph{coordinator} para identificação e ordenação das mensagens, uma simples sequência crescente pode ser
+utilizada. A ação que o \emph{coordinator} deve executar, quando em posse de uma pacote válido do Paxos,
 deve ser de definir o tipo de mensagem do protocolo, definir o valor do \texttt{round} como 0, pois
 uma nova instância foi iniciada, ler da memória não-volátil qual o número da última instância e atualizar
 o valor\cite{dang2016paxos}.
@@ -814,37 +804,37 @@ o valor\cite{dang2016paxos}.
 \lstinputlisting[language=c,caption={P4xos coordinator}]{code/p4xos/explanation/coordinator.p4}
 
 
-Após realizar as ações, o $coordinator$ irá realizar um $broadcast$ do pacote para todos $acceptors$.
-Os $acceptors$ que irão assegurar que somente um valor seja escolhido por instância, eles também deve tolerar
+Após realizar as ações, o \emph{coordinator} irá realizar um \emph{broadcast} do pacote para todos \emph{acceptors}.
+Os \emph{acceptors} que irão assegurar que somente um valor seja escolhido por instância, eles também deve tolerar
 mensagens perdidas ou duplicadas. As mensagens que tratadas são do tipo 1A ou 2A, as mensagens do
 tipo 1A são utilizadas durante a inicialização do protocolo, enquanto mensagens do tipo 2A são utilizadas
-para votação. Em ambos os casos, as ações dos $acceptors$ consistem em definir o tipo seguinte da mensagem,
-atualizar o valor do $round$ na memória não-volátil, armazenar no cabeçalho o valor votado, o número do
-round que foi realizado o voto e o identificador do $acceptor$ que realizou o voto. Para realizar
-essas ações, deve ser verificado de qual $round$ pertence a mensagem que chegou para ser processada,
-caso o $round$ presente no cabeçalho seja menor do que o valor armazenado na memória, o pacote será 
+para votação. Em ambos os casos, as ações dos \emph{acceptors} consistem em definir o tipo seguinte da mensagem,
+atualizar o valor do \emph{round} na memória não-volátil, armazenar no cabeçalho o valor votado, o número do
+round que foi realizado o voto e o identificador do \emph{acceptor} que realizou o voto. Para realizar
+essas ações, deve ser verificado de qual \emph{round} pertence a mensagem que chegou para ser processada,
+caso o \emph{round} presente no cabeçalho seja menor do que o valor armazenado na memória, o pacote será 
 dropado\cite{dang2016paxos}.
 
 \lstinputlisting[language=c,caption={P4xos coordinator}]{code/p4xos/explanation/acceptor.p4}
 
-Após realizado o processamento pelo $switch$, cada um deles realiza um $broadcast$ do pacote,
-com as alterações, caso existam. Com o $broadcast$ realizado, as mensagem chegam aos
-$learners$, que são aplicações que estão sendo executadas em servidores \ref{fig:demo-topo}, 
-na demo disponível, existem 2 $learners$, que executam a mesma aplicação.
+Após realizado o processamento pelo \emph{switch}, cada um deles realiza um \emph{broadcast} do pacote,
+com as alterações, caso existam. Com o \emph{broadcast} realizado, as mensagem chegam aos
+\emph{learners}, que são aplicações que estão sendo executadas em servidores \ref{fig:demo-topo}, 
+na demo disponível, existem 2 \emph{learners}, que executam a mesma aplicação.
 
-A aplicação executada pelos $learners$ ficam realizando um $sniff$ na rede, filtrando pacotes
+A aplicação executada pelos \emph{learners} ficam realizando um \emph{sniff} na rede, filtrando pacotes
 \texttt{UDP} que vierem por uma porta específica, no caso a porta \texttt{34952}. Quando um
-pacote é capturado, é realizado um $parse$ para ter acesso as campos disponíveis no pacote, dentre
-eles o tipo da mensagem, referente ao tipo da mensagem do Paxos. Os $learners$ realizam o processamento
+pacote é capturado, é realizado um \emph{parse} para ter acesso as campos disponíveis no pacote, dentre
+eles o tipo da mensagem, referente ao tipo da mensagem do Paxos. Os \emph{learners} realizam o processamento
 de mensagens do tipo \texttt{1B} e \texttt{2B}. Mensagens do tipo \texttt{1B} são salvas no históricos
-disponível no $learner$ e então são enviadas de volta para rede como mensagem do tipo \texttt{2A}.
+disponível no \emph{learner} e então são enviadas de volta para rede como mensagem do tipo \texttt{2A}.
 
 Para as mensagens do tipo \texttt{2B}, é verificado se já existe o valor da mensagem no histórico
-do $learner$ e se já está finalizada, caso a instância já tenha sido finalizada, é retornado o
+do \emph{learner} e se já está finalizada, caso a instância já tenha sido finalizada, é retornado o
 número de requisição e o valor definido pelo consenso. Caso a instância não tenha sido finalizada,
-o novo $acceptor$ que votou é adicionado no histórico de votos da instância e assim é verificado
-se a maioria de $acceptors$ já votaram na instância, para assim ser encerrada e salva na histórico
-do $learner$. Quando em posse do valor definido em uma instância, o $learner$ irá enviar um pacote de 
+o novo \emph{acceptor} que votou é adicionado no histórico de votos da instância e assim é verificado
+se a maioria de \emph{acceptors} já votaram na instância, para assim ser encerrada e salva na histórico
+do \emph{learner}. Quando em posse do valor definido em uma instância, o \emph{learner} irá enviar um pacote de 
 volta para o servidor que realizou a requisição, contendo o identificador da requisição e o valor definido.
 
 \section{Extensão}
@@ -860,7 +850,7 @@ utilizando esse valor, caso seja muito grande, pode impactar na performance \cit
 Quando realizados testes para simular um valor que exceda o valor que os bits conseguem representar 
 para o valor da instância, o projeto para e não se consegue obter mais respostas para as requisições.
 
-Pelo arquitetura utilizada para o $switch$, quando ocorre um $overflow$ no campo de cabeçalho, assim,
+Pelo arquitetura utilizada para o \emph{switch}, quando ocorre um \emph{overflow} no campo de cabeçalho, assim,
 o valor volta pra 0, isso poderia ajudar o algoritmo a seguir computando novas instâncias, mas como
 os registradores utilizados estão com valores utilizados previamente, isso impossibilita a continuação
 do algoritmo.
@@ -870,7 +860,7 @@ desta forma, poderia ser definido um valor razoável para o número de instânci
 esse valor continuaria a ser realizado o consenso. Com a implementação da janela deslizante é necessário
 se manter atento a alguns problemas que podem surgir. Como lidar caso chegue uma mensagem
 de uma instância antiga, e, possivelmente, já encerrada? Como lidar com os registradores que identificam
-o número do $round$ e de valores de uma instância que precisam ser limpos?
+o número do \emph{round} e de valores de uma instância que precisam ser limpos?
 
 Para o primeiro problema, foi definido que existirão três intervalos possíveis, sendo eles o intervalo
 de instâncias ativas e que podem ser executadas imediatamente, o intervalo de instâncias antigas que
@@ -879,10 +869,10 @@ número da instância que ela pertence estiver no intervalo de instâncias marca
 será ignorada, assim forçando que a instância chegue a um fim. Caso o número da instância estiver no
 intervalo de futuras instâncias, a janela irá deslizar 1 casa, em outras palavras, os registradores terão
 os valores atualizados com os novos valores dos intervalos, e em seguida, o pacote será enviado de volta 
-para o ingresso do \textit{switch}. No último caso, caso o número de instância seja válido,
+para o ingresso do \emph{switch}. No último caso, caso o número de instância seja válido,
 a execução seguirá seu fluxo normal.
 
-Para limpeza dos registradores que armazenam os valores dos $rounds$ e os valores votados, foi implementado
+Para limpeza dos registradores que armazenam os valores dos \emph{rounds} e os valores votados, foi implementado
 juntamente com o deslizar da janela. Sempre que uma uma instância se inicia e está presente no intervalo de
 futuras instâncias, antes da janela deslizar para direita, os registradores presentes na fronteira de 
 instâncias marcadas para morrer terão seus valores sobrescritos com o valor 0, assim, o algoritmo poderá
@@ -894,32 +884,32 @@ Esta seção relatará como foi realizada a implementação das melhorias propos
 os testes e também de possíveis melhorias que podem ser criadas nessa nova versão.
 
 \subsection{Alterações}
-Para as melhorias relatadas, as alterações se concentraram principalmente nos $acceptors$, onde cada um armazena 
+Para as melhorias relatadas, as alterações se concentraram principalmente nos \emph{acceptors}, onde cada um armazena 
 em seus registradores os valores dos intervalos das janelas. Com a inserção de novos registradores, foram
-realizados alterações nos comandos para popular as tabelas no $switches$ e definir quais seriam os comandos padrões
+realizados alterações nos comandos para popular as tabelas no \emph{switches} e definir quais seriam os comandos padrões
 de cada uma delas.
 
 Algumas alterações mínimas foram criadas, como uma campo para marcar se um pacote deve ou não ser descartado no egresso,
-para assim não existir a necessidade de chamar uma função de \textit{drop} no mesmo espaço em que se chama funções para o
-processamento do pacote, dessa maneira, é necessário somente marcar uma $flag$ presente nos metadados do pacote,
+para assim não existir a necessidade de chamar uma função de \emph{drop} no mesmo espaço em que se chama funções para o
+processamento do pacote, dessa maneira, é necessário somente marcar uma \emph{flag} presente nos metadados do pacote,
 caso exista necessidade de descarte.
 
 O funcionamento do projeto segue o mesmo definido anteriormente, onde as alterações agora ocorrem no processamento
-do pacote nos $acceptors$, onde são realizadas mais validações para verificar o intervalo da janela em que a instância
+do pacote nos \emph{acceptors}, onde são realizadas mais validações para verificar o intervalo da janela em que a instância
 está presente.
 
 \subsection{Código}
 Referente ao coordenador, não houve alterações em relação a versão anterior, o funcionamento permanece o mesmo.
-Quando um novo pacote com os cabeçalhos do tipo $paxos$ é aplicada a tabela para recuperar o valor da última instância
+Quando um novo pacote com os cabeçalhos do tipo \emph{paxos} é aplicada a tabela para recuperar o valor da última instância
 processada, é adicionado 1 a esse valor e reescreve esse valor no registrador que mantém o valor da instância, após isso,
 o pacote segue para o egresso. Relembrando, a arquitetura utilizada para o experimento é fornecida pela P4 Consortium, é
-chamada como $simple switch$, nessa arquitetura, quando o valor é adicionado no número de instância o $overflow$ vai para
-0, dependendo da arquitetura utilizada, esse $overflow$ deve ser tratado de maneira diferente, pois poderia acarretar em
+chamada como \emph{simple switch}, nessa arquitetura, quando o valor é adicionado no número de instância o \emph{overflow} vai para
+0, dependendo da arquitetura utilizada, esse \emph{overflow} deve ser tratado de maneira diferente, pois poderia acarretar em
 erro no processamento do pacote.
 
 \lstinputlisting[language=c,caption={Registradores adicionados no acceptor},label={cod:changes:register}]{code/p4xos/changes/register.p4}
 
-O próximo passo, é o processamento realizado pelo $acceptor$, e é onde reside a maior parte das alterações realizadas no projeto.
+O próximo passo, é o processamento realizado pelo \emph{acceptor}, e é onde reside a maior parte das alterações realizadas no projeto.
 Onde antes existiam 3 registradores, foram adicionados outros 3, que são para armazenar o valor da margem de instâncias marcadas
 para morrer, o valor da margem das instâncias válidas e para armazenar a margem das novas instâncias. Todos os registradores
 comportam valores que podem ser representados por 16 bits, ou seja, valores no intervalo de 0 até $(2^{16} - 1)$ \ref{cod:changes:register}.
@@ -928,19 +918,19 @@ comportam valores que podem ser representados por 16 bits, ou seja, valores no i
 
 Para lidar com os novos registradores, foram adicionadas novas tabelas e ações. Foi adicionada um tabela para lidar com os
 valores dos intervalos da janela, com nome \texttt{tbl\_inst} que executa a ação \texttt{read\_instance}, essa ação é executada
-sempre que um novo pacote $paxos$ válido chega para o processamento, ela é encarregada de ler os valores dos registradores
+sempre que um novo pacote \emph{paxos} válido chega para o processamento, ela é encarregada de ler os valores dos registradores
 que armazenam os valores dos intervalos de instâncias marcadas para morrer, de instâncias válidas e de novas instâncias, 
 e armazenar esses valores nos metadados do pacote. Outra tabela adicionada foi a \texttt{tbl\_clean\_register}, que executa
 a ação \texttt{clean\_register}, esse função irá realizar a limpeza dos registradores sempre que a janela se deslocar, colocando
-0 nos registradores de $round$, valores e $vround$. A última tabela adicionada foi a \texttt{tbl\_slide\_window}, que executa a
+0 nos registradores de \emph{round}, valores e \emph{vround}. A última tabela adicionada foi a \texttt{tbl\_slide\_window}, que executa a
 ação \texttt{slide\_window}, essa ação irá adicionar 1 aos valores da janela e irá reescrever o novo valor nos registradores referentes
 a cada um, ao fim irá realizar um \texttt{submit}, visto na linha 26 em \ref{cod:changes:tables}. Essa ação pertence a P4, recebe uma
-lista de campos para para ser ressubmetidas ao processamento, mas antes de ir para o ingresso do $switch$, o pacote prossegue o
+lista de campos para para ser ressubmetidas ao processamento, mas antes de ir para o ingresso do \emph{switch}, o pacote prossegue o
 fluxo normal até o egresso, ou seja, caso o pacote esteja marcado para descarte a ressubmissão não será executada, isso ajuda
 no processamento, pois caso existissem mais casos para se tratar, o pacote segue o fluxo normal de execução, ativando
 tabelas e ações.
 
-Essas adições são utilizadas pelo $acceptor$ no ingresso, para o processamento de pacote válido do $paxos$. Inicialmente se
+Essas adições são utilizadas pelo \emph{acceptor} no ingresso, para o processamento de pacote válido do \emph{paxos}. Inicialmente se
 aplica as tabelas \texttt{tbl\_inst} e \texttt{tbl\_rnd}, para recuperar dos registradores os intervalos da janela e o valor 
 do round. Com esses valores presentes nos metadados do pacote, verifica se o último round salvo em registrador é menor
 ou igual ao round do atual pacote, caso o round seja válido, o processamento prossegue, onde então será verificado o intervalo
@@ -949,16 +939,18 @@ da atual instância. Para explicar os diferentes casos, a imagem \ref{fig:window
 \begin{figure}[ht]
     \caption{Intervalos da janela}
     \centering
-    \includegraphics[scale=0.8]{images/window.png}
+    \includegraphics[scale=0.8]{images/windowOk.png}
     \label{fig:window-intervals}
 \end{figure}
+
+\todo{FEITO. N ou N-1? O tamanho da janela total é N+1?}
 
 Com a janela dividida em três intervalos, existem 3 cenários diferentes que uma nova instância pode se encontrar durante o
 processamento. O primeiro e mais simples de ser tratado, é quando uma nova instância de número \texttt{X} chega para
 o processamento, e X possui valor $j \leq x < k$, ou seja, o número está presente no intervalo de instâncias válidas. 
 Desta forma, o pacote prosseguirá o fluxo normal de processamento.
 
-Existe também a possibilidade de um pacote se atrasar e chegar para o $proposer$ um pacote de uma instância de número
+Existe também a possibilidade de um pacote se atrasar e chegar para o \emph{proposer} um pacote de uma instância de número
 \texttt{X} com valor $i \leq X < j$, ou até mesmo $X < i$, isso significa que o número está no intervalo de instâncias
 marcadas para morrer. Instâncias que residem nesse intervalos, terão os pacotes marcados para descarte, assim, quando
 chegarem no egresso os pacotes serão dropados.
@@ -1018,55 +1010,83 @@ $k$ = intervalo novas instâncias
 }
 \end{algorithm}
 
-Para conseguir tratar os possíveis cenários que podem surgir, foi implementado no ingresso do $switch$ o algoritmo
+Para conseguir tratar os possíveis cenários que podem surgir, foi implementado no ingresso do \emph{switch} o algoritmo
 apresentado em \ref{alg:slide-window}. Observando pelo algoritmo, todas instâncias que estiverem presentes no intervalo de 
-instâncias marcadas para morrer, ou se o $round$ da instância não for válido, não passarão em nenhuma das verificações, esses 
-pacotes serão descartados no egresso do $switch$.
+instâncias marcadas para morrer, ou se o \emph{round} da instância não for válido, não passarão em nenhuma das verificações, esses 
+pacotes serão descartados no egresso do \emph{switch}.
 
 
 \subsection{Experimento}
 Para realizar o experimento, foi reutilizada a estrutura do projeto passado, tanto a estrutura da rede como das 
-aplicações utilizadas para teste. A estrutura da rede utiliza 4 $switches$ e 4 $hosts$,
-dentre os $switches$, 1 foi designado para ser o coordenador e os outros 3 foram designados como $acceptors$.
-Para os $hosts$, 1 deles executa um servidor aberto na porta 8080, que irá receber requisições de leitura
-e escrita em um dicionário, outros 2 $hosts$ executam a função de $learners$ e 1 dos $hosts$ é executado
+aplicações utilizadas para teste. A estrutura da rede utiliza 4 \emph{switches} e 4 \emph{hosts},
+dentre os \emph{switches}, 1 foi designado para ser o coordenador e os outros 3 foram designados como \emph{acceptors}.
+Para os \emph{hosts}, 1 deles executa um servidor aberto na porta 8080, que irá receber requisições de leitura
+e escrita em um dicionário, outros 2 \emph{hosts} executam a função de \emph{learners} e 1 dos \emph{hosts} é executado
 somente para realizar requisições no servidor \ref{fig:demo-topo}.
 
 Para execução da demonstração, foi utilizada a máquina virtual, a mesma utilizada para replicação do projeto
-passado \cite{dang2016paxos}. Com a rede criada, é aberto um terminal no \textit{host} 4, e, a partir dele,
-é executado um \textit{script} para realizar requisições no servidor presente no \textit{host} 1, são realizadas
-3 requisições diferentes por iteração do \textit{loop}. Realizada uma requisição para inserção de um novo valor juntamente
-com uma nova chave na memória da aplicação sendo executada nos \textit{hosts}, em seguida é realizada uma requisição para 
+passado \cite{dang2016paxos}. Com a rede criada, é aberto um terminal no \emph{host} 4, e, a partir dele,
+é executado um \emph{script} para realizar requisições no servidor presente no \emph{host} 1, são realizadas
+3 requisições diferentes por iteração do \emph{loop}. Realizada uma requisição para inserção de um novo valor juntamente
+com uma nova chave na memória da aplicação sendo executada nos \emph{hosts}, em seguida é realizada uma requisição para 
 leitura passando a mesma chave inserida anteriormente e por fim uma requisição para uma chave que não existe.
 
 Para experimentação foram criados alguns cenários, para testar como a nova implementação se sairia. A primeira, e mais simples
-foi a de simplesmente iniciar a demonstração e as requisições a partir do \textit{host} 4, acompanhando os \textit{logs} dos
-\textit{learners} presentes nos \textit{hosts} 2 e 3 é possível verificar o número de instância aumentando e verificando que 
-o valor só é retornado quando o consenso entre os 3 \textit{acceptors} é atingido. Acompanhando também o \textit{log} dos
-\textit{switches} é possível acompanhar o fluxo que o pacote realiza dentro do \textit{switch}, das leituras/escritas de registradores,
+foi a de simplesmente iniciar a demonstração e as requisições a partir do \emph{host} 4, acompanhando os \emph{logs} dos
+\emph{learners} presentes nos \emph{hosts} 2 e 3 é possível verificar o número de instância aumentando e verificando que 
+o valor só é retornado quando o consenso entre os 3 \emph{acceptors} é atingido. Acompanhando também o \emph{log} dos
+\emph{switches} é possível acompanhar o fluxo que o pacote realiza dentro do \emph{switch}, das leituras/escritas de registradores,
 comparações realizadas, do ingresso até o egresso. Nesse cenário, a execução acontece normalmente.
 
 Outro cenário criado foi em que o número da instância se inicia em um valor \texttt{X}, que reside no intervalo de novas instâncias,
 assim, o funcionamento esperado seria o de que a janela deslizasse de 1 em 1, até o número de instância \texttt{X} pertencer ao intervalo
 de instâncias aceitas. Quando iniciado o experimento, para primeira requisição a resposta na é obtida de imediato, dependendo do valor de
 \texttt{X} escolhido, pode demorar um tempo, após a primeira resposta ser obtida, as próximas são obtidas uma após a outra, sem muita 
-demora da requisição. Acompanhando esse início pelo \textit{log} dos \textit{switches}, é possível ver os registradores sendo limpos,
+demora da requisição. Acompanhando esse início pelo \emph{log} dos \emph{switches}, é possível ver os registradores sendo limpos,
 a janela deslizando e o pacote sendo ressubmetido.
 
-O último cenário criado, foi para verificar a virada da janela. Acompanhando pelo \textit{log} do \textit{switch}, é possível
+O último cenário criado, foi para verificar a virada da janela. Acompanhando pelo \emph{log} do \emph{switch}, é possível
 verificar os valores sendo lidos pelos registradores realizam a virada de N para 0 e as requisições seguem normalmente.
-Com a virada, os valores dos antigos \textit{rounds} não influenciaram nas novas instâncias, verificando também que as limpezas
-no deslizar da janela também funcionaram. Na implementação utilizada, foi aproveitado o fator da arquitetura do \textit{switch},
-em que nos casos que se ocorre um \textit{overflow} no número, ele vai para 0.
+Com a virada, os valores dos antigos \emph{rounds} não influenciaram nas novas instâncias, verificando também que as limpezas
+no deslizar da janela também funcionaram. Na implementação utilizada, foi aproveitado o fator da arquitetura do \emph{switch},
+em que nos casos que se ocorre um \emph{overflow} no número, ele vai para 0.
 
 \subsection{Melhorias}
-\begin{center}
-    Citar possíveis melhorias, dentre elas TTL para o switch não parar\\
-    Ver com Lasaro:\\
-        Se é possível processar multiplas instâncias simultaneamente, particionando o registrador com janelas para cada parte
-\end{center}
+No presente, um dos principais pontos que podem ser realizado uma melhoria seria em relação a implementação do \emph{learner}
+também em um dispositivo de rede, deixando a implementação nos \emph{hosts} somente como aplicações que vão ser notificadas
+ao fim do consenso pelo próprio \emph{learner}.
+
+Durante o desenvolvimento, foi observado que após um longo período de execução, os \emph{switches} param completamente o
+processamento de novos pacotes vindo dos \emph{proposers}, monitorando as interfaces de rede nos \emph{hosts}, foi possível 
+verificar que o tráfego parava totalmente. Monitorando os \emph{switches} pelos \emph{logs} foi possível observar que durante a
+computação das instâncias, assim como visto pelo código, que alguns pacotes são marcados para descarte. Com esse descarte, como a requisição
+não obtêm nenhum retorno, o processamento para, só retornando quando é realizado um \emph{ping} entre os \emph{hosts}.
+Existem algumas opções que podem ser implementadas para realizar esse tratamento, uma das opções seria o \emph{switch}
+responder a origem da requisição com uma confirmação negativa, outra possível solução seria a criação de um temporizador para
+a requisição, após o temporizador exceder um tempo determinado o \emph{proposer} envia novamente sua proposta.
 
 \subsection{Discussão}
+Esse seção discorrerá sobre a linguagem P4, novos horizontes que podem surgir com as opções que a linguagem oferece e juntamente
+irá utilizar exemplos do presente trabalho e sobre as dificuldades encontradas na implementação. Com a possibilidade de programar
+\emph{switches}, como Tofino da Barefoot Networks \cite{tofinoSwitch}, são abertas novas possibilidades para os dispositivos de redes,
+uma das possibilidades seria a implementação de parte da lógica do sistema, que antes poderia ser executada somente em servidores, como
+exemplo, o presente trabalho com a implementação do Paxos.
+
+Com a utilização da linguagem P4, é encontrado um paradigma diferente dos paradigmas convencionais, como imperativo ou orientado a objetos,
+é enfrentado uma programação utilizando a abstração de tabelas \emph{match+action}, sem a possibilidade de iterações e ações em baixo
+nível. Com a abstração, não possui uma chamada para uma ação diretamente, sendo necessário ativar uma tabela, para assim uma das ações
+disponíveis na tabela ser executada. Esse mecanismo pode ser visto claramente na implementação do \emph{learner} do presente trabalho
+\ref{cod:acceptor}, onde, por exemplo, para realizar a comparação se o \emph{round} é válido, é necessário invocar a tabela dos \emph{rounds},
+que irá ativar a ação para ler os registradores, quando a ação é executada, os valores dos registradores são lidos para os metadados, após
+esse processo, a comparação pode ser realizada.
+
+A implementação do Paxos, não é uma implementação trivial de ser realizada e a implementação em P4 é possível obter uma visão clara
+do funcionamento da P4 e da programação utilizando tabelas, outra visão, é voltada para uma nova maneira de definir protocolos. A área
+de protocolos de replicação já é bem madura, mas ainda poucas foram as pesquisas voltadas para protocolos que se aproveitam do comportamento
+da rede \cite{dang2016paxos}. Como a possibilidade de programação dos dispositivos de rede, é possível dar um passo adiante nas 
+definições de novos protocolos, voltadas para execução nesses dispositivos, visando, por exemplo, protocolos com baixa latência
+de execução.
+
 
 \begin{center}
     Comentar sobre P4\\
@@ -1083,7 +1103,7 @@ quantas instâncias for necessárias, existindo também o tratamento para valore
 antigas não influenciem nas novas instâncias computadas.
 
 Previamente, não existia tratamento paras os valores das instâncias já computadas, e existia um limite definido pelo registrador
-que armazena o número da instância, que possui tamanhos de 16 bits, podendo armazenar até $2^{16} - 1$. Como o tamanho da janela pode
+que armazena o número da instância, que possui tamanhos de 16 bits, podendo armazenar até $2^{16}$. Como o tamanho da janela pode
 ser definido, pode existir um tamanho ótimo, que garante mais processamento é um pequeno número de reingressos dos pacotes para
 deslizar a janela. Com a flexibilidade de escolher o tamanho da janela, é possível definir um tamanho, de modo que durante a execução,
 os intervalos das janelas se sobreponham, impossibilitando a execução corretamente.
@@ -1093,6 +1113,21 @@ de consenso nos próprios dispositivos da rede. Onde foi realizada a extensão e
 de diversas um número indefinido de instâncias. 
 
 \bibliography{references}
+
+\begin{anexosenv}
+\partanexos
+\chapter{Implementação}
+
+Implementação utilizada no projeto, possuindo códigos em P4, projeto completo também está disponível no GitHub.
+\footnote{https://github.com/jabolina/monography-code}
+
+\subsection{Coordinator}
+\lstinputlisting[language=c,caption={Coordinator em P4},label={cod:coordinator}]{code/extra/coordinator.p4}
+
+\subsection{Acceptor}
+\lstinputlisting[language=c,caption={Acceptor em P4},label={cod:acceptor}]{code/extra/acceptor.p4}
+
+\end{anexosenv}
 
 \end{document}
 
