@@ -9,8 +9,8 @@
     brazil
     ]{facom-ufu-abntex2}
 
-%\usepackage[disable]{todonotes}
-\usepackage[colorinlistoftodos]{todonotes}	%use a linha anterior para esconder os todos.
+\usepackage[disable]{todonotes}
+%\usepackage[colorinlistoftodos]{todonotes}	%use a linha anterior para esconder os todos.
 \usepackage{amsthm}
 \usepackage{listings}
 \usepackage{forest}
@@ -452,22 +452,22 @@ rede \cite{paxos16spec}. Dispositivos de rede possuem dois planos, sendo eles o
 plano de controle e o plano de encaminhamento, também chamado de plano de dados. 
 
 Pode ser feita uma analogia para se entender a diferença entre o 
-plano de controle e o plano de dados, foi eleito de forma honesta, um novo 
+plano de controle e o plano de dados. Foi eleito de forma honesta, um novo 
 funcionário para cuidar do transporte público da cidade Zanzizânia. Antes de se 
 enviar os veículos é necessário realizar o planejamento de quais o caminhos serão
 utilizados, as pessoas ainda não foram movidas pelos veículos, mas os caminhos 
 e as paradas são conhecidos, essa parte é semelhante ao plano de controle, onde 
-são encontradas as rotas.\cite{dataVsControl}.\todo{está faltando algo aqui.}
-
-Numa rede de roteadores, esse planejamento, que é descobrir e aprender novas rotas 
-pode ser realizado por rotas estáticas, onde o roteador é ensinado sobre redes remotas
-e como acessar essas redes. Pode também ser utilizado protocolos de roteamento dinâmicos,
-onde os roteadores aprendem entre si sobre a existência de redes remotas.\cite{dataVsControl}.
+são encontradas as rotas.\cite{dataVsControl}. \todo{FEITO foi movido um paragráfo para cima. está faltando algo aqui.}
 
 Com o plano de rotas definidos para a cidade, agora é possível transportar os cidadãos
 para os locais desejados através das ruas. Isso se trata do plano de dados, onde 
 um pacote chega e é transportado para outro local, ou interface, através das rotas 
 conhecidas \cite{dataVsControl}.
+
+Numa rede de roteadores, esse planejamento, que é descobrir e aprender novas rotas 
+pode ser realizado por rotas estáticas, onde o roteador é ensinado sobre redes remotas
+e como acessar essas redes. Pode também ser utilizado protocolos de roteamento dinâmicos,
+onde os roteadores aprendem entre si sobre a existência de redes remotas.\cite{dataVsControl}.
 
 A linguagem P4 trabalha exatamente com o objetivo de expressar como os pacotes serão 
 processados pelo plano de dados em um dispositivo de redirecionamento programável, 
@@ -1080,6 +1080,12 @@ disponíveis na tabela ser executada. Esse mecanismo pode ser visto claramente n
 que irá ativar a ação para ler os registradores, quando a ação é executada, os valores dos registradores são lidos para os metadados, após
 esse processo, a comparação pode ser realizada.
 
+A maior dificuldade encontrada no presente foi encontrar uma maneira para representação das janelas e seu funcionamento. Como a linguagem
+não oferece uma maneira de iterar, foi necessário a utilização do reingresso no \emph{switch} para realizar o deslizar da janela, aproveitando
+esse funcionamento, foi inserido juntamente o funcionamento para limpeza dos registradores utilizados. Como se trata de um \emph{switch}, caso
+exista uma computação muito complexa, pode ser notado na rede um atraso nas respostas das requisições, desta forma, mesmo performance
+de execução não sendo o foco no presente projeto, é necessário se manter atento a esses pontos.
+
 A implementação do Paxos, não é uma implementação trivial de ser realizada e a implementação em P4 é possível obter uma visão clara
 do funcionamento da P4 e da programação utilizando tabelas, outra visão, é voltada para uma nova maneira de definir protocolos. A área
 de protocolos de replicação já é bem madura, mas ainda poucas foram as pesquisas voltadas para protocolos que se aproveitam do comportamento
@@ -1087,12 +1093,6 @@ da rede \cite{dang2016paxos}. Como a possibilidade de programação dos disposit
 definições de novos protocolos, voltadas para execução nesses dispositivos, visando, por exemplo, protocolos com baixa latência
 de execução.
 
-
-\begin{center}
-    Comentar sobre P4\\
-    Problemas de performance que poderiam acontecer\\
-    Dificuldades encontradas \\
-\end{center}
 
 %######################### CONCLUSÃO ##################################
 \chapter{Conclusão}
@@ -1114,8 +1114,8 @@ de diversas um número indefinido de instâncias.
 
 \bibliography{references}
 
-\begin{anexosenv}
-\partanexos
+\begin{apendicesenv}
+\partapendices
 \chapter{Implementação}
 
 Implementação utilizada no projeto, possuindo códigos em P4, projeto completo também está disponível no GitHub.
@@ -1125,9 +1125,9 @@ Implementação utilizada no projeto, possuindo códigos em P4, projeto completo
 \lstinputlisting[language=c,caption={Coordinator em P4},label={cod:coordinator}]{code/extra/coordinator.p4}
 
 \subsection{Acceptor}
-\lstinputlisting[language=c,caption={Acceptor em P4},label={cod:acceptor}]{code/extra/acceptor.p4}
+\lstinputlisting[language=C++,caption={Acceptor em P4},label={cod:acceptor}]{code/extra/acceptor.p4}
 
-\end{anexosenv}
+\end{apendicesenv}
 
 \end{document}
 
