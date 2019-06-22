@@ -113,11 +113,15 @@ Associado a este uso extensivo de softwares e do aprimoramento de novas tecnolog
 
 Uma aplicação tolerante a falhas consegue manter o funcionamento mesmo com a eventual 
 falha de um de seus componentes. 
-Como é possível existir eventos inesperados que podem causar a eventual falha - ou \emph{crash} - de um servidor, são necessários métodos para garantir a consistência quando a aplicação retornar com seu funcionamento normal. 
+Como é possível existir eventos inesperados que podem causar a eventual falha - ou \emph{crash} - de um servidor, 
+são necessários métodos para garantir a consistência quando a aplicação retornar com seu funcionamento normal. 
 
-Uma maneira de possuir uma aplicação tolerante a falhas é a replicação de máquinas de estado, onde o serviço é modelado como uma máquina de estados determinísticos, e o serviço é executado em cada réplica \cite{santos2012state}, dessa maneira é mantida a consistência da aplicação, mas um \emph{overhead} é adicionado na execução de comandos, pois as réplicas precisam ser sincronizadas para manterem-se consistentes entre si. 
-No centro da replicação de máquina de estados, existe um problema de consenso, onde o conjunto de réplicas deve chegar a um consenso e decidir sobre qual é o estado válido e decidir sobre qual 
-transição será realizada. 
+Uma maneira de possuir uma aplicação tolerante a falhas é a replicação de máquinas de estado, onde o serviço é modelado 
+como uma máquina de estados determinísticos, e o serviço é executado em cada réplica \cite{santos2012state}, dessa maneira 
+é mantida a consistência da aplicação, mas um \emph{overhead} é adicionado na execução de comandos, pois as réplicas precisam 
+ser sincronizadas para manterem-se consistentes entre si. 
+No centro da replicação de máquina de estados, existe um problema de consenso, onde o conjunto de réplicas deve chegar a 
+um consenso e decidir sobre qual é o estado válido e decidir sobre qual transição será realizada. 
 
 Para alcançar o consenso e obter uma aplicação tolerante a falhas, o algoritmo
 Paxos é extensivamente utilizado com esse intuito \cite{dang2016paxos}. 
@@ -128,19 +132,29 @@ uma melhora na performance na execução do algoritmo, pode-se realizar a
 implementação do Paxos no dispositivos físicos da rede \cite{dang2016paxos}.
 
 Com a utilização da linguagem P4, é aberta a possibilidade de se programar dispositivos de rede. 
-Com a utilização de uma tabela \emph{match+action}\todo{use emph em vez de texit para destacar palavras em outras línguas.} é possível realizar um processamento customizado dos pacotes sendo transportados, de forma a se diminuir a latência do algoritmo e os pacotes atravessariam menos \emph{hops}.
+Com a utilização de uma tabela \emph{match+action} \todo{use emph em vez de texit para destacar palavras em outras línguas.} é possível 
+realizar um processamento customizado dos pacotes sendo transportados, de forma a se diminuir a latência do algoritmo e os 
+pacotes atravessariam menos \emph{hops}.
 
-Alguns exemplos de \emph{frameworks} que realizam permitem a replicação de máquinas de estados, são, por exemplo OpenReplica \cite{openreplica} e o Atomix \cite{atomixio}\todo{FEITO.OpenReplica é um framework para replicacao. Chubby é uma aplicação, um serviço de locks distribuído. Então, essencialmente, estão em categorias diferentes. Se quiser ficar com a primeira, cite, em vez do chubby, o atomix, que implementa o raft}. 
-Aplicações de replicação são críticas em data centers, que precisam sempre manter o serviço  disponível, com informações consistentes, logo, a maneira como um algoritmo de consenso funciona para realizar a replicação de máquina de estados influencia na performance de um data center.
+Alguns exemplos de \emph{frameworks} que permitem a replicação de máquinas de estados, são, por exemplo OpenReplica \cite{openreplica} 
+e o Atomix \cite{atomixio}\todo{FEITO.OpenReplica é um framework para replicacao. Chubby é uma aplicação, um serviço de locks 
+distribuído. Então, essencialmente, estão em categorias diferentes. Se quiser ficar com a primeira, cite, em vez do chubby, o atomix, que implementa o raft}. 
+Aplicações de replicação são críticas em data centers, que precisam sempre manter o serviço  disponível, com informações consistentes,
+logo, a maneira como um algoritmo de consenso funciona para realizar a replicação de máquina de estados influencia na 
+performance de um data center.
 
 O presente trabalho se baseia no trabalho de \cite{dang2016paxos}, que apresenta visão
 promissora para o desenvolvimento e pesquisa nas linguagens de programação de planos de dados 
 e vislumbra o que pode ser novos desafios nas pesquisas de protocolos de consenso.
-O presente projeto dá atenção maior ao primeiro fator citado, realizando a implementação do algoritmo de consenso Paxos utilizando a linguagem de programação de planos de dados P4. 
+O presente projeto dá atenção maior ao primeiro fator citado, realizando a implementação do algoritmo de consenso Paxos utilizando 
+a linguagem de programação de planos de dados P4. 
 
 Em \cite{dang2016paxos}, a implementação possui algumas limitações, dentre elas, a limitação na execução de instâncias do Paxos. 
-O número de instâncias que podem ser computadas, é limitado pelo valor do registrador que armazena o número de instância, tal registrador, foi definido com tamanho de 16 bits, assim podendo executar $2^{16}$ instâncias. De acordo com a arquitetura de \emph{switch} utilizada, o \emph{overflow} pode ser tratado de modo que não ocorra erro, e sim que o próximo número após 65535 seja o número 0. 
-Mesmo que o próprio \emph{switch} recomece as instancias a partir de 0, não existe nenhum mecanismo que trate dos registradores em valores utilizados anteriormente. 
+O número de instâncias que podem ser computadas, é limitado pelo valor do registrador que armazena o número de instância, tal registrador, 
+foi definido com tamanho de 16 bits, assim podendo executar $2^{16}$ instâncias. De acordo com a arquitetura de \emph{switch} utilizada, 
+o \emph{overflow} pode ser tratado de modo que não ocorra erro, e sim que o próximo número após 65535 seja o número 0. 
+Mesmo que o próprio \emph{switch} recomece as instancias a partir de 0, não existe nenhum mecanismo que trate dos registradores em 
+valores utilizados anteriormente. 
 
 Desta forma, o presente projeto trata dessas limitações, criando um mecanismo utilizando uma
 janela deslizante para lidar com os valores das instâncias, podendo realizar mais que
@@ -157,36 +171,38 @@ algoritmo alcance seu objetivo que é o consenso.
 Desta forma, essa comunicação pode influenciar na performance da aplicação e em 
 sua disponibilidade, visto que esse processamento é realizado pela própria aplicação ou 
 em servidores que tem essa função delegada. Visando esse problema, com a transferência
-da lógica de consenso da aplicação para dispositivos de rede, podemos reduzir a latência
+da lógica de consenso da aplicação para dispositivos de rede, pode-se reduzir a latência
 quando comparada a uma implementação em um servidor, e também é possível obter uma melhora
 na taxa de transferência, visto que um algoritmo como o Paxos é um serviço que possui
 alta comunicação entre as partes e não um algoritmo com alto processamento
 \cite{netchainRtt}.
 
-Desta maneira, o presente projeto busca obter uma melhora na performance de 
-execução do Paxos e obter uma resposta do algoritmo de forma mais rápida e menos 
-custosa, estendendo uma implementação do algoritmo em dispositivos de rede.
+Utilizando o projeto passado \cite{dang2016paxos}, o presente projeto busca obter uma melhora, removendo a limitação
+de números de instâncias que podem ser realizadas, estendendo uma implementação do algoritmo em dispositivos de rede.
 
 \section{Objetivos}
 Com a possibilidade de programação em dispositivos de redes, o presente trabalho 
-visa estender um projeto anterior que realizou a implementação do algoritmo Paxos nos 
+visa estender um projeto anterior, que realizou a implementação do algoritmo Paxos nos 
 dispositivos de rede, especificamente \emph{switches}, utilizando a linguagem $P4_{14}$. 
+Tendo como objetivo, fazer com que os dispositivos de rede que implementam o Paxos,
+consigam executar um número indefinido de instâncias.
 Desta maneira, conseguindo uma melhora na performance do algoritmo, pois uma parte 
 que seria executado em um servidor se moveria para ser executado nesses dispositivos, permitindo,
 assim, processar as mensagens enquanto as mesmas estão sendo roteadas e atravessar menos
 \emph{hops}, resultando na redução da latência.
 
 Inicialmente, alcançando os resultados obtidos no projeto de \cite{dang2016paxos}, 
-como citado pelos pesquisadores do projeto passado e, como um dos principais pontos deixado pelos 
-pesquisadores seria em relação ao desenvolvimento
-e evolução das linguagens de programação de plano de dados, um dos objetivos seria 
-também uma nova perspectiva acerca das linguagens de programação de planos de dados, 
-especificamente a linguagem P4.
+que realizaram a implementação do Paxos em \emph{switches}. Logo em seguida, foi realizado a extensão
+do projeto, tratando o limite de instâncias deixado pelo projeto anterior. Foram feitos testes
+para verificar o funcionamento tanto do algoritmo, como da execução para inúmeras instâncias em sequência.
+Ao fim, uma discussão, analisando o presente trabalho e propondo pontos de melhora para trabalhos futuros,
+e discorrendo sobre P4 e a possibilidade do que pode ser realizado, com intuito de fornecer uma nova visão de
+possíveis pesquisas.
 
 \section{Método}
 O método utilizado para o desenvolvimento do projeto foi divido em três partes, para
 ser realizado uma análise em cada uma das partes do projeto separadamente, assim deixando uma
-visão mais clara acerca do decorrer do projeto.
+visão mais clara no decorrer do projeto.
 
 \subsection{Reprodução}
 Replicação do projeto de \cite{dang2016paxos} utilizando a linguagem 
@@ -211,11 +227,13 @@ do projeto. Não serão abordadas questões de implementação, serão explicada
 teórico, a fim de auxiliar o entendimento do leitor.
 
 \section{Referencial Teórico}
-Para seguirmos uma linha de raciocínio linear, e melhorar entendimento da teoria
+Para seguir uma linha de raciocínio linear, e melhorar entendimento da teoria
 para compreender o projeto, será abordado inicialmente informações sobre o 
 algoritmo Paxos, seu modo de operar e flexibilidade para resolução de problemas.
 
-Em seguida, será explicado como é o funcionamento da linguagem P4, alguns exemplos da sintaxe e como suas definições na versão $P4_{14}$.Finalizando o referencial teórico, será  explicado sobre o Mininet, seu funcionamento e qual o intuito na sua utilização no projeto.
+Em seguida, será explicado como é o funcionamento da linguagem P4, alguns exemplos da sintaxe e suas definições 
+na versão $P4_{14}$. Finalizando o referencial teórico, será  explicado sobre o Mininet, seu funcionamento e qual 
+o intuito na sua utilização no projeto.
 
 \subsection{Paxos}
 Paxos foi criado por Leslie Lamport, foi publicado inicialmente em 1989. Ele consiste em uma 
@@ -229,12 +247,10 @@ uma transação realizada no banco de dados.
 
 De maneira básica, os elementos devem propor valores para serem escolhidos, 
 comunicar entre si para tomar uma decisão e o valor final é escolhido pela maioria de 
-elementos do conjunto.
-A escolha do quorum não é necessariamente $\frac{n}{2}+1$, --- sendo $n$ o número
+elementos do conjunto. A escolha do quorum não é necessariamente $\frac{n}{2}+1$, --- sendo $n$ o número
 total de elementos processadores --- a decisão do que será o quorum para tomada de decisão
 pode ser criada pelo projetista, mas sempre visando atender o projeto, levando
-em consideração que dentre esses $n$ elementos existirão alguns que falharão, essa maioria
-é o quorum.\todo{FEITO. entendo o que quer dizer, mas tem um problema aqui. maioria é bem definido. quorum é que é variável. acho que os conceitos estão invertidos aqui.}
+em consideração que dentre esses $n$ elementos existirão alguns que falharão.\todo{FEITO. entendo o que quer dizer, mas tem um problema aqui. maioria é bem definido. quorum é que é variável. acho que os conceitos estão invertidos aqui.}
 
 Para garantir a escolha de um valor e a propagação do valor decidido, o problema
 possui alguns requisitos que devem ser atendidos pelos algoritmos. Os requisitos de
@@ -254,7 +270,7 @@ considerando os valores escolhidos no ciclo passado, cada um desses ciclos é co
 
 Os elementos participantes do Paxos, chamados de agentes, comunicam entre si, e assumem 
 um ou mais papéis para a evolução do algoritmo. Os papéis a serem desempenhados são, 
-utilizando a nomenclatura fornecida por Lamport \cite{lamport2001paxos}, 
+utilizando a nomenclatura fornecida por \cite{lamport2001paxos}, 
 \emph{proposers} (agentes que propõem algum valor), \emph{acceptors} 
 (agentes que escolhem um único valor) e \emph{learners} (agentes que aprendem
 qual foi o valor escolhido pelo algoritmo).
@@ -353,7 +369,7 @@ Com essas definições, o algoritmo para envio de propostas funcionará da segui
     \end{itemize}
 \end{itemize}
 
-Esses passos do algoritmo receberam um nomenclatura, que são \emph{prepare} e
+Esses passos do algoritmo receberam uma nomenclatura, que são \emph{prepare} e
 \emph{accept}, respectivamente. O algoritmo em pseudo-código fica da seguinte maneira:
 
 \begin{algorithm}[H]
@@ -438,7 +454,7 @@ Uma das maneiras de se conhecer o valor, seria cada um dos \emph{acceptors} resp
 todos os \emph{learners} qual o valor decidido. Assim, uma troca de $(n \cdot m)$ mensagens, 
 o produto entre o número de \emph{acceptors} e o número de \emph{learners}, seriam obtidas.
 
-Levando em consideração o papel de coordernador, citado anteriormente outra maneira de se 
+Levando em consideração o papel de coordernador, citado anteriormente, outra maneira de se 
 realizar a propagação de mensagens seria os \emph{acceptors} enviarem o valor decidido para um
 \emph{distinguished learner} que, após conhecer o valor decidido, envia para os
 \emph{learners} tal valor decidido. Esse método teria $(n + m)$ troca de mensagens,
@@ -457,23 +473,22 @@ funcionário para cuidar do transporte público da cidade Zanzizânia. Antes de 
 enviar os veículos é necessário realizar o planejamento de quais o caminhos serão
 utilizados, as pessoas ainda não foram movidas pelos veículos, mas os caminhos 
 e as paradas são conhecidos, essa parte é semelhante ao plano de controle, onde 
-são encontradas as rotas.\cite{dataVsControl}. \todo{FEITO foi movido um paragráfo para cima. está faltando algo aqui.}
-
-Com o plano de rotas definidos para a cidade, agora é possível transportar os cidadãos
-para os locais desejados através das ruas. Isso se trata do plano de dados, onde 
-um pacote chega e é transportado para outro local, ou interface, através das rotas 
-conhecidas \cite{dataVsControl}.
+são encontradas as rotas. Com o plano de rotas definidos para a cidade, agora é 
+possível transportar os cidadãos para os locais desejados através das ruas.\cite{dataVsControl}. 
+\todo{FEITO foi movido um paragráfo para cima. está faltando algo aqui.}
 
 Numa rede de roteadores, esse planejamento, que é descobrir e aprender novas rotas 
 pode ser realizado por rotas estáticas, onde o roteador é ensinado sobre redes remotas
 e como acessar essas redes. Pode também ser utilizado protocolos de roteamento dinâmicos,
-onde os roteadores aprendem entre si sobre a existência de redes remotas.\cite{dataVsControl}.
+onde os roteadores aprendem entre si sobre a existência de redes remotas. Com as rotas
+planejadas, o trabalho com os novos pacotes que chegam e são transportados para outro local, 
+ou interface, através das rotas conhecidas, se trata do plano de dados \cite{dataVsControl}.
 
 A linguagem P4 trabalha exatamente com o objetivo de expressar como os pacotes serão 
 processados pelo plano de dados em um dispositivo de redirecionamento programável, 
-como placas de redes, FPGA, switch em software, e ASICs \cite{paxos16spec}. Existe 
-protocolo de comunicação como o OpenFlow, em que é possível controlar o fluxo dos 
-pacotes de um roteador ou switch, mas para isso, é necessário explicitar os 
+como placas de redes, FPGA, \emph{switch} em software, e ASICs \cite{paxos16spec}. Existem 
+protocolos de comunicação, como o OpenFlow, em que é possível controlar o fluxo dos 
+pacotes de um roteador ou \emph{switch}, mas para isso, é necessário explicitar os 
 cabeçalhos em que se está trabalhando, tal método causou um aumento na complexidade 
 especificação da linguagem enquanto não a tornou flexível para se adicionar campos 
 nos cabeçalhos \cite{bosshart2014p4}.
@@ -483,7 +498,7 @@ vide seu nome no artigo em que foi publicado,
 \emph{Programming protocol-independent packet processor}. A linguagem foi 
 construída visando a reconfigurabilidade e ser independente do dispositivo em que se 
 deseja trabalhar, ou seja, é possível processar e analisar os pacotes enquanto o programador
-não precisa se preocupar com detalhes do switch, onde esse trabalho fica para o compilador 
+não precisa se preocupar com detalhes do \emph{switch}, esse trabalho fica para o compilador,
 em transformar um código independente em um código para o dispositivo em que se vai 
 trabalhar \cite{bosshart2014p4}.
 
@@ -491,12 +506,12 @@ trabalhar \cite{bosshart2014p4}.
 
 A máquina abstrata que representa o funcionamento da linguagem é o de um dispositivo
 de alto desempenho para o processamento de pacotes, esse modelo é chamado de PISA,
-um acrônimo $Protocol-Independent Switch Architecture$, que possui alguns componentes
+um acrônimo \emph{Protocol Independent Switch Architecture}, que possui alguns componentes
 básicos, esses componentes também são definidos pela linguagem. O primeiro desses 
 componentes é o parser programável, podendo ser definido pelo programador, juntamente 
 com seu funcionamento. O segundo componente, o coração do modelo, é um pipeline de tabelas,
-que combinam com algum dado e executam a ação correspondente. Após o pipeline, e executado
-o processamento, o pacote passa por um \emph{deparser}, que faz a função ``inversa`` \todo{FEITO aspas são ``assim''} do parser, 
+que combinados com as informações dos cabeçalhos executam a ação correspondente. Após o pipeline, e executado
+o processamento, o pacote passa por um \emph{deparser}, que faz a função ``inversa'' \todo{FEITO aspas são ``assim''} do parser, 
 preparando o pacote na forma correta para ser transmitido \cite{p4LangTutorial}.
 
 \todo{Feito. referencia na figura}
@@ -523,15 +538,15 @@ A linguagem utiliza um modelo abstrato para redirecionamento de pacotes, que pos
 dois tipos de operações, \emph{configure} e \emph{populate}. Durante a operação
 de \emph{configure}, o parser é criado, é definida a ordem de estágios nas tabelas
 \emph{match+action} e quais os campos do cabeçalhos são processados em cada estágio,
-durante a operação de \emph{populate} adicionam e removem entradas nas tabelas
-\emph{match+action} construídas durante operação de \emph{configure}. Assim,
+durante a operação de \emph{populate}, adicionam e removem entradas nas tabelas
+\emph{match+action}, construídas durante operação de \emph{configure}. Assim,
 durante \emph{configure}, é definido qual protocolo será utilizado e como será
 o processamento dos pacotes, e durante \emph{populate} é determinada qual a 
 política utilizada nos pacotes \cite{bosshart2014p4}.
 
 A linguagem possui alguns componentes centrais, o primeiro desses componentes 
 é o cabeçalho, cada cabeçalho é definido seguindo o nome do campo em conjunto 
-com seu tamanho, campos que possui tamanho variável, devem ser definidos com o
+com seu tamanho, campos que possuem tamanho variável, devem ser definidos com o
 tamanho máximo que esse campo pode possuir, um exemplo da definição de cabeçalho
 seria:
 
@@ -544,23 +559,23 @@ para o próximo passo, agindo de maneira semelhante a uma máquina de estados, e
 que as transições são realizadas por valores nos campos do cabeçalho. Um parser
 segue a seguinte definição:
 
-\lstinputlisting[language=c++, caption={header.p4}]{code/p4-example/parser.p4}
+\lstinputlisting[language=c++, caption={parser.p4}]{code/p4-example/parser.p4}
 
-O parser é iniciado em \texttt{start}, é segue até encontrar um \texttt{stop} ou não
+O parser é iniciado em \texttt{start}, e segue até encontrar um \texttt{stop} ou não
 encontrar nenhum match, o que seria um erro \cite{bosshart2014p4}. O parser cria um 
-\emph{parsed packet} em que a tabela de \emph{match+action} irá utilizar,
+\emph{parsed packet}, que a tabela de \emph{match+action} irá utilizar,
 assim, valores que serão utilizados no processamento devem estar contidos nesse
 \emph{parsed packet} \cite{p4USITutorial}.
 
 O componente fornecido pela linguagem para o processamento dos pacotes são as tabelas,
-de acordo com matches em campos do cabeçalho, esse match  pode ser exato, parcial 
+de acordo com \emph{matches} em campos do cabeçalho, esse \emph{match} pode ser exato, parcial 
 ou ser algum "coringa", são especificados quais as ações serão executadas no
 pacote. Utilizando a definição da tabela, o compilador pode decidir quanta memória 
 é necessária e qual o tipo de memória necessária \cite{bosshart2014p4}. A
 tabela é um componente que aponta qual ação deve ser realizada, assim, não é a 
 tabela que executa a ação em si. A definição da tabela segue a seguinte forma:
 
-\lstinputlisting[language=c++, caption={header.p4}]{code/p4-example/table.p4}
+\lstinputlisting[language=c++, caption={table.p4}]{code/p4-example/table.p4}
 
 Pela definição da tabela pode se notar assim, que a ação é outro componente presente
 na linguagem. Com a ação, é possível criar comandos mais complexos para primitivas
@@ -570,7 +585,7 @@ remover campos do cabeçalho, alterar campos dos metadados, realizar operações
 que mantém um estado \cite{p4USITutorial}. O exemplo da estrutura de uma ação
 é a seguinte:
 
-\lstinputlisting[language=c++, caption={header.p4}]{code/p4-example/action.p4}
+\lstinputlisting[language=c++, caption={action.p4}]{code/p4-example/action.p4}
 
 Caso uma ação necessite de parâmetros para ser executada, como no exemplo com
 \texttt{value} e \texttt{egr\_spec}, esses parâmetros são fornecidos pela tabela em tempo 
@@ -581,7 +596,7 @@ a tabelas, é definido o fluxo de uma tabela para a próxima, assim, o controle 
 consiste em um programa imperativo que descreve o fluxo entre tabelas \emph{match+action} 
 \cite{bosshart2014p4}. Um exemplo de como é o controle do programa: 
 
-\lstinputlisting[language=c++, caption={header.p4}]{code/p4-example/program.p4}
+\lstinputlisting[language=c++, caption={program.p4}]{code/p4-example/program.p4}
 
 Para a implantação do programa definido em dispositivos de rede, é necessário realizar
 a compilação para mapear a descrição que está independente para o alvo em que se deseja
@@ -610,8 +625,8 @@ para execução do Paxos, e é possível realizar uma implementação que não f
 dispositivos de rede específicos.
 
 \subsection{Mininet}
-Mininet é um simulador de redes, que executa uma coleção de hosts finais, switches, 
-roteadores e links, em uma única máquina. Os programas que utilizam dessa rede, podem enviar
+Mininet é um simulador de redes, que executa uma coleção de hosts finais, \emph{switches}, 
+roteadores e \emph{links}, em uma única máquina. Os programas que utilizam dessa rede, podem enviar
 pacotes e estes são processados, de maneira semelhante a rede Ethernet \cite{mininetDocs}.
 Desta forma, para o presente projeto, é possível construir a rede utilizando o Mininet, e 
 assim ser testada a implementação do Paxos nos dispositivos dessa rede.
@@ -619,7 +634,7 @@ assim ser testada a implementação do Paxos nos dispositivos dessa rede.
 Internamente, o Mininet realiza a virtualização encontradas no kernel do Linux, onde é possível
 iniciar e escalar mais rápido do que sistemas que emulam a rede utilizando máquinas virtuais
 \cite{mininetDocs}. Nesse modelo de virtualização, um único sistema é separado em diversas
-partes menores, cada um destes possuindo uma parcela do poder de processamento e links virtuais
+partes menores, cada um destes possuindo uma parcela do poder de processamento e \emph{links} virtuais
 \cite{mininetDocs}.
 
 Com a instalação do Mininet, é possível definir topologias de forma rápida e prática, a partir
@@ -629,7 +644,7 @@ A partir da linha de comando, é possível executar comandos em nós específico
 
 \subsubsection{CLI}
 Para iniciar a interface do Mininet pela linha de comando, com a topologia
-\emph{minimal}, que consiste em 2 processos hosts, 1 processo switch e 1 controlador
+\emph{minimal}, que consiste em 2 processos \emph{hosts}, 1 processo \emph{switch} e 1 controlador
 básico, basta executar \cite{mininetOrg}:
 
 \begin{minted}{bash}
@@ -637,7 +652,7 @@ básico, basta executar \cite{mininetOrg}:
 \end{minted}
 
 Outras opções de topologia podem ser passadas com o argumento \texttt{--topo}. Para se testar a
-conectividade entre os hosts, basta executar:
+conectividade entre os \emph{hosts}, basta executar:
 
 \begin{minted}{bash}
   mininet> h1 ping -c 1 h2
@@ -652,7 +667,7 @@ protocolo ICMP, e \emph{h2} responde com \emph{echo reply}.
 
 \subsubsection{Python}
 Utilizando a API em Python, também é possível definir diferentes topologias para a rede. Um
-exemplo simples consiste em uma topologia que possui 2 hosts e 2 switches, distribuídos como
+exemplo simples consiste em uma topologia que possui 2 \emph{hosts} e 2 \emph{switches}, distribuídos como
 a figura \ref{fig:custom-topology-example}. Para se definir essa topologia, utilizando
 Python, fica da seguinte maneira:
 
@@ -688,8 +703,8 @@ pela linha de comando.
 \end{figure}
 
 Visto que a utilização de verdadeiros \emph{switches} e roteadores pode ser caro para simulação do
-projeto, podemos utilizar a simulação que o Mininet oferece para resolver esse problema.
-Como observado no exemplos, podemos utilizar diferentes topologias, que são criadas e 
+projeto, utilizar a simulação que o Mininet oferece para resolver esse problema.
+Como observado no exemplos, utilizar diferentes topologias, que são criadas e 
 executadas de forma prática, assim facilitando nos experimentos.
 
 \section{Trabalhos Correlatos}
@@ -714,7 +729,7 @@ no hardware utilizado, assim, a performance dos protocolos poderiam ser melhorad
 
 %######################### DESENVOLVIMENTO ##################################
 \chapter{Desenvolvimento}
-O desenvolvimento do projeto seguirá como descrito no cronograma, sendo divido em 
+O desenvolvimento do projeto seguirá como descrito no método, sendo divido em 
 3 fases. Para cada uma das fases realizadas, seguirá uma explicação do que foi realizado,
 dos códigos utilizados e uma breve explicação de qual o intuito que se deseja realizar.
 
@@ -760,7 +775,7 @@ com todo código necessário para executar testes.
 
 Logando dentro da máquina virtual que se montou, é encontrado a implementação do projeto
 passado, possuindo uma demonstração para utilização. Com essa demonstração, é possível
-inserir valores relacionados a uma chaves e buscar por valores dado uma chave, utilizando
+inserir valores relacionados a uma chave e buscar por valores dado uma chave, utilizando
 a linha de comando do Mininet é possível simular falhas na rede. Existe também um \emph{script}
 para testar inserção e pesquisa de valores, o \emph{script} insere um valor, pesquisa pela chave
 associada a esse valor e pesquisa por uma chave não existente.
@@ -790,7 +805,7 @@ um campo definindo o round da instancia e o round em que o voto foi realizado, a
 8 bits, o campo \texttt{acceptor} contém o identificador do switch com tamanho de 64 bits e o valor do
 voto com tamanho de 512 bits.
 
-\lstinputlisting[language=c,caption={Cabeçalho do P4xos}, label={cod:p4-header}]{code/p4xos/explanation/headers.p4}
+\lstinputlisting[language=c,caption={Cabeçalho do P4 Paxos}, label={cod:p4-header}]{code/p4xos/explanation/headers.p4}
 
 Assim, o \emph{propopser} irá enviar a requisição, que irá chegar no \emph{coordinator}. O \emph{coordinator} garante que
 somente um processo envie uma mensagem para o protocolo para uma dada instância, isso garante 
@@ -801,12 +816,11 @@ deve ser de definir o tipo de mensagem do protocolo, definir o valor do \texttt{
 uma nova instância foi iniciada, ler da memória não-volátil qual o número da última instância e atualizar
 o valor\cite{dang2016paxos}.
 
-\lstinputlisting[language=c,caption={P4xos coordinator}]{code/p4xos/explanation/coordinator.p4}
-
+\lstinputlisting[language=c,caption={P4 Paxos coordinator}]{code/p4xos/explanation/coordinator.p4}
 
 Após realizar as ações, o \emph{coordinator} irá realizar um \emph{broadcast} do pacote para todos \emph{acceptors}.
 Os \emph{acceptors} que irão assegurar que somente um valor seja escolhido por instância, eles também deve tolerar
-mensagens perdidas ou duplicadas. As mensagens que tratadas são do tipo 1A ou 2A, as mensagens do
+mensagens perdidas ou duplicadas. As mensagens tratadas são do tipo 1A ou 2A, as mensagens do
 tipo 1A são utilizadas durante a inicialização do protocolo, enquanto mensagens do tipo 2A são utilizadas
 para votação. Em ambos os casos, as ações dos \emph{acceptors} consistem em definir o tipo seguinte da mensagem,
 atualizar o valor do \emph{round} na memória não-volátil, armazenar no cabeçalho o valor votado, o número do
@@ -819,7 +833,7 @@ dropado\cite{dang2016paxos}.
 
 Após realizado o processamento pelo \emph{switch}, cada um deles realiza um \emph{broadcast} do pacote,
 com as alterações, caso existam. Com o \emph{broadcast} realizado, as mensagem chegam aos
-\emph{learners}, que são aplicações que estão sendo executadas em servidores \ref{fig:demo-topo}, 
+\emph{learners}, que são aplicações que estão sendo executadas em servidores (\ref{fig:demo-topo}), 
 na demo disponível, existem 2 \emph{learners}, que executam a mesma aplicação.
 
 A aplicação executada pelos \emph{learners} ficam realizando um \emph{sniff} na rede, filtrando pacotes
@@ -842,20 +856,20 @@ Está seção irá analisar alguns pontos em que o projeto pode ser melhorado, o
 melhora e será apresentado de que maneira será realizada essa melhoria.
 
 \subsection{Pontos de melhora}
-Os pontos de melhora perceptíveis foram na questão do número de instâncias possíveis de serem executadas,
-esse valor é definido pelo campo \texttt{instance} no cabeçalho. o número de instâncias que pode ser 
+O ponto de melhora perceptível foi na questão do número de instâncias possíveis de serem executadas,
+esse valor é definido pelo campo \texttt{instance} no cabeçalho. O número de instâncias que pode ser 
 computado na primeira fase do Paxos é limitado por esse valor, dessa forma, se for utilizado um valor
 muito pequeno o consenso será executado por um pequeno período de tempo, mas por ser realizadas operações
 utilizando esse valor, caso seja muito grande, pode impactar na performance \cite{dang2016paxos}. 
 Quando realizados testes para simular um valor que exceda o valor que os bits conseguem representar 
 para o valor da instância, o projeto para e não se consegue obter mais respostas para as requisições.
 
-Pelo arquitetura utilizada para o \emph{switch}, quando ocorre um \emph{overflow} no campo de cabeçalho, assim,
+Pela arquitetura utilizada para o \emph{switch}, quando ocorre um \emph{overflow} no campo de cabeçalho, assim,
 o valor volta pra 0, isso poderia ajudar o algoritmo a seguir computando novas instâncias, mas como
 os registradores utilizados estão com valores utilizados previamente, isso impossibilita a continuação
 do algoritmo.
 
-A melhora aqui proposta seria a utilização do algoritmo da janela deslizante para manejar as instâncias,
+A melhora aqui proposta, seria a utilização do algoritmo da janela deslizante para manejar as instâncias,
 desta forma, poderia ser definido um valor razoável para o número de instâncias, que mesmo após atingir
 esse valor continuaria a ser realizado o consenso. Com a implementação da janela deslizante é necessário
 se manter atento a alguns problemas que podem surgir. Como lidar caso chegue uma mensagem
@@ -900,7 +914,7 @@ está presente.
 
 \subsection{Código}
 Referente ao coordenador, não houve alterações em relação a versão anterior, o funcionamento permanece o mesmo.
-Quando um novo pacote com os cabeçalhos do tipo \emph{paxos} é aplicada a tabela para recuperar o valor da última instância
+Quando um novo pacote com os cabeçalhos do tipo \emph{paxos} é aplicado a tabela para recuperar o valor da última instância
 processada, é adicionado 1 a esse valor e reescreve esse valor no registrador que mantém o valor da instância, após isso,
 o pacote segue para o egresso. Relembrando, a arquitetura utilizada para o experimento é fornecida pela P4 Consortium, é
 chamada como \emph{simple switch}, nessa arquitetura, quando o valor é adicionado no número de instância o \emph{overflow} vai para
@@ -922,9 +936,9 @@ sempre que um novo pacote \emph{paxos} válido chega para o processamento, ela �
 que armazenam os valores dos intervalos de instâncias marcadas para morrer, de instâncias válidas e de novas instâncias, 
 e armazenar esses valores nos metadados do pacote. Outra tabela adicionada foi a \texttt{tbl\_clean\_register}, que executa
 a ação \texttt{clean\_register}, esse função irá realizar a limpeza dos registradores sempre que a janela se deslocar, colocando
-0 nos registradores de \emph{round}, valores e \emph{vround}. A última tabela adicionada foi a \texttt{tbl\_slide\_window}, que executa a
+0 nos registradores de \emph{round}, \emph{values} e \emph{vround}. A última tabela adicionada foi a \texttt{tbl\_slide\_window}, que executa a
 ação \texttt{slide\_window}, essa ação irá adicionar 1 aos valores da janela e irá reescrever o novo valor nos registradores referentes
-a cada um, ao fim irá realizar um \texttt{submit}, visto na linha 26 em \ref{cod:changes:tables}. Essa ação pertence a P4, recebe uma
+a cada um, ao fim irá realizar um \texttt{submit}, visto na linha 22 em \ref{cod:changes:tables}. Essa ação pertence a P4, recebe uma
 lista de campos para para ser ressubmetidas ao processamento, mas antes de ir para o ingresso do \emph{switch}, o pacote prossegue o
 fluxo normal até o egresso, ou seja, caso o pacote esteja marcado para descarte a ressubmissão não será executada, isso ajuda
 no processamento, pois caso existissem mais casos para se tratar, o pacote segue o fluxo normal de execução, ativando
@@ -932,9 +946,9 @@ tabelas e ações.
 
 Essas adições são utilizadas pelo \emph{acceptor} no ingresso, para o processamento de pacote válido do \emph{paxos}. Inicialmente se
 aplica as tabelas \texttt{tbl\_inst} e \texttt{tbl\_rnd}, para recuperar dos registradores os intervalos da janela e o valor 
-do round. Com esses valores presentes nos metadados do pacote, verifica se o último round salvo em registrador é menor
-ou igual ao round do atual pacote, caso o round seja válido, o processamento prossegue, onde então será verificado o intervalo
-da atual instância. Para explicar os diferentes casos, a imagem \ref{fig:window-intervals} será utilizada como referência.
+do \emph{round}. Com esses valores presentes nos metadados do pacote, verifica se o último \emph{round} salvo em registrador é menor
+ou igual ao \emph{round} do atual pacote, caso o \emph{round} seja válido, o processamento prossegue, onde então será verificado o intervalo
+da atual instância. Para explicar os diferentes casos, a imagem (\ref{fig:window-intervals}) será utilizada como referência.
 
 \begin{figure}[ht]
     \caption{Intervalos da janela}
@@ -947,7 +961,7 @@ da atual instância. Para explicar os diferentes casos, a imagem \ref{fig:window
 
 Com a janela dividida em três intervalos, existem 3 cenários diferentes que uma nova instância pode se encontrar durante o
 processamento. O primeiro e mais simples de ser tratado, é quando uma nova instância de número \texttt{X} chega para
-o processamento, e X possui valor $j \leq x < k$, ou seja, o número está presente no intervalo de instâncias válidas. 
+o processamento, e X possui valor $j \leq X < k$, ou seja, o número está presente no intervalo de instâncias válidas. 
 Desta forma, o pacote prosseguirá o fluxo normal de processamento.
 
 Existe também a possibilidade de um pacote se atrasar e chegar para o \emph{proposer} um pacote de uma instância de número
@@ -958,10 +972,10 @@ O terceiro e último cenário para o valor de uma instância \texttt{X} é o val
 assim primeiramente serão limpos os registradores de índice \texttt{i}, em seguida serão atualizado os valores de
 intervalos nos registradores e por fim, executa o \texttt{resubmit} do pacote.
 
-Com o deslizamento da janela, chegaram o ponto que deve existir um restart dos intervalos, desta maneira, é possível
-imaginar a janela como um anel, onde numa janela de tamanho $N$, o primeiro número logo após o $N$ é o 0. Pela 
+Com o deslizamento da janela, chegará o ponto que deve existir um \emph{restart} dos intervalos, desta maneira, é possível
+imaginar a janela como um anel, onde numa janela de tamanho $N$, o primeiro número logo após o $N - 1$ é o 0. Pela 
 existência de 3 intervalos, existirão também 3 cenários existentes. O mais simples é o quando a janela é iniciada,
-e segue deslizando da esquerda para direito, e, utilizando \ref{fig:window-intervals} como referência, os intervalos
+e segue deslizando da esquerda para direito, e, utilizando (\ref{fig:window-intervals}) como referência, os intervalos
 se mantém com $i < j < k$, que é exatamente o caso demonstrado pela figura. No decorrer do algoritmo, o primeiro intervalo
 que precisará ser resetado é o de novas instâncias, com esse reset, existe um novo cenário, o caso em que $k < i < j$.
 O próximo e último caso, ocorre quando ocorre ambos o reset do valor $k$ e em seguida do valor $j$, tendo assim,
@@ -984,7 +998,7 @@ $k$ = intervalo novas instâncias
         processar mensagem;
     }
     
-    \SenaoSe{$(k \leq X) \land (i < k)$}{
+    \SenaoSe{$(k \leq X)$}{
         limpar registradores;\\
         resubmit;
     }
@@ -1022,7 +1036,7 @@ aplicações utilizadas para teste. A estrutura da rede utiliza 4 \emph{switches
 dentre os \emph{switches}, 1 foi designado para ser o coordenador e os outros 3 foram designados como \emph{acceptors}.
 Para os \emph{hosts}, 1 deles executa um servidor aberto na porta 8080, que irá receber requisições de leitura
 e escrita em um dicionário, outros 2 \emph{hosts} executam a função de \emph{learners} e 1 dos \emph{hosts} é executado
-somente para realizar requisições no servidor \ref{fig:demo-topo}.
+somente para realizar requisições no servidor (\ref{fig:demo-topo}).
 
 Para execução da demonstração, foi utilizada a máquina virtual, a mesma utilizada para replicação do projeto
 passado \cite{dang2016paxos}. Com a rede criada, é aberto um terminal no \emph{host} 4, e, a partir dele,
@@ -1040,13 +1054,13 @@ comparações realizadas, do ingresso até o egresso. Nesse cenário, a execuç�
 
 Outro cenário criado foi em que o número da instância se inicia em um valor \texttt{X}, que reside no intervalo de novas instâncias,
 assim, o funcionamento esperado seria o de que a janela deslizasse de 1 em 1, até o número de instância \texttt{X} pertencer ao intervalo
-de instâncias aceitas. Quando iniciado o experimento, para primeira requisição a resposta na é obtida de imediato, dependendo do valor de
+de instâncias aceitas. Quando iniciado o experimento, para primeira requisição a resposta não é obtida de imediato, dependendo do valor de
 \texttt{X} escolhido, pode demorar um tempo, após a primeira resposta ser obtida, as próximas são obtidas uma após a outra, sem muita 
 demora da requisição. Acompanhando esse início pelo \emph{log} dos \emph{switches}, é possível ver os registradores sendo limpos,
 a janela deslizando e o pacote sendo ressubmetido.
 
 O último cenário criado, foi para verificar a virada da janela. Acompanhando pelo \emph{log} do \emph{switch}, é possível
-verificar os valores sendo lidos pelos registradores realizam a virada de N para 0 e as requisições seguem normalmente.
+verificar os valores sendo lidos pelos registradores realizam a virada de $N - 1$ para 0 e as requisições seguem normalmente.
 Com a virada, os valores dos antigos \emph{rounds} não influenciaram nas novas instâncias, verificando também que as limpezas
 no deslizar da janela também funcionaram. Na implementação utilizada, foi aproveitado o fator da arquitetura do \emph{switch},
 em que nos casos que se ocorre um \emph{overflow} no número, ele vai para 0.
@@ -1066,7 +1080,7 @@ responder a origem da requisição com uma confirmação negativa, outra possív
 a requisição, após o temporizador exceder um tempo determinado o \emph{proposer} envia novamente sua proposta.
 
 \subsection{Discussão}
-Esse seção discorrerá sobre a linguagem P4, novos horizontes que podem surgir com as opções que a linguagem oferece e juntamente
+Essa seção discorrerá sobre a linguagem P4, novos horizontes que podem surgir com as opções que a linguagem oferece e juntamente
 irá utilizar exemplos do presente trabalho e sobre as dificuldades encontradas na implementação. Com a possibilidade de programar
 \emph{switches}, como Tofino da Barefoot Networks \cite{tofinoSwitch}, são abertas novas possibilidades para os dispositivos de redes,
 uma das possibilidades seria a implementação de parte da lógica do sistema, que antes poderia ser executada somente em servidores, como
@@ -1082,9 +1096,19 @@ esse processo, a comparação pode ser realizada.
 
 A maior dificuldade encontrada no presente foi encontrar uma maneira para representação das janelas e seu funcionamento. Como a linguagem
 não oferece uma maneira de iterar, foi necessário a utilização do reingresso no \emph{switch} para realizar o deslizar da janela, aproveitando
-esse funcionamento, foi inserido juntamente o funcionamento para limpeza dos registradores utilizados. Como se trata de um \emph{switch}, caso
-exista uma computação muito complexa, pode ser notado na rede um atraso nas respostas das requisições, desta forma, mesmo performance
+esse funcionamento, foi inserido juntamente a lógica para limpeza dos registradores utilizados. Como se trata de um \emph{switch}, caso
+exista uma computação muito complexa, pode ser notado na rede um atraso nas respostas das requisições, desta forma, mesmo a performance
 de execução não sendo o foco no presente projeto, é necessário se manter atento a esses pontos.
+
+Os tamanhos das janelas podem ser definidos por arquivos de configuração, onde os valores definidos serão lidos para registradores 
+presentes no \emph{switch}. Deve-se manter atento ao tamanho das janelas e a frequência que novas instâncias são iniciadas, para
+o funcionamento ser garantido, os intervalos não podem se sobrepor. Uma maneira de realizar isso, seria a execução de mais 
+\emph{rounds} e somente prosseguir quando se tiver certeza de que os intervalos não estão sobrepostos.
+
+Com esse mecanismo criado, o número de \emph{rounds} que podem ser executados em uma instância está limitado ao valor definido no
+cabeçalho, que é valor 8 bits, ou seja, pode executar $2^8$ \emph{rounds}. Assim, também deve existir um tratamento para o número
+dos \emph{rounds} que serão executados em uma instância, para que não aconteça um estouro ou que seja utilizados valores 
+``lixos'' na computação.
 
 A implementação do Paxos, não é uma implementação trivial de ser realizada e a implementação em P4 é possível obter uma visão clara
 do funcionamento da P4 e da programação utilizando tabelas, outra visão, é voltada para uma nova maneira de definir protocolos. A área
@@ -1099,18 +1123,20 @@ de execução.
 Neste trabalho foi realizada a replicação e implementação de melhorias em um trabalho prévio \cite{dang2016paxos} utilizando
 a linguagem de programação P4. Visto que em um sistema de consenso, o número de instâncias a ser executadas é indefinido, foi realizada
 a melhoria para o tratamento das instâncias onde antes não havia. Com essa melhoria, conceitualmente, é possível executar
-quantas instâncias for necessárias, existindo também o tratamento para valores definidos escritos em registradores por instâncias
-antigas não influenciem nas novas instâncias computadas.
+quantas instâncias for necessárias, existindo também o tratamento para que valores escritos em registradores por instâncias
+antigas, não influenciem nas novas instâncias computadas.
 
 Previamente, não existia tratamento paras os valores das instâncias já computadas, e existia um limite definido pelo registrador
-que armazena o número da instância, que possui tamanhos de 16 bits, podendo armazenar até $2^{16}$. Como o tamanho da janela pode
-ser definido, pode existir um tamanho ótimo, que garante mais processamento é um pequeno número de reingressos dos pacotes para
-deslizar a janela. Com a flexibilidade de escolher o tamanho da janela, é possível definir um tamanho, de modo que durante a execução,
-os intervalos das janelas se sobreponham, impossibilitando a execução corretamente.
+que armazena o número da instância, que possui tamanhos de 16 bits, assim, podendo executar $2^{16}$ instâncias. Foi feito um trabalho
+para conseguir que o algoritmo consiga realizar um número indefinido de instâncias, utilizando janela deslizante para o tratamento 
+de futuras instâncias, e limpeza dos registradores utilizados em instâncias passadas. Como o tamanho da janela pode ser definido, 
+pode existir um tamanho ótimo, que garante mais processamento e um pequeno número de reingressos dos pacotes para deslizar a janela. 
+Com a flexibilidade de escolher o tamanho da janela, é possível definir um tamanho, de modo que durante a execução, os intervalos das 
+janelas se sobreponham, impossibilitando a execução acontecer corretamente.
 
 Com o presente trabalho, foi visto que com a possibilidade de programação em dispositivos de redes, é possível executar um algoritmo
 de consenso nos próprios dispositivos da rede. Onde foi realizada a extensão em um projeto passado e adicionados métodos para execução
-de diversas um número indefinido de instâncias. 
+de um número indefinido de instâncias. 
 
 \bibliography{references}
 
@@ -1119,7 +1145,7 @@ de diversas um número indefinido de instâncias.
 \chapter{Implementação}
 
 Implementação utilizada no projeto, possuindo códigos em P4, projeto completo também está disponível no GitHub.
-\footnote{https://github.com/jabolina/monography-code}
+\footnote{https://github.com/jabolina/monography-code/tree/stable}
 
 \subsection{Coordinator}
 \lstinputlisting[language=c,caption={Coordinator em P4},label={cod:coordinator}]{code/extra/coordinator.p4}
