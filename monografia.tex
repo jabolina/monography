@@ -107,9 +107,10 @@
 % ######################### INICIO ###########################################
 \chapter{Introdução}
 
-Com o avanço da tecnologia a interação com dispositivos computacionais se tornou diária; mesmo
+Com o avanço da tecnologia, a interação com dispositivos computacionais se tornou diária; mesmo
 nos mínimos afazeres do dia-a-dia, como fazer uma lista de compras para o supermercado, interage-se com algum software. 
-Associado a este uso extensivo de softwares e do aprimoramento de novas tecnologias,  reforça-se a necessidade de aplicações serem resilientes e tolerantes a falhas.
+Associado a este uso extensivo de softwares e do aprimoramento de novas tecnologias, reforça-se a necessidade de
+aplicações serem resilientes e tolerantes a falhas.
 
 Uma aplicação tolerante a falhas consegue manter o funcionamento mesmo com a eventual 
 falha de um de seus componentes. 
@@ -117,24 +118,19 @@ Como é possível existir eventos inesperados que podem causar a eventual falha 
 são necessários métodos para garantir a consistência quando a aplicação retornar com seu funcionamento normal. 
 
 Uma maneira de possuir uma aplicação tolerante a falhas é a replicação de máquinas de estado, onde o serviço é modelado 
-como uma máquina de estados determinísticos, e o serviço é executado em cada réplica \cite{santos2012state}, dessa maneira 
+como uma máquina de estados determinísticos, e o serviço é executado em cada réplica \cite{santos2012state}. Dessa maneira 
 é mantida a consistência da aplicação, mas um \emph{overhead} é adicionado na execução de comandos, pois as réplicas precisam 
-ser sincronizadas para manterem-se consistentes entre si. 
-No centro da replicação de máquina de estados, existe um problema de consenso, onde o conjunto de réplicas deve chegar a 
-um consenso e decidir sobre qual é o estado válido e decidir sobre qual transição será realizada. 
+ser sincronizadas para manterem-se consistentes entre si. No centro da replicação de máquina de estados, existe um problema 
+de consenso, onde o conjunto de réplicas deve chegar a um consenso e decidir sobre qual é o estado válido e qual será
+a transição realizada. 
 
-Para alcançar o consenso e obter uma aplicação tolerante a falhas, o algoritmo
-Paxos é extensivamente utilizado com esse intuito \cite{dang2016paxos}. 
-O algoritmo realiza uma custosa troca de mensagens entre seus agentes. Por se 
-tratar de um ambiente distribuído as mensagens podem demorar um tempo arbitrário 
-para chegar ao destinatário ou se perder durante a transmissão. Para conseguir 
-uma melhora na performance na execução do algoritmo, pode-se realizar a 
-implementação do Paxos no dispositivos físicos da rede \cite{dang2016paxos}.
+Para alcançar o consenso e obter uma aplicação tolerante a falhas, o algoritmo Paxos é extensivamente utilizado \cite{dang2016paxos}. 
+O algoritmo possui uma alta troca de mensagens entre seus agentes \cite{netchainRtt}. Por se tratar de um ambiente distribuído as 
+mensagens podem demorar um tempo arbitrário para chegar ao destinatário ou se perder durante a transmissão.
 
 Com a utilização da linguagem P4, é aberta a possibilidade de se programar dispositivos de rede. 
-Com a utilização de uma tabela \emph{match+action} \todo{use emph em vez de texit para destacar palavras em outras línguas.} é possível 
-realizar um processamento customizado dos pacotes sendo transportados, de forma a se diminuir a latência do algoritmo e os 
-pacotes atravessariam menos \emph{hops}.
+Com a utilização de uma tabela \emph{match+action} é possível realizar um processamento customizado dos pacotes sendo transportados, de 
+forma a se diminuir a latência do algoritmo e os pacotes atravessariam menos \emph{hops}.
 
 Alguns exemplos de \emph{frameworks} que permitem a replicação de máquinas de estados, são, por exemplo OpenReplica \cite{openreplica} 
 e o Atomix \cite{atomixio}\todo{FEITO.OpenReplica é um framework para replicacao. Chubby é uma aplicação, um serviço de locks 
@@ -165,7 +161,7 @@ que estão presentes no registradores.
 Com a utilização do algoritmo Paxos para resolução do problema de consenso e para a 
 construção de uma aplicação tolerante a falhas, é necessário uma comunicação entre os 
 agentes pertencentes a aplicação. Essa comunicação, pode se tornar dispendiosa, pois 
-a troca de mensagens entre as partes podem ter falhas e ser prolongada até que o 
+a troca de mensagens entre as partes pode ter falhas e ser prolongada até que o 
 algoritmo alcance seu objetivo que é o consenso.
 
 Desta forma, essa comunicação pode influenciar na performance da aplicação e em 
@@ -183,15 +179,15 @@ de números de instâncias que podem ser realizadas, estendendo uma implementaç
 \section{Objetivos}
 Com a possibilidade de programação em dispositivos de redes, o presente trabalho 
 visa estender um projeto anterior, que realizou a implementação do algoritmo Paxos nos 
-dispositivos de rede, especificamente \emph{switches}, utilizando a linguagem $P4_{14}$. 
-Tendo como objetivo, fazer com que os dispositivos de rede que implementam o Paxos,
+dispositivos de rede, especificamente \emph{switches}, utilizando a linguagem $P4_{14}$,
+tendo como objetivo fazer com que os dispositivos de rede que implementam o Paxos
 consigam executar um número indefinido de instâncias.
-Desta maneira, conseguindo uma melhora na performance do algoritmo, pois uma parte 
+Desta maneira, consegue-se uma melhora na performance do algoritmo, pois uma parte 
 que seria executado em um servidor se moveria para ser executado nesses dispositivos, permitindo,
 assim, processar as mensagens enquanto as mesmas estão sendo roteadas e atravessar menos
 \emph{hops}, resultando na redução da latência.
 
-Inicialmente, alcançando os resultados obtidos no projeto de \cite{dang2016paxos}, 
+Inicialmente, foram reproduzidos os resultados obtidos no projeto de \cite{dang2016paxos}, 
 que realizaram a implementação do Paxos em \emph{switches}. Logo em seguida, foi realizado a extensão
 do projeto, tratando o limite de instâncias deixado pelo projeto anterior. Foram feitos testes
 para verificar o funcionamento tanto do algoritmo, como da execução para inúmeras instâncias em sequência.
@@ -214,11 +210,9 @@ melhorados no antigo projeto, sendo explicado o que pode ser feito para melhorar
 realizada a implementação.
 
 \subsection{Validação}
-A terceira e última fase, foi composta pela implementação e foram realizadas
-simulações também utilizando o Mininet para validação do comportamento na rede.
-\cite{dang2015netpaxos}
+A terceira e última fase, foram realizadas simulações também utilizando o Mininet para validação 
+do comportamento na rede. \cite{dang2015netpaxos}
 
-\todo{FEITO. Comentar a seção de cronograma.}
 
 %######################### FUNDAMENTACAO ##################################
 \chapter{Fundamentação Teórica}
@@ -242,19 +236,17 @@ família de algoritmos voltada para resolução de problemas de consenso.
 A ideia de consenso é a de compartilhar informações entre um grupo de elementos
 processadores, de preferência com uma maneira tolerante a falhas \cite{barborak1993consensus}.
 Normalmente esse compartilhamento de informações é realizado com o intuito de tomar
-uma decisão, por exemplo, os elementos devem decidir se \emph{commitam} ou não
-uma transação realizada no banco de dados. 
+uma decisão, por exemplo, qual o valor presente em um dicionário distribuído de acordo com um chave. 
 
 De maneira básica, os elementos devem propor valores para serem escolhidos, 
 comunicar entre si para tomar uma decisão e o valor final é escolhido pela maioria de 
-elementos do conjunto. A escolha do quorum não é necessariamente $\frac{n}{2}+1$, --- sendo $n$ o número
-total de elementos processadores --- a decisão do que será o quorum para tomada de decisão
-pode ser criada pelo projetista, mas sempre visando atender o projeto, levando
-em consideração que dentre esses $n$ elementos existirão alguns que falharão.\todo{FEITO. entendo o que quer dizer, mas tem um problema aqui. maioria é bem definido. quorum é que é variável. acho que os conceitos estão invertidos aqui.}
+elementos do conjunto. A maioria será $\frac{n}{2}+1$, --- sendo $n$ o número
+total de elementos que são \emph{acceptors} --- levando em consideração que dentre esses $n$ 
+elementos existirão alguns que falharão.
 
 Para garantir a escolha de um valor e a propagação do valor decidido, o problema
 possui alguns requisitos que devem ser atendidos pelos algoritmos. Os requisitos de
-segurança são: \todo{FEITO. itemizações seguem a mesma regra gramatical que listas corridas no texto, isto é, ; separando as partes, e uma conjunção para terminar.}
+segurança são:
 
 \begin{itemize}
     \item Somente um valor proposto pode ser aceito;
@@ -365,7 +357,7 @@ Com essas definições, o algoritmo para envio de propostas funcionará da segui
     \begin{itemize}
         \item[] Enviar a proposta $(n, v)$, sendo $v$ o valor da proposta de maior identificador
         recebido nas respostas
-        \item[] Um valor escolhido pelo próprio \emph{proposer}.
+        \item[] Caso contário, um valor escolhido pelo próprio \emph{proposer}.
     \end{itemize}
 \end{itemize}
 
@@ -434,7 +426,8 @@ O algoritmo final para escolha é definido a seguir, separado em duas fases:
         \item [a] Se o \emph{proposer} recebe resposta de uma maioria de \emph{acceptors}
         para seu \emph{prepare} de identificador $n$, então, envia um \emph{accept} 
         com identificador $n$ e valor $v$, sendo $v$ o valor da resposta de \emph{prepare}
-        com maior identificador; senão, $v$ é um valor escolhido pelo \emph{proposer}.
+        com maior identificador; ou, $v$ é um valor escolhido pelo \emph{proposer}, caso
+        não haja nenhuma outra proposta.
         
         \item [b] Se um \emph{acceptor} recebe um \emph{accept} com identificador $n$,
         ele o aceita; caso, no tempo transcorrido tenha respondido um \emph{prepare}
@@ -451,13 +444,13 @@ de diferentes maneiras e fica a critério do arquiteto para escolher qual atende
 problema a ser resolvido.
 
 Uma das maneiras de se conhecer o valor, seria cada um dos \emph{acceptors} responder para
-todos os \emph{learners} qual o valor decidido. Assim, uma troca de $(n \cdot m)$ mensagens, 
+todos os \emph{learners} qual o valor decidido. Assim, uma troca de $(k \cdot j)$ mensagens, 
 o produto entre o número de \emph{acceptors} e o número de \emph{learners}, seriam obtidas.
 
 Levando em consideração o papel de coordernador, citado anteriormente, outra maneira de se 
 realizar a propagação de mensagens seria os \emph{acceptors} enviarem o valor decidido para um
 \emph{distinguished learner} que, após conhecer o valor decidido, envia para os
-\emph{learners} tal valor decidido. Esse método teria $(n + m)$ troca de mensagens,
+\emph{learners} tal valor decidido. Esse método teria $(k + j)$ troca de mensagens,
 a soma entre o número de \emph{acceptors} e o número de \emph{learners}. Mas, como os
 agentes são suscetíveis a falhas, o \emph{distinguished learner} também pode falhar,
 assim impossibilitando a transmissão do valor decidido para os \emph{learners}.
@@ -508,13 +501,13 @@ A máquina abstrata que representa o funcionamento da linguagem é o de um dispo
 de alto desempenho para o processamento de pacotes, esse modelo é chamado de PISA,
 um acrônimo \emph{Protocol Independent Switch Architecture}, que possui alguns componentes
 básicos, esses componentes também são definidos pela linguagem. O primeiro desses 
-componentes é o parser programável, podendo ser definido pelo programador, juntamente 
+componentes é o \emph{parser} programável, podendo ser definido pelo programador, juntamente 
 com seu funcionamento. O segundo componente, o coração do modelo, é um pipeline de tabelas,
 que combinados com as informações dos cabeçalhos executam a ação correspondente. Após o pipeline, e executado
-o processamento, o pacote passa por um \emph{deparser}, que faz a função ``inversa'' \todo{FEITO aspas são ``assim''} do parser, 
+o processamento, o pacote passa por um \emph{deparser}, que faz a função ``inversa'' do \emph{parser}, 
 preparando o pacote na forma correta para ser transmitido \cite{p4LangTutorial}.
+Utilizando a figura \ref{fig:pisa-model} como guia, podemos notar o \emph{parser} de 
 
-\todo{Feito. referencia na figura}
 
 \begin{figure}[ht]
     \caption{Protocol Independent Switch Architecture \cite{paxos14spec}}
@@ -529,14 +522,14 @@ seus campos são separados em campos individuais de acordo com as regras descrit
 passados para as tabelas. As tabelas possuem como entrada os campos do cabeçalhos e 
 resultados parciais, com essas informações, as tabelas executam diferentes ações,
 como remover ou adicionar cabeçalhos, funções aritméticas e mover valores. Após o 
-processamento pelas tabelas, as informações são passadas para o deparser, que 
+processamento pelas tabelas, as informações são passadas para o \emph{parser}, que 
 monta os pacotes e transmite de volta para rede \cite{p4LangTutorial}.
 
 \subsubsection{Componentes da linguagem}
 
 A linguagem utiliza um modelo abstrato para redirecionamento de pacotes, que possui
 dois tipos de operações, \emph{configure} e \emph{populate}. Durante a operação
-de \emph{configure}, o parser é criado, é definida a ordem de estágios nas tabelas
+de \emph{configure}, o \emph{parser} é criado, é definida a ordem de estágios nas tabelas
 \emph{match+action} e quais os campos do cabeçalhos são processados em cada estágio,
 durante a operação de \emph{populate}, adicionam e removem entradas nas tabelas
 \emph{match+action}, construídas durante operação de \emph{configure}. Assim,
@@ -552,17 +545,17 @@ seria:
 
 \lstinputlisting[language=c++, caption={header.p4}]{code/p4-example/header.p4}
 
-Outro componente é o parser, o parser especifica quais campos do cabeçalhos estão
+Outro componente é o \emph{parser}, o \emph{parser} especifica quais campos do cabeçalhos estão
 bem definidos e como encontrar esses campos. Os campos extraídos dos cabeçalhos e 
 são enviados para tabela de \emph{match+action}, onde será processado e seguirá
 para o próximo passo, agindo de maneira semelhante a uma máquina de estados, em 
-que as transições são realizadas por valores nos campos do cabeçalho. Um parser
+que as transições são realizadas por valores nos campos do cabeçalho. Um \emph{parser}
 segue a seguinte definição:
 
 \lstinputlisting[language=c++, caption={parser.p4}]{code/p4-example/parser.p4}
 
-O parser é iniciado em \texttt{start}, e segue até encontrar um \texttt{stop} ou não
-encontrar nenhum match, o que seria um erro \cite{bosshart2014p4}. O parser cria um 
+O \emph{parser} é iniciado em \texttt{start}, e segue até encontrar um \texttt{stop} ou não
+encontrar nenhum match, o que seria um erro \cite{bosshart2014p4}. O \emph{parser} cria um 
 \emph{parsed packet}, que a tabela de \emph{match+action} irá utilizar,
 assim, valores que serão utilizados no processamento devem estar contidos nesse
 \emph{parsed packet} \cite{p4USITutorial}.

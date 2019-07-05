@@ -25,7 +25,7 @@
     
     \large\imprimirlocal
 
-    \large\imprimirdata
+    \large\the\year
     
     \vspace*{1cm}
   \end{capa}
@@ -71,11 +71,11 @@
 
 {\abntex@ifnotempty{\imprimirinstituicao}{\imprimirinstituicao\vspace*{\fill}}}
 
-{\large\imprimirlocal}
+{\large\the\year}
 
 \par
 
-{\large\imprimirdata}
+{\large}
 \vspace*{1cm}
 \end{center}
 }
@@ -146,7 +146,7 @@
 \preambulo{Trabalho de conclusão de curso apresentado
 à Faculdade de Computação da Universidade
 Federal de Uberlândia, Minas Gerais, como
-requisito exigido parcial à obtenção do grau
+requisito exigido à obtenção do grau
 de Bacharel em Ciência da Computação.}
 % ---
 
